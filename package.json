@@ -1,0 +1,19 @@
+{
+  "name": "postfixjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/leMaik/postfixjs.git"
+  },
+  "author": "Maik Marschner",
+  "license": "UNLICENSED",
+  "homepage": "https://bitbucket.org/leMaik/postfixjs#readme",
+  "devDependencies": {
+    "ava": "^0.25.0"
+  }
+}
