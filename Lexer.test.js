@@ -16,6 +16,18 @@ test('The lexer tokenizes PostFix code', t => {
   })
 })
 
+test('The lexer handles comments', t => {
+  let tokens = tokenize('# this is a comment')
+  t.is(tokens.length, 0)
+
+  tokens = tokenize('42 # this is a comment')
+  t.deepEqual(tokens, [{
+    token: '42',
+    line: 0,
+    col: 0
+  }])
+})
+
 test('The lexer gets the line after multiline comments right', t => {
   const tokens = tokenize(`
 #<
