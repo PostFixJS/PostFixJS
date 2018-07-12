@@ -120,6 +120,8 @@ class Lexer {
         if (!maskNext) {
           if (this.peek === '\\') {
             maskNext = true
+            token += this.peek
+            this._readch()
             continue
           }
         } else {

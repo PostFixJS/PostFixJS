@@ -28,3 +28,12 @@ test`)
     col: 0
   }])
 })
+
+test('The lexer handles escaped quotes properly', t => {
+  const tokens = tokenize('"hello \\"world\\""')
+  t.deepEqual(tokens, [{
+    token: '"hello \\"world\\""',
+    col: 0,
+    line: 0
+  }])
+})
