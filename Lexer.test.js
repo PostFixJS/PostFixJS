@@ -29,6 +29,25 @@ test`)
   }])
 })
 
+test('The lexer inserts a get token when using the . operator', t => {
+  const tokens = tokenize('object .property')
+  t.deepEqual(tokens, [{
+    token: 'object',
+    line: 0,
+    col: 0
+  }, {
+    token: 'property',
+    line: 0,
+    col: 8
+  }, {
+    token: 'get',
+    line: 0,
+    col: 7,
+    generated: true,
+    generatedReason: 'DOT_SUGAR'
+  }])
+})
+
 test('The lexer handles escaped quotes properly', t => {
   const tokens = tokenize('"hello \\"world\\""')
   t.deepEqual(tokens, [{

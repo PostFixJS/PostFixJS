@@ -140,6 +140,12 @@ class Lexer {
           col: tokenCol - 1,
           line: tokenLine
         }
+
+        // emit the deferred token here, otherwise it would get lost if the input is empty now
+        if (this.deferredToken != null) {
+          yield this.deferredToken
+          this.deferredToken = null
+        }
       }
     }
   }
