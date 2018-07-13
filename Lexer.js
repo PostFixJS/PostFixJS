@@ -84,6 +84,7 @@ class Lexer {
         this._readch()
         yield {
           token: oldPeek,
+          tokenType: this.getTokenType(oldPeek),
           col: tokenCol - 1,
           line: tokenLine
         }
@@ -95,6 +96,7 @@ class Lexer {
       } else if (this.peek === '.') {
         this.deferredToken = {
           token: 'get',
+          tokenType: this.getTokenType('get'),
           col: this.col - 1,
           line: this.row,
           generated: true,
@@ -137,6 +139,7 @@ class Lexer {
       if (token !== '') {
         yield {
           token,
+          tokenType: this.getTokenType(token),
           col: tokenCol - 1,
           line: tokenLine
         }
@@ -147,6 +150,46 @@ class Lexer {
           this.deferredToken = null
         }
       }
+    }
+  }
+
+  getTokenType (token) {
+    switch (token) {
+      case '(':
+        return 'PARAM_LIST_START'
+      case ')':
+        return 'PARAM_LIST_END'
+      case '[':
+        return 'ARR_START'
+      case ']':
+        return 'ARR_END'
+      case '{':
+        return 'EXEARR_START'
+      case '}':
+        return 'EXEARR_END'
+      case '->':
+        return 'RIGHT_ARROW'
+      case 'true':
+      case 'false':
+        return 'BOOLEAN'
+    }
+
+    // TODO how/where to handle !, +!, .foo (currently handled by the lexer) and bar.!
+
+    if (!isNaN(token)) {
+      if (token.indexOf('.') >= 0) {
+        return 'FLOAT'
+      } else {
+        return 'INTEGER'
+      }
+    } else if (token.length >= 2 && token[0] === '"' && token[token.length - 1] === '"') {
+      return 'STRING'
+    } else if (token.length >= 2 && (token[0] === ':' || token[token.length - 1] === ':')) {
+      return 'SYMBOL'
+    } else if (token.length >= 2 && token[token.length - 1] === '!') {
+      return 'DEFINITION'
+    } else {
+      return 'REFERENCE'
     }
   }
 }
