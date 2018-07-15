@@ -81,7 +81,6 @@ class Lexer {
       let token = ''
 
       if ('{[()]}'.includes(this.peek)) {
-        this._readch()
         yield {
           token: oldPeek,
           tokenType: this.getTokenType(oldPeek),
@@ -148,6 +147,17 @@ class Lexer {
         if (this.deferredToken != null) {
           yield this.deferredToken
           this.deferredToken = null
+        }
+
+        // if the next token is self-delimiting, there might not be whitespace between this token and the next token
+        // so it would be skipped in the next iteration; solution: emit that token here
+        if ('{[()]}'.includes(this.peek)) {
+          yield {
+            token: this.peek,
+            tokenType: this.getTokenType(this.peek),
+            col: this.col - 1,
+            line: this.row
+          }
         }
       }
     }

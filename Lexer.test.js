@@ -75,3 +75,56 @@ test('The lexer handles escaped quotes properly', t => {
     line: 0
   }])
 })
+
+test('Brackets are self-delimiting tokens', t => {
+  t.deepEqual(tokenize('[42]'), [{
+    token: '[',
+    tokenType: 'ARR_START',
+    col: 0,
+    line: 0
+  }, {
+    token: '42',
+    tokenType: 'INTEGER',
+    col: 1,
+    line: 0
+  }, {
+    token: ']',
+    tokenType: 'ARR_END',
+    col: 3,
+    line: 0
+  }])
+
+  t.deepEqual(tokenize('( 42)'), [{
+    token: '(',
+    tokenType: 'PARAM_LIST_START',
+    col: 0,
+    line: 0
+  }, {
+    token: '42',
+    tokenType: 'INTEGER',
+    col: 2,
+    line: 0
+  }, {
+    token: ')',
+    tokenType: 'PARAM_LIST_END',
+    col: 4,
+    line: 0
+  }])
+
+  t.deepEqual(tokenize('{42 }'), [{
+    token: '{',
+    tokenType: 'EXEARR_START',
+    col: 0,
+    line: 0
+  }, {
+    token: '42',
+    tokenType: 'INTEGER',
+    col: 1,
+    line: 0
+  }, {
+    token: '}',
+    tokenType: 'EXEARR_END',
+    col: 4,
+    line: 0
+  }])
+})
