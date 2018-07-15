@@ -1,3 +1,5 @@
+const types = require('./types')
+
 class Interpreter {
   constructor () {
     this._builtIns = {}
@@ -6,44 +8,37 @@ class Interpreter {
 
     // TODO Built-ins need to be Objs, too
     this.registerBuiltIn('*', {
-      execute: (interpreter, token) => {
-        interpreter._stack.push({
-          type: 'Flt',
-          value: interpreter._stack.popNumber().value * interpreter._stack.popNumber().value
-        })
+      name: '*',
+      execute: (interpreter) => {
+        interpreter._stack.push(new types.Flt(interpreter._stack.popNumber().value * interpreter._stack.popNumber().value))
       }
     })
     this.registerBuiltIn('+', {
-      execute: (interpreter, token) => {
+      name: '+',
+      execute: (interpreter) => {
         const a = interpreter._stack.pop()
         const b = interpreter._stack.pop()
         interpreter._stack._assertType(a, 'Int', 'Flt', 'Str')
         interpreter._stack._assertType(b, 'Int', 'Flt', 'Str')
 
         let type
-        if (a.type === 'Str' || b.type === 'Str') {
-          type = 'Str'
-        } else if (a.type === 'Flt' || b.type === 'Flt') {
-          type = 'Flt'
+        if (a instanceof types.Str || b instanceof types.Str) {
+          interpreter._stack.push(new types.Str(b.value + a.value))
+        } else if (a instanceof types.Flt || b instanceof types.Flt) {
+          interpreter._stack.push(new types.Flt(b.value + a.value))
         } else {
-          type = 'Int'
+          interpreter._stack.push(new types.Int(b.value + a.value))
         }
-
-        interpreter._stack.push({
-          type,
-          value: b.value + a.value
-        })
       }
     })
     this.registerBuiltIn('trim', {
+      name: 'trim',
       execute: (interpreter) => {
-        interpreter._stack.push({
-          type: 'Str',
-          value: interpreter._stack.popString().value.trim()
-        })
+        interpreter._stack.push(new types.Str(interpreter._stack.popString().value.trim()))
       }
     })
     this.registerBuiltIn('println', {
+      name: 'println',
       execute: (interpreter) => {
         console.log(interpreter._stack.pop().value)
       }
@@ -58,53 +53,59 @@ class Interpreter {
   }
 
   execute (token) {
+    // TODO handle DEFINITION tokens
     if (token.tokenType === 'REFERENCE') {
       const builtIn = this._builtIns[token.token]
       if (builtIn != null) {
-        // TODO only push if inside ExeArr
-        builtIn.execute(this, token)
+        // this is an optimization; don't create an intermediate Obj instance
+        // if it is executed right away
+        if (this._openExeArrs > 0) {
+          const operation = new types.Op(builtIn, token)
+          operation.origin = token
+          this._stack.push(operation)
+        } else {
+          builtIn.execute(this, token)
+        }
+      } else {
+        // TODO this is an actual reference, handle it as such
       }
     } else {
-      // TODO handle remaining token types and references
+      // TODO handle RIGHT_ARROW
+      let obj
       switch (token.tokenType) {
         case 'FLOAT':
-          this._stack.push({
-            type: 'Flt',
-            value: parseFloat(token.token),
-            origin: token
-          })
+          obj = types.Flt.fromToken(token)
           break
         case 'INTEGER':
-          this._stack.push({
-            type: 'Int',
-            value: parseInt(token.token),
-            origin: token
-          })
+          obj = types.Int.fromToken(token)
           break
         case 'BOOLEAN':
-          this._stack.push({
-            type: 'Bool',
-            value: token.token === 'true',
-            origin: token
-          })
+          obj = types.Bool.fromToken(token)
           break
         case 'STRING':
-          this._stack.push({
-            type: 'Str',
-            value: token.token.substr(1, token.token.length - 2),
-            origin: token
-          })
+          obj = types.Str.fromToken(token)
           break
+        case 'SYMBOL':
+          obj = types.Sym.fromToken(token)
+          break
+        case 'ARR_START':
+        case 'ARR_END':
         case 'EXEARR_START':
-          this._stack.push({
-            type: 'ExeArrOpen',
-            origin: token
-          })
-          this._openExeArrs++
-          break
         case 'EXEARR_END':
-          // TODO
+        case 'PARAM_LIST_START':
+        case 'PARAM_LIST_END':
+          obj = types.Marker.fromToken(token)
           break
+      }
+
+      if (obj) {
+        if (this._openExeArrs > 0 && !(obj instanceof types.Marker && (obj.type === 'ExeArrOpen' || obj.type === 'ExeArrClose'))) {
+          this._stack.push(obj)
+        } else {
+          obj.execute(this)
+        }
+      } else {
+        console.error(`Unknown token type ${token.tokenType} at line ${token.line}:${token.col}`)
       }
     }
   }
@@ -123,6 +124,21 @@ class Stack {
     return this._stack.pop()
   }
 
+  /**
+   * Pop from the stack until the given function returns `true` for the popped element and return all elements.
+   * @param {function} condition Condition function
+   * @returns Popped elements, in the order they were popped
+   */
+  popUntil (condition) {
+    const values = []
+    let value
+    do {
+      value = this.pop()
+      values.push(value)
+    } while (!condition(value))
+    return values.reverse()
+  }
+
   popNumber () {
     return this._assertType(this.pop(), 'Flt', 'Int')
   }
@@ -131,11 +147,11 @@ class Stack {
     return this._assertType(this.pop(), 'Str')
   }
 
-  _assertType (obj, ...types) {
-    if (types.indexOf(obj.type) < 0) {
+  _assertType (obj, ...expectedTypes) {
+    if (!expectedTypes.some((t) => obj instanceof types[t])) {
       this.push({
         type: 'Err',
-        value: `Expected ${types.join(' or ')} but got ${obj.type}`,
+        value: `Expected ${expectedTypes.join(' or ')} but got ${obj.constructor.name}`,
         origin: obj.origin
       })
     }

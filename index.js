@@ -11,5 +11,5 @@ process.stdin.on('end', () => {
     // console.log(token)
     interpreter.execute(token)
   }
-  console.log(interpreter._stack._stack.map(({ value }) => value).join(', '))
+  console.log(interpreter._stack._stack.map(obj => obj.toString()).join(', '))
 })
