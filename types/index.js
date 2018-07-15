@@ -1,3 +1,4 @@
+const Arr = require('./Arr')
 const Bool = require('./Bool')
 const Flt = require('./Flt')
 const Int = require('./Int')
@@ -10,6 +11,7 @@ const Str = require('./Str')
 const Sym = require('./Sym')
 
 module.exports = {
+  Arr,
   Bool,
   Flt,
   Int,

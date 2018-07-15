@@ -7,7 +7,7 @@ class Interpreter {
     this._dictStack = new DictStack()
     this._openExeArrs = 0
 
-    this.registerBuiltIn('!', {
+    this.registerBuiltIn({
       name: '!',
       execute: (interpreter, token) => {
         const obj = interpreter._stack.pop()
@@ -17,37 +17,18 @@ class Interpreter {
         interpreter._dictStack.put(sym, obj)
       }
     })
-    this.registerBuiltIn('*', {
-      name: '*',
-      execute: (interpreter) => {
-        interpreter._stack.push(new types.Flt(interpreter._stack.popNumber().value * interpreter._stack.popNumber().value))
-      }
-    })
-    this.registerBuiltIn('+', {
-      name: '+',
-      execute: (interpreter) => {
-        const a = interpreter._stack.pop()
-        const b = interpreter._stack.pop()
-        interpreter._stack._assertType(a, 'Int', 'Flt', 'Str')
-        interpreter._stack._assertType(b, 'Int', 'Flt', 'Str')
 
-        let type
-        if (a instanceof types.Str || b instanceof types.Str) {
-          interpreter._stack.push(new types.Str(b.value + a.value))
-        } else if (a instanceof types.Flt || b instanceof types.Flt) {
-          interpreter._stack.push(new types.Flt(b.value + a.value))
-        } else {
-          interpreter._stack.push(new types.Int(b.value + a.value))
-        }
-      }
-    })
-    this.registerBuiltIn('trim', {
+    this.registerBuiltIns(require('./operators/stack'))
+    this.registerBuiltIns(require('./operators/math'))
+    this.registerBuiltIns(require('./operators/logical'))
+
+    this.registerBuiltIn({
       name: 'trim',
       execute: (interpreter) => {
         interpreter._stack.push(new types.Str(interpreter._stack.popString().value.trim()))
       }
     })
-    this.registerBuiltIn('println', {
+    this.registerBuiltIn({
       name: 'println',
       execute: (interpreter) => {
         console.log(interpreter._stack.pop().value)
@@ -55,11 +36,22 @@ class Interpreter {
     })
   }
 
-  registerBuiltIn (name, implementation) {
-    if (this._builtIns[name] != null) {
-      console.warn(`Replacing already registered built-in ${name}`)
+  registerBuiltIn (builtIn) {
+    if (this._builtIns[builtIn.name] != null) {
+      console.warn(`Replacing already registered built-in ${builtIn.name}`)
     }
-    this._builtIns[name] = implementation
+    this._builtIns[builtIn.name] = builtIn
+  }
+
+  registerBuiltIns (builtIns) {
+    if (Array.isArray(builtIns)) {
+      for (const builtIn of builtIns) {
+        this.registerBuiltIn(builtIn)
+      }
+    } else {
+      // object
+      this.registerBuiltIns(Object.values(builtIns))
+    }
   }
 
   execute (token) {
@@ -170,6 +162,14 @@ class Stack {
     return this._assertType(this.pop(), 'Str')
   }
 
+  peek (i = 0) {
+    return this._stack[this._stack.length - 1 - i]
+  }
+
+  clear () {
+    this._stack = []
+  }
+
   _assertType (obj, ...expectedTypes) {
     if (!expectedTypes.some((t) => obj instanceof types[t])) {
       this.push({
@@ -177,6 +177,7 @@ class Stack {
         value: `Expected ${expectedTypes.join(' or ')} but got ${obj.constructor.name}`,
         origin: obj.origin
       })
+      return false
     }
     return obj
   }
