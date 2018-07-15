@@ -15,5 +15,8 @@
   "homepage": "https://bitbucket.org/leMaik/postfixjs#readme",
   "devDependencies": {
     "ava": "^0.25.0"
+  },
+  "dependencies": {
+    "read": "^1.0.7"
   }
 }
