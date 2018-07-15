@@ -184,7 +184,7 @@ class Lexer {
         return 'BOOLEAN'
     }
 
-    // TODO how/where to handle !, +!, .foo (currently handled by the lexer) and bar.!
+    // TODO how/where to handle .foo (currently handled by the lexer) and bar.!
 
     if (!isNaN(token)) {
       if (token.indexOf('.') >= 0) {

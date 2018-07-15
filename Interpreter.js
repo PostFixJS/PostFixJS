@@ -4,9 +4,19 @@ class Interpreter {
   constructor () {
     this._builtIns = {}
     this._stack = new Stack()
+    this._dictStack = new DictStack()
     this._openExeArrs = 0
 
-    // TODO Built-ins need to be Objs, too
+    this.registerBuiltIn('!', {
+      name: '!',
+      execute: (interpreter, token) => {
+        const obj = interpreter._stack.pop()
+        const sym = token.tokenType === 'DEFINITION'
+          ? token.token.substr(0, token.token.length - 1)
+          : interpreter._stack.pop().name
+        interpreter._dictStack.put(sym, obj)
+      }
+    })
     this.registerBuiltIn('*', {
       name: '*',
       execute: (interpreter) => {
@@ -53,7 +63,6 @@ class Interpreter {
   }
 
   execute (token) {
-    // TODO handle DEFINITION tokens
     if (token.tokenType === 'REFERENCE') {
       const builtIn = this._builtIns[token.token]
       if (builtIn != null) {
@@ -61,13 +70,24 @@ class Interpreter {
         // if it is executed right away
         if (this._openExeArrs > 0) {
           const operation = new types.Op(builtIn, token)
-          operation.origin = token
           this._stack.push(operation)
         } else {
           builtIn.execute(this, token)
         }
       } else {
-        // TODO this is an actual reference, handle it as such
+        // this is an optimization; don't create an intermediate Ref instance
+        // if it is executed right away
+        if (this._openExeArrs > 0) {
+          const ref = types.Ref.fromToken(token)
+          this._stack.push(ref)
+        } else {
+          const value = this._dictStack.get(token.token)
+          if (!value) {
+            console.error(`Could not find ${token.token} in the dictionary`)
+          } else {
+            this._stack.push(value)
+          }
+        }
       }
     } else {
       // TODO handle RIGHT_ARROW
@@ -95,6 +115,9 @@ class Interpreter {
         case 'PARAM_LIST_START':
         case 'PARAM_LIST_END':
           obj = types.Marker.fromToken(token)
+          break
+        case 'DEFINITION':
+          obj = new types.Op(this._builtIns['!'], token)
           break
       }
 
@@ -156,6 +179,20 @@ class Stack {
       })
     }
     return obj
+  }
+}
+
+class DictStack {
+  constructor () {
+    this._dict = {}
+  }
+
+  put (key, value) {
+    this._dict[key] = value
+  }
+
+  get (key) {
+    return this._dict[key]
   }
 }
 
