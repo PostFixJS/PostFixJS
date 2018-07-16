@@ -77,7 +77,7 @@ class Interpreter {
           if (!value) {
             console.error(`Could not find ${token.token} in the dictionary`)
           } else {
-            this._stack.push(value)
+            value.execute(this, token)
           }
         }
       }

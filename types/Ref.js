@@ -11,7 +11,7 @@ class Ref extends Obj {
     if (!value) {
       console.error(`Could not find ${this.name} in the dictionary`)
     } else {
-      interpreter._stack.push(value)
+      value.execute(interpreter)
     }
   }
 
