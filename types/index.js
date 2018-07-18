@@ -1,5 +1,7 @@
 const Arr = require('./Arr')
 const Bool = require('./Bool')
+const Err = require('./Err')
+const ExeArr = require('./ExeArr')
 const Flt = require('./Flt')
 const Int = require('./Int')
 const Marker = require('./Marker')
@@ -13,6 +15,8 @@ const Sym = require('./Sym')
 module.exports = {
   Arr,
   Bool,
+  Err,
+  ExeArr,
   Flt,
   Int,
   Marker,
