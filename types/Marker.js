@@ -30,8 +30,7 @@ class Marker extends Obj {
       interpreter._stack.push(arr)
     } else if (this.type === 'ParamsClose') {
       const items = interpreter._stack.popUntil((obj) => obj instanceof Marker && obj.type === 'ParamsOpen')
-      const params = new Params(items.slice(1))
-      params.origin = items[0].origin
+      const params = new Params(items.slice(1), items[0].origin)
       interpreter._stack.push(params)
     } else {
       super.execute(interpreter)
@@ -55,6 +54,8 @@ class Marker extends Obj {
         return '('
       case 'ParamsClose':
         return ')'
+      case 'RightArrow':
+        return '->'
     }
   }
 
@@ -66,6 +67,7 @@ class Marker extends Obj {
       'EXEARR_END': 'ExeArrClose',
       'PARAM_LIST_START': 'ParamsOpen',
       'PARAM_LIST_END': 'ParamsClose',
+      'RIGHT_ARROW': 'RightArrow'
     }[token.tokenType])
     marker.origin = token
     return marker

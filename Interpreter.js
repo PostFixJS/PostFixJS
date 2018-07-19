@@ -6,6 +6,7 @@ class Interpreter {
     this._stack = new Stack()
     this._dictStack = new DictStack()
     this._openExeArrs = 0
+    this._openParamLists = 0
 
     this.registerBuiltIn({
       name: '!',
@@ -70,7 +71,7 @@ class Interpreter {
       } else {
         // this is an optimization; don't create an intermediate Ref instance
         // if it is executed right away
-        if (this._openExeArrs > 0) {
+        if (this._openExeArrs > 0 || this._openParamLists > 0) {
           const ref = types.Ref.fromToken(token)
           this._stack.push(ref)
         } else {
@@ -83,7 +84,6 @@ class Interpreter {
         }
       }
     } else {
-      // TODO handle RIGHT_ARROW
       let obj
       switch (token.tokenType) {
         case 'FLOAT':
@@ -105,9 +105,16 @@ class Interpreter {
         case 'ARR_END':
         case 'EXEARR_START':
         case 'EXEARR_END':
+        case 'RIGHT_ARROW':
+          obj = types.Marker.fromToken(token)
+          break
         case 'PARAM_LIST_START':
+          obj = types.Marker.fromToken(token)
+          this._openParamLists++
+          break
         case 'PARAM_LIST_END':
           obj = types.Marker.fromToken(token)
+          this._openParamLists--
           break
         case 'DEFINITION':
           obj = new types.Op(this._builtIns['!'], token)
