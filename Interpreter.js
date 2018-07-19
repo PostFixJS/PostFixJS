@@ -173,11 +173,7 @@ class Stack {
 
   _assertType (obj, ...expectedTypes) {
     if (!expectedTypes.some((t) => obj instanceof types[t])) {
-      this.push({
-        type: 'Err',
-        value: `Expected ${expectedTypes.join(' or ')} but got ${obj.constructor.name}`,
-        origin: obj.origin
-      })
+      this.push(new types.Err(`Expected ${expectedTypes.join(' or ')} but got ${obj.constructor.name}`, obj.origin))
       return false
     }
     return obj
