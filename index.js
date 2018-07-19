@@ -18,7 +18,7 @@ if (process.argv[process.argv.length - 1] === '--') {
   function repl () {
     read({ prompt: '>' }, (err, input) => {
       if (!err) {
-        lexer.put(input)
+        lexer.put(input + '\n')
         for (const token of lexer.getTokens()) {
           interpreter.execute(token)
         }
