@@ -21,6 +21,7 @@ class Interpreter {
 
     this.registerBuiltIns(require('./operators/core'))
     this.registerBuiltIns(require('./operators/stack'))
+    this.registerBuiltIns(require('./operators/controlflow'))
     this.registerBuiltIns(require('./operators/math'))
     this.registerBuiltIns(require('./operators/logical'))
 
