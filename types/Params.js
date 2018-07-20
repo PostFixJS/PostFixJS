@@ -22,7 +22,7 @@ class Params extends Obj {
     for (let i = 0; i < rightArrowPosition; i++) {
       const o = params[i]
       if (!((o instanceof types.Ref) || (o instanceof types.Sym))) {
-        throw new Err(`Found ${o.constructor.name} in the parameter list, but it may only contain variable names and type names.`, this.origin)
+        throw new Err(`Found ${o.getTypeName()} in the parameter list, but it may only contain variable names and type names.`, this.origin)
       }
       if (i === 0 && o instanceof types.Sym) {
         throw new Err(`Found type name at the beginning of the parameter list but expected to find a variable name at the first position.`, this.origin)
@@ -41,7 +41,7 @@ class Params extends Obj {
 
     for (const r of this.returns) {
       if (!(r instanceof Sym)) {
-        throw new Err(`Found ${r.constructor.name} in the return list, but it may only contain type names (e.g. :Int or :Flt).`, this.origin)
+        throw new Err(`Found ${r.getTypeName()} in the return list, but it may only contain type names (e.g. :Int or :Flt).`, this.origin)
       }
     }
   }
