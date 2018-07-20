@@ -4,10 +4,12 @@ const Err = require('./Err')
 const ExeArr = require('./ExeArr')
 const Flt = require('./Flt')
 const Int = require('./Int')
+const Lam = require('./Lam')
 const Marker = require('./Marker')
 const Num = require('./Num')
 const Obj = require('./Obj')
 const Op = require('./Op')
+const Params = require('./Params')
 const Ref = require('./Ref')
 const Str = require('./Str')
 const Sym = require('./Sym')
@@ -19,10 +21,12 @@ module.exports = {
   ExeArr,
   Flt,
   Int,
+  Lam,
   Marker,
   Num,
   Obj,
   Op,
+  Params,
   Ref,
   Str,
   Sym

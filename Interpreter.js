@@ -192,6 +192,7 @@ class Stack {
 class DictStack {
   constructor () {
     this._dict = {}
+    this._stack = []
   }
 
   put (key, value) {
@@ -200,6 +201,19 @@ class DictStack {
 
   get (key) {
     return this._dict[key]
+  }
+
+  pushDict (dict) {
+    this._stack.push(this._dict)
+    this._dict = dict
+  }
+
+  popDict () {
+    this._dict = this._stack.pop()
+  }
+
+  copyDict () {
+    return { ...this._dict }
   }
 }
 
