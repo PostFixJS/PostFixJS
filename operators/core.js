@@ -45,5 +45,7 @@ module.exports.lam = {
     closure.params = params
     closure.dict = interpreter._dictStack.copyDict()
     closure.dict['recur'] = closure
+
+    interpreter._stack.push(closure)
   }
 }
