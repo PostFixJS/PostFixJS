@@ -5,7 +5,11 @@ class Obj {
 
   getTypeName () {
     return `:${this.constructor.name}`
-  }  
+  }
+
+  isAssignableTo (type) {
+    return type === this.getTypeName()
+  }
 }
 
 module.exports = Obj

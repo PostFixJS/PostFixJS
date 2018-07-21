@@ -46,6 +46,19 @@ class Params extends Obj {
     }
   }
 
+  bind (interpreter) {
+    const types = require('./') // Params is a circular dependency; this wouldn't be required with es6 imports
+
+    for (let i = this.params.length - 1; i >= 0; i--) {
+      const { ref, type } = this.params[i]
+      const value = interpreter._stack.pop()
+      if (!value.isAssignableTo(type.toString())) {
+        throw new Err(`Expected ${type.toString()} but got incompatible type ${value.getTypeName()} for parameter ${ref.name}`, ref.origin)
+      }
+      interpreter._dictStack.put(ref.name, value)
+    }
+  }
+
   toString () {
     const params = this.params
       .map(({ ref, type }) => `${ref.toString()}${type ? ` ${type.toString()}` : ''}`)

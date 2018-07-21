@@ -6,6 +6,10 @@ class Num extends Obj {
     this.value = value
   }
 
+  isAssignableTo (type) {
+    return type === this.getTypeName() || type === ':Num'
+  }
+
   toString () {
     return `${this.value}`
   }
