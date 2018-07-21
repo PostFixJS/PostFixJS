@@ -53,3 +53,43 @@ module.exports.cond = {
     }
   }
 }
+
+module.exports.loop = {
+  name: 'loop',
+  execute: (interpreter, token) => {
+    const body = interpreter._stack.pop()
+    if (!(body instanceof types.ExeArr)) {
+      throw new types.Err(`loop expects an :ExeArr but got ${body.getTypeName()}`, token)
+    }
+    try {
+      while (true) {
+        interpreter.executeObj(body)
+      }
+    } catch (e) {
+      if (e !== 'break') {
+        throw e
+      }
+    }
+  }
+}
+
+module.exports.break = {
+  name: 'break',
+  execute: () => {
+    throw 'break'
+  }
+}
+
+module.exports.breakif = {
+  name: 'breakif',
+  execute: (interpreter, token) => {
+    const cond = interpreter._stack.pop()
+    if (cond instanceof types.Bool) {
+      if (cond.value) {
+        throw 'break'
+      }
+    } else {
+      throw new types.Err(`breakif expects a :Bool but got ${body.getTypeName()}`, token)
+    }
+  }
+}
