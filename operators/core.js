@@ -49,3 +49,15 @@ module.exports.lam = {
     interpreter._stack.push(closure)
   }
 }
+
+module.exports.popv = {
+  name: 'popv',
+  execute: (interpreter, token) => {
+    const params = interpreter._stack.pop()
+    if (params instanceof types.Params) {
+      params.bind(interpreter)
+    } else {
+      throw new types.Err(`popv expected :Params but got ${params.getTypeName()}`, token)
+    }
+  }
+}
