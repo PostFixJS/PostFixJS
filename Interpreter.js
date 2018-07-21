@@ -184,6 +184,10 @@ class Stack {
     this._stack = []
   }
 
+  get count () {
+    return this._stack.length
+  }
+
   _assertType (obj, ...expectedTypes) {
     if (!expectedTypes.some((t) => obj instanceof types[t])) {
       this.push(new types.Err(`Expected ${expectedTypes.join(' or ')} but got ${obj.getTypeName()}`, obj.origin))

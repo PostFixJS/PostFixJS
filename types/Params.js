@@ -47,8 +47,6 @@ class Params extends Obj {
   }
 
   bind (interpreter) {
-    const types = require('./') // Params is a circular dependency; this wouldn't be required with es6 imports
-
     for (let i = this.params.length - 1; i >= 0; i--) {
       const { ref, type } = this.params[i]
       const value = interpreter._stack.pop()
@@ -56,6 +54,23 @@ class Params extends Obj {
         throw new Err(`Expected ${type.toString()} but got incompatible type ${value.getTypeName()} for parameter ${ref.name}`, ref.origin)
       }
       interpreter._dictStack.put(ref.name, value)
+    }
+  }
+
+  checkReturns (interpreter, returnCount) {
+    if (returnCount != this.returns.length) {
+      if (returnCount >= 0) {
+        throw new Err(`Expected fun to return ${this.returns.length} values but it returned ${returnCount} values`, this.origin)
+      } else {
+        throw new Err(`Expected fun to return ${this.returns.length} values but it even dropped ${-returnCount} values from the stack`, this.origin)
+      }
+    }
+    for (let i = 0; i < this.returns.length; i++) {
+      const expectedType = this.returns[i].toString()
+      const actual = interpreter._stack.peek(this.returns.length - i - 1)
+      if (!actual.isAssignableTo(expectedType)) {
+        throw new Err(`Expected return value ${i + 1} to be of type ${expectedType} but got incompatible type ${actual.getTypeName()}`, this.origin)
+      }
     }
   }
 
