@@ -12,9 +12,9 @@ module.exports.if = {
     const condition = interpreter._stack.pop()
 
     if (condition.value) {
-      thenPart.execute(interpreter, thenPart.origin)
+      interpreter.executeObj(thenPart)
     } else if (elsePart != null) {
-      elsePart.execute(interpreter, elsePart.origin)
+      interpreter.executeObj(elsePart)
     }
   }
 }

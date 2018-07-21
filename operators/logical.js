@@ -6,7 +6,7 @@ module.exports.and = {
     const a = interpreter._stack.pop()
     if (a instanceof types.Arr) {
       for (const item of a.items) {
-        item.execute(interpreter)
+        interpreter.executeObj(item)
         const result = interpreter._stack.pop()
         if (!(result instanceof types.Bool && result.value)) {
           interpreter._stack.push(new types.Bool(false))
@@ -27,7 +27,7 @@ module.exports.or = {
     const a = interpreter._stack.pop()
     if (a instanceof types.Arr) {
       for (const item of a.items) {
-        item.execute(interpreter)
+        interpreter.executeObj(item)
         const result = interpreter._stack.pop()
         if (result instanceof types.Bool && result.value) {
           interpreter._stack.push(new types.Bool(true))

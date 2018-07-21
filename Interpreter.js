@@ -134,6 +134,10 @@ class Interpreter {
       }
     }
   }
+
+  executeObj (obj) {
+    obj.execute(this)
+  }
 }
 
 class Stack {

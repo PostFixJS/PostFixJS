@@ -10,7 +10,7 @@ module.exports.err = {
 module.exports.exec = {
   name: 'exec',
   execute: (interpreter) => {
-    interpreter._stack.pop().execute(interpreter)
+    interpreter.executeObj(interpreter._stack.pop())
   }
 }
 
