@@ -50,7 +50,7 @@ class Params extends Obj {
     for (let i = this.params.length - 1; i >= 0; i--) {
       const { ref, type } = this.params[i]
       const value = interpreter._stack.pop()
-      if (!value.isAssignableTo(type.toString())) {
+      if (type != null && !value.isAssignableTo(type.toString())) {
         throw new Err(`Expected ${type.toString()} but got incompatible type ${value.getTypeName()} for parameter ${ref.name}`, ref.origin)
       }
       interpreter._dictStack.put(ref.name, value)
