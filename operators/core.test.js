@@ -19,3 +19,10 @@ test('vref should throw if no symbol is provided', (t) => {
     return err.message === 'vref expected :Sym but got :Int'
   })
 })
+
+test('type should get the type of an Obj', (t) => {
+  const stack = execute('42 type')._stack
+  const type = stack.pop()
+  t.true(type instanceof types.Sym)
+  t.is(type.name, 'Int')
+})
