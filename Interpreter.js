@@ -58,7 +58,16 @@ class Interpreter {
     }
   }
 
-  execute (token) {
+  /**
+   * Execute the given token.
+   * This is implemented as an Iterator because this is a natural way to suspend execution
+   * in JavaScript. The iterator will yield every token before it is executed, flattening 
+   * nested execution (e.g. executing the token of the `if` operator will yield multiple times).
+   * @param {object} token Token to execute
+   */
+  *_execute (token) {
+    yield token
+
     if (token.tokenType === 'REFERENCE') {
       const builtIn = this._builtIns[token.token]
       if (builtIn != null) {
@@ -68,7 +77,10 @@ class Interpreter {
           const operation = new types.Op(builtIn, token)
           this._stack.push(operation)
         } else {
-          builtIn.execute(this, token)
+          const result = builtIn.execute(this, token)
+          if (result != null && result[Symbol.iterator]) {
+            yield* result
+          }
         }
       } else {
         // this is an optimization; don't create an intermediate Ref instance
@@ -78,10 +90,13 @@ class Interpreter {
           this._stack.push(ref)
         } else {
           const value = this._dictStack.get(token.token)
-          if (!value) {
-            console.error(`Could not find ${token.token} in the dictionary`)
+          if (value) {
+            const result = value.execute(this, token)
+            if (result != null && result[Symbol.iterator]) {
+              yield* result
+            }
           } else {
-            value.execute(this, token)
+            console.error(`Could not find ${token.token} in the dictionary`)
           }
         }
       }
@@ -127,7 +142,10 @@ class Interpreter {
         if (this._openExeArrs > 0 && !(obj instanceof types.Marker && (obj.type === 'ExeArrOpen' || obj.type === 'ExeArrClose'))) {
           this._stack.push(obj)
         } else {
-          obj.execute(this)
+          const result = obj.execute(this)
+          if (result != null && result[Symbol.iterator]) {
+            yield* result
+          }
         }
       } else {
         console.error(`Unknown token type ${token.tokenType} at line ${token.line}:${token.col}`)
@@ -135,8 +153,51 @@ class Interpreter {
     }
   }
 
-  executeObj (obj) {
-    obj.execute(this)
+  *executeObj (obj) {
+    const result = obj.execute(this)
+    if (result != null && result[Symbol.iterator]) {
+      yield* result
+    }
+  }
+
+  /**
+   * Create an Iterator that will execute the given tokens.
+   * @param {Iterable} tokens Tokens
+   */
+  *_run (tokens) {
+    for (const token of tokens) {
+      yield* this._execute(token)
+    }
+  }
+
+  /**
+   * Initialize the interpreter to execute the given tokens.
+   * Continue execution by calling `step()`.
+   * @param {Iterable} tokens Tokens
+   */
+  startRun (tokens) {
+    this._stepper = this._run(tokens)
+  }
+
+  /**
+   * Continue execution until the next token.
+   * @returns object An object with a done and value property, value will be the next token
+   */
+  step () {
+    const next = this._stepper.next()
+    if (next.done) {
+      this._stepper = null
+    }
+    return next
+  }
+
+  /**
+   * Run all tokens.
+   * Breakpoints won't work in this mode.
+   * @param {Iterable} tokens 
+   */
+  runToCompletion (tokens) {
+    Array.from(this._run(tokens))
   }
 }
 

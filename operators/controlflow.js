@@ -2,7 +2,7 @@ const types = require('../types')
 
 module.exports.if = {
   name: 'if',
-  execute: (interpreter) => {
+  *execute (interpreter) {
     let thenPart = interpreter._stack.pop()
     let elsePart = null
     if (interpreter._stack.peek() instanceof types.ExeArr) {
@@ -12,16 +12,16 @@ module.exports.if = {
     const condition = interpreter._stack.pop()
 
     if (condition.value) {
-      interpreter.executeObj(thenPart)
+      yield* interpreter.executeObj(thenPart)
     } else if (elsePart != null) {
-      interpreter.executeObj(elsePart)
+      yield* interpreter.executeObj(elsePart)
     }
   }
 }
 
 module.exports.cond = {
   name: 'cond',
-  execute: (interpreter, token) => {
+  *execute (interpreter, token) {
     const pairs = interpreter._stack.pop()
     if (!(pairs instanceof types.Arr)) {
       throw new types.Err(`cond expects an array (:Arr) with conditions followed by actions but got ${pairs.getTypeName()}`, token)
@@ -40,11 +40,11 @@ module.exports.cond = {
         throw new types.Err(`cond expected an action array (:ExeArr) but found ${action.getTypeName()}`, action.origin)
       }
 
-      interpreter.executeObj(cond)
+      yield* interpreter.executeObj(cond)
       const result = interpreter._stack.pop()
       if (result instanceof types.Bool) {
         if (result.value) {
-          interpreter.executeObj(action)
+          yield* interpreter.executeObj(action)
           break // break at first matching condition
         }
       } else {
@@ -56,14 +56,14 @@ module.exports.cond = {
 
 module.exports.loop = {
   name: 'loop',
-  execute: (interpreter, token) => {
+  *execute (interpreter, token) {
     const body = interpreter._stack.pop()
     if (!(body instanceof types.ExeArr)) {
       throw new types.Err(`loop expects an :ExeArr but got ${body.getTypeName()}`, token)
     }
     try {
       while (true) {
-        interpreter.executeObj(body)
+        yield* interpreter.executeObj(body)
       }
     } catch (e) {
       if (e !== 'break') {

@@ -2,13 +2,13 @@ const ExeArr = require('./ExeArr')
 const Err = require('./Err')
 
 class Lam extends ExeArr {
-  execute (interpreter) {
+  *execute (interpreter) {
     interpreter._dictStack.pushDict(this.dict)
     if (this.params != null) {
       this.params.bind(interpreter)
     }
     const stackHeight = interpreter._stack.count
-    super.execute(interpreter)
+    yield* super.execute(interpreter)
     interpreter._dictStack.popDict()
     const returnCount = interpreter._stack.count - stackHeight
     this.params.checkReturns(interpreter, returnCount)

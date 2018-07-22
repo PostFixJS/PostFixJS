@@ -19,9 +19,7 @@ if (process.argv[process.argv.length - 1] === '--') {
     read({ prompt: '>' }, (err, input) => {
       if (!err) {
         lexer.put(input + '\n')
-        for (const token of lexer.getTokens()) {
-          interpreter.execute(token)
-        }
+        interpreter.runToCompletion(lexer.getTokens())
         console.log(interpreter._stack._stack.map(obj => obj.toString()).join(', '))
         repl()
       } else {
