@@ -65,6 +65,8 @@ function isEqual (a, b) {
     return a.value === b.value
   } else if (a instanceof types.Bool && b instanceof types.Bool) {
     return a.value === b.value
+  } else if (a instanceof types.Sym && b instanceof types.Sym) {
+    return a.name === b.name
   }
   return false
 }
@@ -88,6 +90,8 @@ function isApproxEqual (a, b, tolerance) {
     return a.value === b.value
   } else if (a instanceof types.Bool && b instanceof types.Bool) {
     return a.value === b.value
+  } else if (a instanceof types.Sym && b instanceof types.Sym) {
+    return a.name === b.name
   }
   return false
 }
