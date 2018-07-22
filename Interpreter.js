@@ -19,6 +19,7 @@ class Interpreter {
       }
     })
 
+    this.registerBuiltIns(require('./operators/array'))
     this.registerBuiltIns(require('./operators/compare'))
     this.registerBuiltIns(require('./operators/controlflow'))
     this.registerBuiltIns(require('./operators/core'))
