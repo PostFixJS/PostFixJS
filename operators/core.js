@@ -61,3 +61,20 @@ module.exports.popv = {
     }
   }
 }
+
+module.exports.vref = {
+  name: 'vref',
+  execute (interpreter, token) {
+    const sym = interpreter._stack.pop()
+    if (sym instanceof types.Sym) {
+      const ref = interpreter._dictStack.get(sym.name)
+      if (ref) {
+        interpreter._stack.push(ref)
+      } else {
+        throw new types.Err(`Could not find ${sym.name} in the dictionary`, token)
+      }
+    } else {
+      throw new types.Err(`vref expected :Sym but got ${sym.getTypeName()}`, token)
+    }
+  }
+}

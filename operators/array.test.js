@@ -1,6 +1,5 @@
 import test from 'ava'
-const Lexer = require('../Lexer')
-const Interpreter = require('../Interpreter')
+const { execute } = require('../test/helpers/util')
 
 test('length should return length of strings', (t) => {
   const interpreter = execute('"hello world" length')
@@ -68,11 +67,3 @@ test('set should set the i-th character of a string', (t) => {
 })
 
 // TODO specify when set should throw
-
-function execute (code) {
-  const interpreter = new Interpreter()
-  const lexer = new Lexer()
-  lexer.put(code)
-  interpreter.runToCompletion(lexer.getTokens())
-  return interpreter
-}
