@@ -172,14 +172,14 @@ module.exports.fori = {
 
 module.exports.break = {
   name: 'break',
-  execute: () => {
+  execute () {
     throw 'break'
   }
 }
 
 module.exports.breakif = {
   name: 'breakif',
-  execute: (interpreter, token) => {
+  execute (interpreter, token) {
     const cond = interpreter._stack.pop()
     if (cond instanceof types.Bool) {
       if (cond.value) {

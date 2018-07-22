@@ -2,7 +2,7 @@ const types = require('../types')
 
 module.exports.err = {
   name: 'err',
-  execute: (interpreter, token) => {
+  execute (interpreter, token) {
     interpreter._stack.push(new types.Err(interpreter._stack.pop().value, token))
   }
 }
@@ -16,7 +16,7 @@ module.exports.exec = {
 
 module.exports.fun = {
   name: 'fun',
-  execute: (interpreter) => {
+  execute (interpreter) {
     const body = interpreter._stack.pop()
     let params = null
     if (interpreter._stack.peek() instanceof types.Params) {
@@ -34,7 +34,7 @@ module.exports.fun = {
 
 module.exports.lam = {
   name: 'lam',
-  execute: (interpreter) => {
+  execute (interpreter) {
     const body = interpreter._stack.pop()
     let params = null
     if (interpreter._stack.peek() instanceof types.Params) {
@@ -52,7 +52,7 @@ module.exports.lam = {
 
 module.exports.popv = {
   name: 'popv',
-  execute: (interpreter, token) => {
+  execute (interpreter, token) {
     const params = interpreter._stack.pop()
     if (params instanceof types.Params) {
       params.bind(interpreter)

@@ -10,7 +10,7 @@ class Interpreter {
 
     this.registerBuiltIn({
       name: '!',
-      execute: (interpreter, token) => {
+      execute (interpreter, token) {
         const obj = interpreter._stack.pop()
         const sym = token.tokenType === 'DEFINITION'
           ? token.token.substr(0, token.token.length - 1)
@@ -29,13 +29,13 @@ class Interpreter {
 
     this.registerBuiltIn({
       name: 'trim',
-      execute: (interpreter) => {
+      execute (interpreter) {
         interpreter._stack.push(new types.Str(interpreter._stack.popString().value.trim()))
       }
     })
     this.registerBuiltIn({
       name: 'println',
-      execute: (interpreter) => {
+      execute (interpreter) {
         console.log(interpreter._stack.pop().value)
       }
     })

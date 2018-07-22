@@ -16,7 +16,7 @@ function getValues (interpreter, token) {
 
 module.exports.lessThan = {
   name: '<',
-  execute: (interpreter, token) => {
+  execute (interpreter, token) {
     const { a, b } = getValues(interpreter, token)
     interpreter._stack.push(new types.Bool(a < b))
   }
@@ -24,7 +24,7 @@ module.exports.lessThan = {
 
 module.exports.lessThanOrEqual = {
   name: '<=',
-  execute: (interpreter, token) => {
+  execute (interpreter, token) {
     const { a, b } = getValues(interpreter, token)
     interpreter._stack.push(new types.Bool(a <= b))
   }
@@ -32,7 +32,7 @@ module.exports.lessThanOrEqual = {
 
 module.exports.greaterThan = {
   name: '>',
-  execute: (interpreter, token) => {
+  execute (interpreter, token) {
     const { a, b } = getValues(interpreter, token)
     interpreter._stack.push(new types.Bool(a > b))
   }
@@ -40,7 +40,7 @@ module.exports.greaterThan = {
 
 module.exports.greaterThanOrEqual = {
   name: '>=',
-  execute: (interpreter, token) => {
+  execute (interpreter, token) {
     const { a, b } = getValues(interpreter, token)
     interpreter._stack.push(new types.Bool(a >= b))
   }
@@ -98,7 +98,7 @@ function isApproxEqual (a, b, tolerance) {
 
 module.exports.equal = {
   name: '=',
-  execute: (interpreter) => {
+  execute (interpreter) {
     const a = interpreter._stack.pop()
     const b = interpreter._stack.pop()
     interpreter._stack.push(new types.Bool(isEqual(a, b)))
@@ -107,7 +107,7 @@ module.exports.equal = {
 
 module.exports.notEqual = {
   name: '!=',
-  execute: (interpreter) => {
+  execute (interpreter) {
     const a = interpreter._stack.pop()
     const b = interpreter._stack.pop()
     interpreter._stack.push(new types.Bool(!isEqual(a, b)))
@@ -116,7 +116,7 @@ module.exports.notEqual = {
 
 module.exports.approxEqual = {
   name: '~=',
-  execute: (interpreter) => {
+  execute (interpreter) {
     const tolerance = interpreter._stack.popNumber()
     const a = interpreter._stack.pop()
     const b = interpreter._stack.pop()
@@ -126,7 +126,7 @@ module.exports.approxEqual = {
 
 module.exports.notApproxEqual = {
   name: '!~=',
-  execute: (interpreter) => {
+  execute (interpreter) {
     const tolerance = interpreter._stack.popNumber()
     const a = interpreter._stack.pop()
     const b = interpreter._stack.pop()
