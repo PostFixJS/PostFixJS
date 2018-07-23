@@ -26,3 +26,9 @@ test('type should get the type of an Obj', (t) => {
   t.true(type instanceof types.Sym)
   t.is(type.name, 'Int')
 })
+
+test('exec should execute nested ExeArrs', (t) => {
+  const stack = execute('{"pass"} x! {x} exec')._stack
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'pass')
+})
