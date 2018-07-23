@@ -10,8 +10,11 @@ class Op extends Obj {
     this.origin = origin
   }
 
-  execute (interpreter) {
-    this._impl.execute(interpreter, this.origin)
+  *execute (interpreter) {
+    const result = this._impl.execute(interpreter, this.origin)
+    if (result != null && result[Symbol.iterator]) {
+      yield* result
+    }
   }
 
   toString () {

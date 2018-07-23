@@ -92,7 +92,7 @@ class Interpreter {
         } else {
           const value = this._dictStack.get(token.token)
           if (value) {
-            const result = value.execute(this, token)
+            const result = value.execute(this)
             if (result != null && result[Symbol.iterator]) {
               yield* result
             }
@@ -283,7 +283,7 @@ class DictStack {
   }
 
   copyDict () {
-    return { ...this._dict }
+    return Object.assign({}, this._dict)
   }
 }
 
