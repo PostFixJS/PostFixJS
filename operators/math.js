@@ -35,7 +35,14 @@ module.exports.minus = {
 module.exports.multiply = {
   name: '*',
   execute (interpreter) {
-    interpreter._stack.push(new types.Flt(interpreter._stack.popNumber().value * interpreter._stack.popNumber().value))
+    const b = interpreter._stack.popNumber()
+    const a = interpreter._stack.popNumber()
+
+    if (a instanceof types.Flt || b instanceof types.Flt) {
+      interpreter._stack.push(new types.Flt(a.value * b.value))
+    } else {
+      interpreter._stack.push(new types.Int(a.value * b.value))
+    }
   }
 }
 
