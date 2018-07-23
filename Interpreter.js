@@ -200,6 +200,14 @@ class Interpreter {
   runToCompletion (tokens) {
     Array.from(this._run(tokens))
   }
+
+  /**
+   * Reset the interpreter (i.e. clear the stack and the dictionary stack).
+   */
+  reset () {
+    this._stack.clear()
+    this._dictStack.clear()
+  }
 }
 
 class Stack {
@@ -284,6 +292,11 @@ class DictStack {
 
   copyDict () {
     return Object.assign({}, this._dict)
+  }
+
+  clear () {
+    this._dict = {}
+    this._stack = []
   }
 }
 
