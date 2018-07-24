@@ -1,14 +1,8 @@
 import test from 'ava'
 import Lexer from './Lexer'
 
-const tokenize = (code) => {
-  const lexer = new Lexer()
-  lexer.put(code)
-  return Array.from(lexer.getTokens())
-}
-
-test('The lexer tokenizes PostFix code', t => {
-  const tokens = tokenize('2 21 multiply')
+test('The lexer Lexer.parses PostFix code', t => {
+  const tokens = Lexer.parse('2 21 multiply')
   t.deepEqual(tokens[0], {
     token: '2',
     tokenType: 'INTEGER',
@@ -18,10 +12,10 @@ test('The lexer tokenizes PostFix code', t => {
 })
 
 test('The lexer handles comments', t => {
-  let tokens = tokenize('# this is a comment')
+  let tokens = Lexer.parse('# this is a comment')
   t.is(tokens.length, 0)
 
-  tokens = tokenize('42 # this is a comment')
+  tokens = Lexer.parse('42 # this is a comment')
   t.deepEqual(tokens, [{
     token: '42',
     tokenType: 'INTEGER',
@@ -31,7 +25,7 @@ test('The lexer handles comments', t => {
 })
 
 test('The lexer gets the line after multiline comments right', t => {
-  const tokens = tokenize(`
+  const tokens = Lexer.parse(`
 #<
 This multi-line comment should be ignored
 >#
@@ -45,7 +39,7 @@ test`)
 })
 
 test('The lexer inserts a get token when using the . operator', t => {
-  const tokens = tokenize('object .property')
+  const tokens = Lexer.parse('object .property')
   t.deepEqual(tokens, [{
     token: 'object',
     tokenType: 'REFERENCE',
@@ -67,7 +61,7 @@ test('The lexer inserts a get token when using the . operator', t => {
 })
 
 test('The lexer handles escaped quotes properly', t => {
-  const tokens = tokenize('"hello \\"world\\""')
+  const tokens = Lexer.parse('"hello \\"world\\""')
   t.deepEqual(tokens, [{
     token: '"hello \\"world\\""',
     tokenType: 'STRING',
@@ -77,7 +71,7 @@ test('The lexer handles escaped quotes properly', t => {
 })
 
 test('Brackets are self-delimiting tokens', t => {
-  t.deepEqual(tokenize('[42]'), [{
+  t.deepEqual(Lexer.parse('[42]'), [{
     token: '[',
     tokenType: 'ARR_START',
     col: 0,
@@ -94,7 +88,7 @@ test('Brackets are self-delimiting tokens', t => {
     line: 0
   }])
 
-  t.deepEqual(tokenize('( 42)'), [{
+  t.deepEqual(Lexer.parse('( 42)'), [{
     token: '(',
     tokenType: 'PARAM_LIST_START',
     col: 0,
@@ -111,7 +105,7 @@ test('Brackets are self-delimiting tokens', t => {
     line: 0
   }])
 
-  t.deepEqual(tokenize('{42 }'), [{
+  t.deepEqual(Lexer.parse('{42 }'), [{
     token: '{',
     tokenType: 'EXEARR_START',
     col: 0,
@@ -130,21 +124,21 @@ test('Brackets are self-delimiting tokens', t => {
 })
 
 test('The lexer parses scientific notation', (t) => {
-  t.deepEqual(tokenize('7e-8'), [{
+  t.deepEqual(Lexer.parse('7e-8'), [{
     token: '7e-8',
     tokenType: 'FLOAT',
     col: 0,
     line: 0
   }])
 
-  t.deepEqual(tokenize('7e+8'), [{
+  t.deepEqual(Lexer.parse('7e+8'), [{
     token: '7e+8',
     tokenType: 'INTEGER',
     col: 0,
     line: 0
   }])
 
-  t.deepEqual(tokenize('7e8'), [{
+  t.deepEqual(Lexer.parse('7e8'), [{
     token: '7e8',
     tokenType: 'INTEGER',
     col: 0,

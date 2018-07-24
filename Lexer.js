@@ -202,6 +202,17 @@ class Lexer {
       return 'REFERENCE'
     }
   }
+
+  /**
+   * Parse the given code and return an array of tokens.
+   * @param {string} code Code to parse
+   * @returns {object[]} Tokens
+   */
+  static parse(code) {
+    const lexer = new Lexer()
+    lexer.put(code)
+    return Array.from(lexer.getTokens())
+  }
 }
 
 module.exports = Lexer
