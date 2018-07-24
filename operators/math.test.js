@@ -3,7 +3,7 @@ const { execute } = require('../test/helpers/util')
 const types = require('../types')
 
 test('* should return an Int if both operands are Ints', (t) => {
-  const stack = execute('4 8 *')._stack
+  const { stack } = execute('4 8 *')
   t.is(stack.count, 1)
   const result = stack.pop()
   t.true(result instanceof types.Int)
@@ -11,7 +11,7 @@ test('* should return an Int if both operands are Ints', (t) => {
 })
 
 test('* should return a Flt if one of the operands is a Flt', (t) => {
-  const stack = execute('0.5 8 *')._stack
+  const { stack } = execute('0.5 8 *')
   t.is(stack.count, 1)
   const result = stack.pop()
   t.true(result instanceof types.Flt)
