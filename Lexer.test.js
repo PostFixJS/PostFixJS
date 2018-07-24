@@ -128,3 +128,26 @@ test('Brackets are self-delimiting tokens', t => {
     line: 0
   }])
 })
+
+test('The lexer parses scientific notation', (t) => {
+  t.deepEqual(tokenize('7e-8'), [{
+    token: '7e-8',
+    tokenType: 'FLOAT',
+    col: 0,
+    line: 0
+  }])
+
+  t.deepEqual(tokenize('7e+8'), [{
+    token: '7e+8',
+    tokenType: 'INTEGER',
+    col: 0,
+    line: 0
+  }])
+
+  t.deepEqual(tokenize('7e8'), [{
+    token: '7e8',
+    tokenType: 'INTEGER',
+    col: 0,
+    line: 0
+  }])
+})
