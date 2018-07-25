@@ -33,12 +33,6 @@ class Interpreter {
         interpreter._stack.push(new types.Str(interpreter._stack.popString().value.trim()))
       }
     })
-    this.registerBuiltIn({
-      name: 'println',
-      execute (interpreter) {
-        console.log(interpreter._stack.pop().value)
-      }
-    })
   }
 
   registerBuiltIn (builtIn) {
