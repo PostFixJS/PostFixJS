@@ -205,9 +205,7 @@ class Interpreter {
 }
 
 class Stack {
-  constructor () {
-    this._stack = []
-  }
+  _stack = []
 
   push (obj) {
     this._stack.push(obj)
@@ -252,6 +250,14 @@ class Stack {
     return this._stack.length
   }
 
+  /**
+   * Get the stack. The first element is the bottom-most element.
+   * @returns {Obj[]} The stack
+   */
+  getElements () {
+    return this._stack
+  }
+
   _assertType (obj, ...expectedTypes) {
     if (!expectedTypes.some((t) => obj instanceof types[t])) {
       this.push(new types.Err(`Expected ${expectedTypes.join(' or ')} but got ${obj.getTypeName()}`, obj.origin))
@@ -262,10 +268,8 @@ class Stack {
 }
 
 class DictStack {
-  constructor () {
-    this._dict = {}
-    this._stack = []
-  }
+  _dict = {}
+  _stack = []
 
   put (key, value) {
     this._dict[key] = value
@@ -291,6 +295,14 @@ class DictStack {
   clear () {
     this._dict = {}
     this._stack = []
+  }
+
+  /**
+   * Get the dictionary stack. The first element is the bottom-most dict.
+   * @return {object[]} The dictionary stack
+   */
+  getDicts () {
+    return this._stack
   }
 }
 
