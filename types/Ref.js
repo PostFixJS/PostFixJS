@@ -1,3 +1,4 @@
+const Err = require('./Err')
 const Obj = require('./Obj')
 
 class Ref extends Obj {
@@ -9,7 +10,7 @@ class Ref extends Obj {
   *execute (interpreter) {
     const value = interpreter._dictStack.get(this.name)
     if (!value) {
-      console.error(`Could not find ${this.name} in the dictionary`)
+      throw new Err(`Could not find ${this.name} in the dictionary`, this.origin)
     } else {
       const result = value.execute(interpreter)
       if (result != null && result[Symbol.iterator]) {

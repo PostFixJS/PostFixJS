@@ -91,7 +91,7 @@ class Interpreter {
               yield* result
             }
           } else {
-            console.error(`Could not find ${token.token} in the dictionary`)
+            throw new types.Err(`Could not find ${token.token} in the dictionary`, token)
           }
         }
       }
@@ -143,7 +143,8 @@ class Interpreter {
           }
         }
       } else {
-        console.error(`Unknown token type ${token.tokenType} at line ${token.line}:${token.col}`)
+        // This should never happen
+        throw new types.Err(`Unknown token type ${token.tokenType} at line ${token.line}:${token.col}, this is most likely a bug in PostFix`, token)
       }
     }
   }
@@ -260,8 +261,7 @@ class Stack {
 
   _assertType (obj, ...expectedTypes) {
     if (!expectedTypes.some((t) => obj instanceof types[t])) {
-      this.push(new types.Err(`Expected ${expectedTypes.join(' or ')} but got ${obj.getTypeName()}`, obj.origin))
-      return false
+      throw new types.Err(`Expected ${expectedTypes.join(' or ')} but got ${obj.getTypeName()}`, obj.origin)
     }
     return obj
   }
