@@ -11,7 +11,13 @@ class Lam extends ExeArr {
     yield* super.execute(interpreter)
     interpreter._dictStack.popDict()
     const returnCount = interpreter._stack.count - stackHeight
-    this.params.checkReturns(interpreter, returnCount)
+    if (this.params != null) {
+      this.params.checkReturns(interpreter, returnCount)
+    }
+  }
+
+  isAssignableTo (type) {
+    return type === this.getTypeName() || type === ':ExeArr'
   }
 
   toString () {
