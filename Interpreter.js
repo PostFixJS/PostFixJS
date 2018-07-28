@@ -272,7 +272,7 @@ class Stack {
 class DictStack {
   constructor () {
     this._dict = {}
-    this._stack = []
+    this._stack = [this._dict]
   }
 
   put (key, value) {
@@ -298,7 +298,7 @@ class DictStack {
 
   clear () {
     this._dict = {}
-    this._stack = []
+    this._stack = [this._dict]
   }
 
   /**
