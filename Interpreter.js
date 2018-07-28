@@ -206,7 +206,9 @@ class Interpreter {
 }
 
 class Stack {
-  _stack = []
+  constructor () {
+    this._stack = []
+  }
 
   push (obj) {
     this._stack.push(obj)
@@ -268,8 +270,10 @@ class Stack {
 }
 
 class DictStack {
-  _dict = {}
-  _stack = []
+  constructor () {
+    this._dict = {}
+    this._stack = []
+  }
 
   put (key, value) {
     this._dict[key] = value
