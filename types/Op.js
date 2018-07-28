@@ -18,6 +18,9 @@ class Op extends Obj {
   }
 
   toString () {
+    if (this.origin.tokenType === 'DEFINITION') {
+      return this.origin.token
+    }
     return this._impl.name
   }
 }
