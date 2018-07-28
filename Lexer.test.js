@@ -38,6 +38,21 @@ test`)
   }])
 })
 
+test('The lexer handles nested multiline comments correctly', t => {
+  const tokens = Lexer.parse(`
+  #< comment
+  with multiple lines #< nested
+  multiline comment >#
+  # nested single line comment
+  ># test`)
+  t.deepEqual(tokens, [{
+    token: 'test',
+    tokenType: 'REFERENCE',
+    line: 5,
+    col: 5
+  }])
+})
+
 test('The lexer inserts a get token when using the . operator', t => {
   const tokens = Lexer.parse('object .property')
   t.deepEqual(tokens, [{

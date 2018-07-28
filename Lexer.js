@@ -50,10 +50,18 @@ class Lexer {
           if (this.peek === '<') {
             // block comment
             let prev = this.peek
+            let levels = 1
             while (this._readch()) {
               if (prev === '>' && this.peek === '#') {
                 this._readch()
-                break
+                levels--
+                if (levels === 0) {
+                  break
+                }
+              }
+              if (prev === '#' && this.peek === '<') {
+                this._readch()
+                levels++
               }
               prev = this.peek
             }
