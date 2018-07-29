@@ -47,10 +47,9 @@ module.exports.greaterThanOrEqual = {
 }
 
 function isEqual (a, b) {
-  if (a instanceof types.Arr && b instanceof types.Arr) {
-    if (a === b) {
-      return true
-    }
+  if (a === b) {
+    return true
+  } else if (a instanceof types.Arr && b instanceof types.Arr) {
     if (a.items.length === b.items.length) {
       for (let i = 0; i < a.items.length; i++) {
         if (!isEqual(a.items[i], b.items[i])) {

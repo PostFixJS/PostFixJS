@@ -55,3 +55,41 @@ test('set should set the i-th character of a string', (t) => {
 })
 
 // TODO specify when set should throw
+
+test('key-get should get a value by its key', (t) => {
+  const { stack } = execute('[foo: "bar", bar: 2] :bar 0 key-get')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 2)
+})
+
+test('key-get should return the default value of the key is not found', (t) => {
+  const { stack } = execute('[foo: "bar", bar: 2] :baz "default" key-get')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'default')
+})
+
+test('key-get should return the default value of the key has no value', (t) => {
+  const { stack } = execute('[foo:] :foo "default" key-get')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'default')
+})
+
+test('key-set should replace a value of a key', (t) => {
+  const { stack } = execute('[a: 1 b: 2 c: 3] :b "hello" key-set')
+  t.is(stack.count, 1)
+  const arr = stack.pop().items
+  t.is(arr.length, 6)
+  t.is(arr[3].getTypeName(), ':Str')
+  t.is(arr[3].value, 'hello')
+})
+
+test('key-set should append a key and a value to an array', (t) => {
+  const { stack } = execute('[] :foo "hello" key-set')
+  t.is(stack.count, 1)
+  const arr = stack.pop().items
+  t.is(arr.length, 2)
+  t.is(arr[0].getTypeName(), ':Sym')
+  t.is(arr[0].name, 'foo')
+  t.is(arr[1].getTypeName(), ':Str')
+  t.is(arr[1].value, 'hello')
+})

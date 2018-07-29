@@ -81,3 +81,63 @@ module.exports.set = {
     }
   }
 }
+
+module.exports.keyGet = {
+  name: 'key-get',
+  execute (interpreter, token) {
+    const defaultValue = interpreter._stack.pop()
+    const key = interpreter._stack.pop()
+    const array = interpreter._stack.pop()
+
+    for (let i = 0; i < array.items.length - 1; i++) {
+      if (isEqual(key, array.items[i])) {
+        interpreter._stack.push(array.items[i + 1])
+        return
+      }
+    }
+    interpreter._stack.push(defaultValue)
+  }
+}
+
+module.exports.keySet = {
+  name: 'key-set',
+  execute (interpreter, token) {
+    const value = interpreter._stack.pop()
+    const key = interpreter._stack.pop()
+    const array = interpreter._stack.pop()
+
+    for (let i = 0; i < array.items.length - 1; i++) {
+      if (isEqual(key, array.items[i])) {
+        const newArr = new types.Arr([...array.items])
+        newArr.items[i + 1] = value
+        interpreter._stack.push(newArr)
+        return
+      }
+    }
+    interpreter._stack.push(new types.Arr([...array.items, key, value]))
+  }
+}
+
+function isEqual (a, b) {
+  if (a === b) {
+    return true
+  } else if (a instanceof types.Arr && b instanceof types.Arr) {
+    if (a.items.length === b.items.length) {
+      for (let i = 0; i < a.items.length; i++) {
+        if (!isEqual(a.items[i], b.items[i])) {
+          return false
+        }
+      }
+      return true
+    }
+  } else if (a instanceof types.Num && b instanceof types.Num) {
+    return a.value === b.value
+  } else if (a instanceof types.Str && b instanceof types.Str) {
+    return a.value === b.value
+  } else if (a instanceof types.Bool && b instanceof types.Bool) {
+    return a.value === b.value
+  } else if (a instanceof types.Sym && b instanceof types.Sym) {
+    return a.name === b.name
+  }
+  return false
+}
