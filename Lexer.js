@@ -37,7 +37,7 @@ class Lexer {
     return false
   }
 
-  *getTokens () {
+  * getTokens () {
     while (!this.empty) {
       if (this.deferredToken != null) {
         yield this.deferredToken
@@ -276,7 +276,7 @@ class Lexer {
    * @param {bool} options.emitComments True to emit tokens for comments, defaults to false
    * @returns {object[]} Tokens
    */
-  static parse(code, options = {}) {
+  static parse (code, options = {}) {
     const lexer = new Lexer(options)
     lexer.put(code)
     return Array.from(lexer.getTokens())

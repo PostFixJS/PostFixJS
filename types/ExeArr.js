@@ -1,13 +1,13 @@
 const Arr = require('./Arr')
 
 class ExeArr extends Arr {
-  *execute (interpreter) {
+  * execute (interpreter) {
     for (const obj of this.items) {
       yield obj.origin
       if (obj instanceof ExeArr) {
         interpreter._stack.push(obj)
       } else {
-        yield* interpreter.executeObj(obj)
+        yield * interpreter.executeObj(obj)
       }
     }
   }

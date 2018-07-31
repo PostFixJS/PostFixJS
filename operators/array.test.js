@@ -20,7 +20,7 @@ test('length should throw if the argument is neither :Str nor :Arr', (t) => {
 test('get should get the i-th element of an array', (t) => {
   const { stack } = execute('["a" "b" "c"] 1 get')
   t.is(stack.count, 1)
-  t.is(stack.popString().value, "b")
+  t.is(stack.popString().value, 'b')
 })
 
 test('get should throw if the index is out of the range of the array', (t) => {
@@ -30,7 +30,7 @@ test('get should throw if the index is out of the range of the array', (t) => {
 test('get should get the i-th character of a string', (t) => {
   const { stack } = execute('"PostFix" 4 get')
   t.is(stack.count, 1)
-  t.is(stack.popString().value, "F")
+  t.is(stack.popString().value, 'F')
 })
 
 test('get should throw if the index is out of the range of the string', (t) => {
@@ -51,7 +51,7 @@ test('set should set the i-th element of an array', (t) => {
 test('set should set the i-th character of a string', (t) => {
   const { stack } = execute('"accent" 4 "p" set')
   t.is(stack.count, 1)
-  t.is(stack.pop().value, "accept")
+  t.is(stack.pop().value, 'accept')
 })
 
 // TODO specify when set should throw

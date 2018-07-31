@@ -56,11 +56,11 @@ class Interpreter {
   /**
    * Execute the given token.
    * This is implemented as an Iterator because this is a natural way to suspend execution
-   * in JavaScript. The iterator will yield every token before it is executed, flattening 
+   * in JavaScript. The iterator will yield every token before it is executed, flattening
    * nested execution (e.g. executing the token of the `if` operator will yield multiple times).
    * @param {object} token Token to execute
    */
-  *_execute (token) {
+  * _execute (token) {
     yield token
 
     if (token.tokenType === 'REFERENCE') {
@@ -74,7 +74,7 @@ class Interpreter {
         } else {
           const result = builtIn.execute(this, token)
           if (result != null && result[Symbol.iterator]) {
-            yield* result
+            yield * result
           }
         }
       } else {
@@ -88,7 +88,7 @@ class Interpreter {
           if (value) {
             const result = value.execute(this)
             if (result != null && result[Symbol.iterator]) {
-              yield* result
+              yield * result
             }
           } else {
             throw new types.Err(`Could not find ${token.token} in the dictionary`, token)
@@ -139,7 +139,7 @@ class Interpreter {
         } else {
           const result = obj.execute(this)
           if (result != null && result[Symbol.iterator]) {
-            yield* result
+            yield * result
           }
         }
       } else {
@@ -149,10 +149,10 @@ class Interpreter {
     }
   }
 
-  *executeObj (obj) {
+  * executeObj (obj) {
     const result = obj.execute(this)
     if (result != null && result[Symbol.iterator]) {
-      yield* result
+      yield * result
     }
   }
 
@@ -160,9 +160,9 @@ class Interpreter {
    * Create an Iterator that will execute the given tokens.
    * @param {Iterable} tokens Tokens
    */
-  *_run (tokens) {
+  * _run (tokens) {
     for (const token of tokens) {
-      yield* this._execute(token)
+      yield * this._execute(token)
     }
   }
 
@@ -190,7 +190,7 @@ class Interpreter {
   /**
    * Run all tokens.
    * Breakpoints won't work in this mode.
-   * @param {Iterable} tokens 
+   * @param {Iterable} tokens Tokens to execute
    */
   runToCompletion (tokens) {
     Array.from(this._run(tokens))

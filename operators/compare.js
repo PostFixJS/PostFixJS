@@ -6,7 +6,6 @@ function getValues (interpreter, token) {
 
   if (a instanceof types.Num && b instanceof types.Num) {
     return { a: a.value, b: b.value }
-    interpreter._stack.push(new types.Bool(a.value < b.value))
   } else if (a instanceof types.Str && b instanceof types.Str) {
     return { a: a.value.localeCompare(b.value), b: 0 }
   } else {

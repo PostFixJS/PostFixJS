@@ -33,10 +33,10 @@ module.exports.get = {
         } else {
           throw new types.Err(`Index is out of range (index is ${index.value} but the :Str has length ${obj.value.length})`, token)
         }
-      } else {    
+      } else {
         throw new types.Err(`get expects the first argument to be :Arr or :Str but got ${obj.getTypeName()} instead`, token)
       }
-    } else {    
+    } else {
       throw new types.Err(`get expects the second argument to be an :Int but got ${index.getTypeName()} instead`, token)
     }
   }
@@ -73,10 +73,10 @@ module.exports.set = {
         } else {
           throw new types.Err(`Index is out of range (index is ${index.value} but the :Str has length ${obj.value.length})`, token)
         }
-      } else {    
+      } else {
         throw new types.Err(`set expects the first argument to be :Arr or :Str but got ${obj.getTypeName()} instead`, token)
       }
-    } else {    
+    } else {
       throw new types.Err(`set expects the second argument to be an :Int but got ${index.getTypeName()} instead`, token)
     }
   }

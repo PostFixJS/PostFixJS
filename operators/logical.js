@@ -2,11 +2,11 @@ const types = require('../types')
 
 module.exports.and = {
   name: 'and',
-  *execute (interpreter) {
+  * execute (interpreter) {
     const a = interpreter._stack.pop()
     if (a instanceof types.Arr) {
       for (const item of a.items) {
-        yield* interpreter.executeObj(item)
+        yield * interpreter.executeObj(item)
         const result = interpreter._stack.pop()
         if (!(result instanceof types.Bool && result.value)) {
           interpreter._stack.push(new types.Bool(false))
@@ -23,11 +23,11 @@ module.exports.and = {
 
 module.exports.or = {
   name: 'or',
-  *execute (interpreter) {
+  * execute (interpreter) {
     const a = interpreter._stack.pop()
     if (a instanceof types.Arr) {
       for (const item of a.items) {
-        yield* interpreter.executeObj(item)
+        yield * interpreter.executeObj(item)
         const result = interpreter._stack.pop()
         if (result instanceof types.Bool && result.value) {
           interpreter._stack.push(new types.Bool(true))

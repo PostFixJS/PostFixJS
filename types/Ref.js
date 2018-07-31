@@ -7,14 +7,14 @@ class Ref extends Obj {
     this.name = name
   }
 
-  *execute (interpreter) {
+  * execute (interpreter) {
     const value = interpreter._dictStack.get(this.name)
     if (!value) {
       throw new Err(`Could not find ${this.name} in the dictionary`, this.origin)
     } else {
       const result = value.execute(interpreter)
       if (result != null && result[Symbol.iterator]) {
-        yield* result
+        yield * result
       }
     }
   }

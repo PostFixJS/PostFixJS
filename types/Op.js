@@ -10,10 +10,10 @@ class Op extends Obj {
     this.origin = origin
   }
 
-  *execute (interpreter) {
+  * execute (interpreter) {
     const result = this._impl.execute(interpreter, this.origin)
     if (result != null && result[Symbol.iterator]) {
-      yield* result
+      yield * result
     }
   }
 

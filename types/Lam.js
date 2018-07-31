@@ -2,7 +2,7 @@ const ExeArr = require('./ExeArr')
 const Err = require('./Err')
 
 class Lam extends ExeArr {
-  *execute (interpreter) {
+  * execute (interpreter) {
     interpreter._dictStack.pushDict(this.dict)
     if (this.params != null) {
       this.params.bind(interpreter)

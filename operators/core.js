@@ -9,8 +9,8 @@ module.exports.err = {
 
 module.exports.exec = {
   name: 'exec',
-  *execute (interpreter) {
-    yield* interpreter.executeObj(interpreter._stack.pop())
+  * execute (interpreter) {
+    yield * interpreter.executeObj(interpreter._stack.pop())
   }
 }
 

@@ -18,7 +18,7 @@ class Params extends Obj {
 
     this.params = []
     this.returns = params.slice(rightArrowPosition + 1)
-    
+
     for (let i = 0; i < rightArrowPosition; i++) {
       const o = params[i]
       if (!((o instanceof types.Ref) || (o instanceof types.Sym))) {
@@ -58,7 +58,7 @@ class Params extends Obj {
   }
 
   checkReturns (interpreter, returnCount) {
-    if (returnCount != this.returns.length) {
+    if (returnCount !== this.returns.length) {
       if (returnCount >= 0) {
         throw new Err(`Expected fun to return ${this.returns.length} values but it returned ${returnCount} values`, this.origin)
       } else {
