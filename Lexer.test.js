@@ -160,3 +160,31 @@ test('The lexer parses scientific notation', (t) => {
     line: 0
   }])
 })
+
+test('The lexer emits tokens for line comments when emitComments is true', (t) => {
+  t.deepEqual(Lexer.parse('42 # answer to all questions', { emitComments: true }), [{
+    token: '42',
+    tokenType: 'INTEGER',
+    col: 0,
+    line: 0
+  }, {
+    token: '# answer to all questions',
+    tokenType: 'LINE_COMMENT',
+    col: 3,
+    line: 0
+  }])
+})
+
+test('The lexer emits tokens for block comments when emitComments is true', (t) => {
+  t.deepEqual(Lexer.parse('42 #< this is a\nmulti-line\n#< nested >#\nblock comment >#', { emitComments: true }), [{
+    token: '42',
+    tokenType: 'INTEGER',
+    col: 0,
+    line: 0
+  }, {
+    token: '#< this is a\nmulti-line\n#< nested >#\nblock comment >#',
+    tokenType: 'BLOCK_COMMENT',
+    col: 3,
+    line: 0
+  }])
+})

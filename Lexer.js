@@ -1,5 +1,11 @@
 class Lexer {
-  constructor () {
+  /**
+   * Create a new lexer instance.
+   * @param {object} options Options for the lexer
+   * @param {bool} options.emitComments True to emit tokens for comments, defaults to false
+   */
+  constructor (options = {}) {
+    this.options = options
     this.col = 0
     this.row = 0
     this.pos = 0
@@ -44,32 +50,84 @@ class Lexer {
         if (' \t\r,'.indexOf(this.peek) >= 0) {
           continue
         }
-        if (this.peek === '#') {
-          // comment
-          this._readch()
-          if (this.peek === '<') {
-            // block comment
-            let prev = this.peek
-            let levels = 1
-            while (this._readch()) {
-              if (prev === '>' && this.peek === '#') {
-                this._readch()
-                levels--
-                if (levels === 0) {
+        if (this.peek === '#') { // comment
+          if (this.options.emitComments) {
+            const tokenLine = this.row
+            const tokenCol = this.col - 1
+            let token = '#'
+
+            this._readch()
+            token += this.peek
+            if (this.peek === '<') {
+              // block comment
+              let prev = this.peek
+              let levels = 1
+              while (this._readch()) {
+                token += this.peek
+                if (prev === '>' && this.peek === '#') {
+                  if (this._readch()) {
+                    token += this.peek
+                  }
+                  levels--
+                  if (levels === 0) {
+                    break
+                  }
+                }
+                if (prev === '#' && this.peek === '<') {
+                  if (this._readch()) {
+                    token += this.peek
+                  }
+                  levels++
+                }
+                prev = this.peek
+              }
+              yield {
+                token,
+                tokenType: 'BLOCK_COMMENT',
+                col: tokenCol,
+                line: tokenLine
+              }
+            } else {
+              // line comment
+              while (this.peek !== '\n') {
+                if (!this._readch()) {
                   break
                 }
+                token += this.peek
               }
-              if (prev === '#' && this.peek === '<') {
-                this._readch()
-                levels++
+              yield {
+                token,
+                tokenType: 'LINE_COMMENT',
+                col: tokenCol,
+                line: tokenLine
               }
-              prev = this.peek
             }
           } else {
-            // line comment
-            while (this.peek !== '\n') {
-              if (!this._readch()) {
-                break
+            this._readch()
+            if (this.peek === '<') {
+              // block comment
+              let prev = this.peek
+              let levels = 1
+              while (this._readch()) {
+                if (prev === '>' && this.peek === '#') {
+                  this._readch()
+                  levels--
+                  if (levels === 0) {
+                    break
+                  }
+                }
+                if (prev === '#' && this.peek === '<') {
+                  this._readch()
+                  levels++
+                }
+                prev = this.peek
+              }
+            } else {
+              // line comment
+              while (this.peek !== '\n') {
+                if (!this._readch()) {
+                  break
+                }
               }
             }
           }
@@ -214,10 +272,12 @@ class Lexer {
   /**
    * Parse the given code and return an array of tokens.
    * @param {string} code Code to parse
+   * @param {object} options Options for the lexer
+   * @param {bool} options.emitComments True to emit tokens for comments, defaults to false
    * @returns {object[]} Tokens
    */
-  static parse(code) {
-    const lexer = new Lexer()
+  static parse(code, options = {}) {
+    const lexer = new Lexer(options)
     lexer.put(code)
     return Array.from(lexer.getTokens())
   }
