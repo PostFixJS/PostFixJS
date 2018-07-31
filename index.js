@@ -9,8 +9,12 @@ if (process.argv[process.argv.length - 1] === '--') {
   process.stdin.resume()
   process.stdin.on('data', (buf) => lexer.put(buf.toString()))
   process.stdin.on('end', () => {
-    for (const token of lexer.getTokens()) {
-      interpreter.execute(token)
+    try {
+      for (const token of lexer.getTokens()) {
+        interpreter.execute(token)
+      }
+    } catch (e) {
+      console.error(e.toString())
     }
     console.log(interpreter._stack._stack.map(obj => obj.toString()).join(', '))
   })
@@ -20,7 +24,11 @@ if (process.argv[process.argv.length - 1] === '--') {
     read({ prompt: '>' }, (err, input) => {
       if (!err) {
         lexer.put(input + '\n')
-        interpreter.runToCompletion(lexer.getTokens())
+        try {
+          interpreter.runToCompletion(lexer.getTokens())
+        } catch (e) {
+          console.error(e.toString())
+        }
         console.log(interpreter._stack._stack.map(obj => obj.toString()).join(', '))
         repl()
       } else {
