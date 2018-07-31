@@ -208,6 +208,7 @@ class Interpreter {
 class Stack {
   constructor () {
     this._stack = []
+    this._minStackHeight = []
   }
 
   push (obj) {
@@ -215,6 +216,10 @@ class Stack {
   }
 
   pop () {
+    const minStackHeight = this._minStackHeight[this._minStackHeight.length - 1] || 0
+    if (this._stack.length <= minStackHeight) {
+      throw 'STACK_CORRUPTED'
+    }
     return this._stack.pop()
   }
 
@@ -242,6 +247,10 @@ class Stack {
   }
 
   peek (i = 0) {
+    const minStackHeight = this._minStackHeight[this._minStackHeight.length - 1] || 0
+    if (this._stack.length - i <= minStackHeight) {
+      throw 'STACK_CORRUPTED'
+    }
     return this._stack[this._stack.length - 1 - i]
   }
 
@@ -266,6 +275,26 @@ class Stack {
       throw new types.Err(`Expected ${expectedTypes.join(' or ')} but got ${obj.getTypeName()}`, obj.origin)
     }
     return obj
+  }
+
+  /**
+   * Throw if the stack height gets below the current height.
+   * @returns The current stack height
+   */
+  forbidPop () {
+    this._minStackHeight.push(this.count)
+    return this.count
+  }
+
+  /**
+   * Don't throw if the stack height gets below the given height.
+   * This reverts forbidPop.
+   */
+  allowPop (height) {
+    const i = this._minStackHeight.lastIndexOf(height)
+    if (i >= 0) {
+      this._minStackHeight.splice(i, 1)
+    }
   }
 }
 
