@@ -65,12 +65,12 @@ class Lexer {
               while (this._readch()) {
                 token += this.peek
                 if (prev === '>' && this.peek === '#') {
-                  if (this._readch()) {
-                    token += this.peek
-                  }
                   levels--
                   if (levels === 0) {
+                    this._readch()
                     break
+                  } else if (this._readch()) {
+                    token += this.peek
                   }
                 }
                 if (prev === '#' && this.peek === '<') {

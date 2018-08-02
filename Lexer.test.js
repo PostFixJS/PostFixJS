@@ -188,3 +188,12 @@ test('The lexer emits tokens for block comments when emitComments is true', (t) 
     line: 0
   }])
 })
+
+test('The lexer emitted block comment tokens end where the comment ends', (t) => {
+  t.deepEqual(Lexer.parse('\n #< test ># \n', { emitComments: true })[0], {
+    token: '#< test >#',
+    tokenType: 'BLOCK_COMMENT',
+    col: 1,
+    line: 1
+  })
+})
