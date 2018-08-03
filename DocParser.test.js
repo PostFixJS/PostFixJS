@@ -1,12 +1,8 @@
 import test from 'ava'
 import DocParser from './DocParser'
 
-function getFunctions (code) {
-  return Array.from(DocParser.getFunctions(code))
-}
-
 test('DocParser gets the signature of a function', (t) => {
-  const functions = getFunctions(`
+  const functions = DocParser.getFunctions(`
 #<
 Calculate the factorial of the given number.
 @param n Number
@@ -30,7 +26,7 @@ fac: (n :Int -> :Int) {
 })
 
 test('DocParser gets the signature of an undocumented function', (t) => {
-  const functions = getFunctions(`
+  const functions = DocParser.getFunctions(`
 fac: (n :Int -> :Int) {
   { n n 1 - recur * } { 1 } n 1 > if
 } fun
@@ -49,7 +45,7 @@ fac: (n :Int -> :Int) {
 })
 
 test('DocParser supports missing function descriptions', (t) => {
-  const functions = getFunctions(`
+  const functions = DocParser.getFunctions(`
 #<
 @param n Some number
 >#
@@ -69,7 +65,7 @@ foo: (n :Int -> :Str) {} fun
 })
 
 test('DocParser supports missing @param tags', (t) => {
-  const functions = getFunctions(`
+  const functions = DocParser.getFunctions(`
 #<
 A function that does things.
 @return The resulting string
@@ -90,7 +86,7 @@ foo: (n :Int -> :Str) {} fun
 })
 
 test('DocParser supports incomplete @param tags', (t) => {
-  const functions = getFunctions(`
+  const functions = DocParser.getFunctions(`
 #<
 A function that does things.
 @param a
@@ -105,7 +101,7 @@ foo: (a b -> :Str) {} fun
     description: 'A function that does things.',
     params: [
       { name: 'a', type: undefined, description: undefined },
-      { name: 'b', type: undefined, description: undefined },
+      { name: 'b', type: undefined, description: undefined }
     ],
     returns: [
       { type: ':Str', description: 'The resulting string' }
@@ -114,7 +110,7 @@ foo: (a b -> :Str) {} fun
 })
 
 test('DocParser supports missing @return tags', (t) => {
-  const functions = getFunctions(`
+  const functions = DocParser.getFunctions(`
 #<
 A function that does things.
 >#
@@ -132,14 +128,14 @@ foo: (-> :Str) {} fun
 })
 
 test('DocParser supports functions that return nothing', (t) => {
-  t.deepEqual(getFunctions('noop: (->) {} fun'), [{
+  t.deepEqual(DocParser.getFunctions('noop: (->) {} fun'), [{
     name: 'noop',
     description: undefined,
     params: [],
     returns: []
   }])
 
-  t.deepEqual(getFunctions('noop: () {} fun'), [{
+  t.deepEqual(DocParser.getFunctions('noop: () {} fun'), [{
     name: 'noop',
     description: undefined,
     params: [],
@@ -148,7 +144,7 @@ test('DocParser supports functions that return nothing', (t) => {
 })
 
 test('DocParser supports functions with multiple return values', (t) => {
-  t.deepEqual(getFunctions(`
+  t.deepEqual(DocParser.getFunctions(`
 #<
 Get the first two elements of an array.
 @param arr Array

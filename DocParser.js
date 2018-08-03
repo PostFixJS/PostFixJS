@@ -1,15 +1,27 @@
 const Lexer = require('./Lexer')
 
+/**
+ * A parser for documentation.
+ */
 class DocParser {
-  static * getFunctions (code) {
+  /**
+   * Get all function signatures and related documentation from the given code.
+   * @param {string} code PostFix code
+   * @return {object[]} Function signatures with descriptions
+   */
+  static getFunctions (code) {
+    const functions = []
     const tokens = Lexer.parse(code, { emitComments: true })
+
     for (let i = 0; i < tokens.length; i++) {
       const fn = getFunctionAt(tokens, i)
       if (fn !== false) {
-        yield fn.fn
+        functions.push(fn.fn)
         i = fn.i
       }
     }
+
+    return functions
   }
 }
 
