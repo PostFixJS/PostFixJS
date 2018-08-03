@@ -164,3 +164,21 @@ firstTwo: (arr :Arr -> :Obj :Obj) {} fun
     ]
   }])
 })
+
+test('DocParser does not crash on broken input', (t) => {
+  t.notThrows(() => {
+    DocParser.getFunctions(`
+#<
+test
+>#`)
+  }, 'should not throw if block comment is not followed by any token')
+
+  t.notThrows(() => {
+    DocParser.getFunctions(`
+#<
+Calculate the factorial of a number.
+@param
+>#
+    `, 'should not throw on invalid @param tags')
+  })
+})

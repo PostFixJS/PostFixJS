@@ -28,7 +28,7 @@ class DocParser {
 function getFunctionAt (tokens, i) {
   const fn = {}
   let doc
-  if (tokens[i].tokenType === 'BLOCK_COMMENT') {
+  if (tokens[i] && tokens[i].tokenType === 'BLOCK_COMMENT') {
     doc = parseDocComment(tokens[i].token)
     fn.description = doc.description
     i++
@@ -37,7 +37,7 @@ function getFunctionAt (tokens, i) {
     fn.description = undefined
   }
 
-  if (tokens[i].tokenType === 'SYMBOL') {
+  if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
     const token = tokens[i].token
     fn.name = token.indexOf(':') === 0
       ? token.substr(1)
@@ -49,7 +49,8 @@ function getFunctionAt (tokens, i) {
     i = params.i
     const paramsAndReturns = parseParamsList(params.params)
     fn.params = paramsAndReturns.params.map((param) => ({
-      ...param,
+      name: param.name,
+      type: param.type,
       description: doc.params[param.name]
     }))
     fn.returns = paramsAndReturns.returns.map((type, i) => ({
@@ -118,8 +119,9 @@ function parseDocComment (comment) {
     .filter((line) => line[0] === '@')
     .map((line) => {
       const match = line.match(/^(@.+?)\s+(.+?)$/)
-      return { tag: match[1], value: match[2] }
+      return match ? { tag: match[1], value: match[2] } : null
     })
+    .filter((tag) => tag != null)
 
   const params = tags
     .filter(({ tag }) => tag === '@param')
