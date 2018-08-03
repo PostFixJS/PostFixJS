@@ -256,6 +256,7 @@ class Stack {
 
   clear () {
     this._stack = []
+    this._minStackHeight = []
   }
 
   get count () {
