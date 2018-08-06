@@ -1,0 +1,64 @@
+#<
+Get the length of a string.
+@param str String
+@return Length of the string
+>#
+length: (str :Str -> :Int) {} fun
+
+#<
+Get the length of an array.
+@param arr Array
+@return Length of the array
+>#
+length: (arr :Arr -> :Int) {} fun
+
+#<
+Get the i-th character of a string.
+@param str String
+@param i Zero-based index of a character in the string
+@return The i-th character of the string
+>#
+get: (str :Str, i :Int -> :Str) {} fun
+
+#<
+Get the i-th item of an array.
+@param arr Array
+@param i Zero-based index of the item to get
+@return The i-th element in the array
+>#
+get: (arr :Arr, i :Int -> :Obj) {} fun
+
+#<
+Set the i-th character of a string.
+@param str String
+@param i Zero-based index of a character in the string
+@return The updated string
+>#
+set: (str :Str, i :Int -> :Str) {} fun
+
+#<
+Set the i-th item of an array.
+@param arr Array
+@param i Zero-based index of the item to set
+@return The updated array
+>#
+set: (arr :Arr, i :Int -> :Arr) {} fun
+
+#<
+Get the item after the first item in the array that is equal to the given key.
+E.g., `[ :a 1 :b 2 ] :a 0 key-get` would return the value after `:a`, which is `1`.
+@param arr Array
+@param key Key
+@param default Default value that is returned when the key is not found in the array
+@return The value at the given key or the default value if the key is not found
+>#
+key-get: (arr :Arr, key :Obj, default :Obj -> :Obj) {} fun
+
+#<
+Set the item after the first item in the array that is equal to the given key. If the key is not found, it is appended to the array.
+@param arr Array
+@param key Key
+@param value Value to assign at the given key
+@return The modified array
+>#
+key-set: (arr :Arr, key :Obj, value :Obj -> :Arr) {} fun

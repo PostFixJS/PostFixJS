@@ -1,0 +1,27 @@
+#<
+Swap the two topmost objects on the stack.
+>#
+swap: () {} fun
+
+#<
+Remove the topmost object from the stack.
+>#
+pop: () {} fun
+
+#<
+Duplicate the topmost object on the stack.
+@return Copy of the topmost object
+>#
+dup: (-> :Obj) {} fun
+
+#<
+Copy the i-th object (from top) of the stack on top of the stack.
+@param i Offset of the object to copy, from the top of the stack
+@return The copied object
+>#
+copy: (i :Int -> :Obj) {} fun
+
+#<
+Clear the stack.
+>#
+clear: () {} fun
