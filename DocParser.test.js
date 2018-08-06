@@ -141,6 +141,17 @@ test('DocParser supports functions that return nothing', (t) => {
     params: [],
     returns: []
   }])
+
+  t.deepEqual(DocParser.getFunctions('pop: (top :Obj) {} fun'), [{
+    name: 'pop',
+    description: undefined,
+    params: [{
+      name: 'top',
+      type: ':Obj',
+      description: undefined
+    }],
+    returns: []
+  }])
 })
 
 test('DocParser supports functions with multiple return values', (t) => {

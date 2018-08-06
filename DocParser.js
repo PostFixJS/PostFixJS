@@ -94,10 +94,13 @@ function skipExeArr (tokens, i) {
 }
 
 function parseParamsList (paramsList) {
-  const arrowRightPosition = paramsList.findIndex((token) => token.tokenType === 'RIGHT_ARROW')
+  let rightArrowPosition = paramsList.findIndex((token) => token.tokenType === 'RIGHT_ARROW')
+  if (rightArrowPosition < 0) {
+    rightArrowPosition = paramsList.length - 1
+  }
 
   const params = []
-  for (let i = 1; i < arrowRightPosition; i++) {
+  for (let i = 1; i < rightArrowPosition; i++) {
     const value = paramsList[i].token
     if (value[0] === ':' || value[value.length - 1] === ':') {
       // this is a symbol
@@ -108,7 +111,7 @@ function parseParamsList (paramsList) {
     }
   }
 
-  const returns = arrowRightPosition >= 0 ? paramsList.slice(arrowRightPosition + 1, -1).map((token) => token.token) : []
+  const returns = rightArrowPosition >= 0 ? paramsList.slice(rightArrowPosition + 1, -1).map((token) => token.token) : []
   return { params, returns }
 }
 
