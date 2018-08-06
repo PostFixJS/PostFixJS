@@ -1,0 +1,46 @@
+#<
+Push an error on the stack. This stops the program immediately.
+@param message An error message
+>#
+err: (message :Str) {} fun
+
+#<
+Execute the object that is on top of the stack.
+>#
+exec: (obj :Obj) {} fun
+
+#<
+Create a function and save it into the current dictionary.
+@param name Symbol for the function name
+@param params Parameter list of the function (optional)
+@param body Function body
+>#
+fun: (name :Sym, params :Params, body :ExeArr) {} fun
+
+#<
+Create a lambda function.
+@param params Parameter list of the function (optional)
+@param body Function body
+@return Lambda function
+>#
+lam: (params :Params, body :ExeArr -> :Lam) {} fun
+
+#<
+Pop values from the stack and bind them to the parameter list, that is, put them into the current dictionary with the names from the parameter list. An error is thrown if types don't match.
+@param params Parameter list to bind the stack content to
+>#
+popv: (params :Params) {} fun
+
+#<
+Get the value of the given symbol from the current dictionary and put it on the stack, without executing it.
+@param sym Name of a dictionary entry
+@return Value of the dictionary entry
+>#
+vref: (sym :Sym -> :Obj) {} fun
+
+#<
+Get the type of an object.
+@param obj Object
+@return The type of the object
+>#
+type: (obj :Obj -> :Sym) {} fun
