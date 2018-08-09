@@ -1,0 +1,71 @@
+#<
+Run `then` if the `condition` is true or `else` otherwise.
+@param condition A condition
+@param then Code to run if the condition is true
+@param else Code to run if the condition is false (optional)
+>#
+if: (condition :Bool, then :ExeArr, else :ExeArr) {} fun
+
+#<
+Execute the first condition that returns `true`. Only the executable array of the first matching condition is executed.
+@param conditions Array of executable arrays, always pairs of an executable array that calculates a condition and an executable array that is executed if the condition is true
+>#
+cond: (conditions :Arr) {} fun
+
+#<
+Execute the given executable array until the loop is exited with `break` or `breakif`.
+@param body Executable array to run in a loop
+>#
+loop: (body :ExeArr) {} fun
+
+#<
+Execute the given executable array for every even number between lower (inclusive) and upper (exclusive).
+Before every iteration, the current value is pushed on the stack.
+@param lower Start of the range (inclusive)
+@param upper End of the range (exclusive)
+@param body Executable array to run for number in the range
+>#
+for: (lower :Int, upper :Int, body :ExeArr) {} fun
+
+#<
+Execute the given executable array for every item of the array.
+Before every iteration, the current item is pushed on the stack.
+@param arr Array to iterate through
+@param body Executable array to run for every item
+>#
+for: (arr :Arr, body :ExeArr) {} fun
+
+#<
+Execute the given executable array for character of the string.
+Before every iteration, the current character is pushed on the stack.
+@param str A string
+@param body Executable array to run for every character
+>#
+for: (str :Str, body :ExeArr) {} fun
+
+#<
+Execute the given executable array for every item of the array.
+Before every iteration, the current item and index are pushed on the stack.
+@param arr Array to iterate through
+@param body Executable array to run for every item
+>#
+fori: (arr :Arr, body :ExeArr) {} fun
+
+#<
+Execute the given executable array for character of the string.
+Before every iteration, the current character and index are pushed on the stack.
+@param str A string
+@param body Executable array to run for every character
+>#
+fori: (str :Str, body :ExeArr) {} fun
+
+#<
+Break the current loop.
+>#
+break: () {} fun
+
+#<
+Break the current loop if the condition is true.
+@param condition A condition
+>#
+breakif: (condition :Bool) {} fun

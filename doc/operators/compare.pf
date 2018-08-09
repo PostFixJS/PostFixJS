@@ -1,0 +1,117 @@
+#<
+Check if a is smaller than b.
+@param a Number a
+@param b Number b
+@return true if a is smaller than b, false otherwise
+>#
+<: (a :Num, b :Num -> :Bool) {} fun
+
+#<
+Check if the string a appears before b when sorted alphabetically.
+@param a String a
+@param b String b
+@return true if a comes before b in alphabetical order, false otherwise
+>#
+<: (a :Str, b :Str -> :Bool) {} fun
+
+#<
+Check if a is smaller than or equal to b.
+@param a Number a
+@param b Number b
+@return true if a is smaller than or equal to b, false otherwise
+>#
+<=: (a :Num, b :Num -> :Bool) {} fun
+
+#<
+Check if the string a equals string b or appears before b when sorted alphabetically.
+@param a String a
+@param b String b
+@return true if a equals b or comes before b in alphabetical order, false otherwise
+>#
+<=: (a :Str, b :Str -> :Bool) {} fun
+
+#<
+Check if a is greater than b.
+@param a Number a
+@param b Number b
+@return true if a is greater than b, false otherwise
+>#
+>: (a :Num, b :Num -> :Bool) {} fun
+
+#<
+Check if the string a appears after b when sorted alphabetically.
+@param a String a
+@param b String b
+@return true if a comes after b in alphabetical order, false otherwise
+>#
+>: (a :Str, b :Str -> :Bool) {} fun
+
+#<
+Check if a is greater than or equal to b.
+@param a Number a
+@param b Number b
+@return true if a is greater than or equal to b, false otherwise
+>#
+>=: (a :Num, b :Num -> :Bool) {} fun
+
+#<
+Check if the string a equals string b or appears after b when sorted alphabetically.
+@param a String a
+@param b String b
+@return true if a equals b or comes after b in alphabetical order, false otherwise
+>#
+>=: (a :Str, b :Str -> :Bool) {} fun
+
+#<
+Check if two objects are equal, according to the following rules:
+
+* Numbers, booleans and strings are equal if they have the same value
+* Symbols are equal if they have the same name
+* Arrays are equal if all entries are equal
+
+@param a Object a
+@param b Object b
+@return true if the objects are equal, false otherwise
+>#
+=: (a :Obj, b :Obj -> :Bool) {} fun
+
+#<
+Check if two objects are not equal, according to the following rules:
+
+* Numbers, booleans and strings are equal if they have the same value
+* Symbols are equal if they have the same name
+* Arrays are equal if all entries are equal
+
+@param a Object a
+@param b Object b
+@return true if the objects are not equal, false otherwise
+>#
+=: (a :Obj, b :Obj -> :Bool) {} fun
+
+#<
+Check if two objects are approximately equal, according to the following rules:
+
+* Numbers are approximately equal if the difference is smaller than or equal to the tolerance
+* Arrays are approximately equal if all entries are approximately equal
+* For all other types, the tolerance is ignored and the `=` operator is used
+
+@param a Object a
+@param b Object b
+@param tolerance Tolerance for comparing numbers
+@return true if the objects are approximately equal, false otherwise
+>#
+~=: (a :Obj, b :Obj -> :Bool) {} fun
+
+#<
+Check if two objects are not approximately equal, according to the following rules:
+
+* Numbers are approximately equal if the difference is smaller than or equal to the tolerance
+* Arrays are approximately equal if all entries are approximately equal
+* For all other types, the tolerance is ignored and the `=` operator is used
+
+@param a Object a
+@param b Object b
+@param tolerance Tolerance for comparing numbers
+@return true if the objects are not approximately equal, false otherwise
+>#
+!~=: (a :Obj, b :Obj -> :Bool) {} fun
