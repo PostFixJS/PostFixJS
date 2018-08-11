@@ -1,0 +1,36 @@
+#<
+Check if a and b are true.
+@param a A boolean
+@param b A boolean
+@return True if a and b are true, false otherwise
+>#
+and: (a :Bool, b :Bool -> :Bool) {} fun
+
+#<
+Check if all values in the array are :Bool and true. All items are executed, so executable arrays that produce a :Bool may be used. The evaluation is stopped when the first non-true value is encountered.
+@param arr Array of items to check
+@return True if all items are true, false otherwise
+>#
+and: (arr :Arr -> :Bool) {} fun
+
+#<
+Check if a or b is true, or both are true.
+@param a A boolean
+@param b A boolean
+@return True if a or b are true, false otherwise
+>#
+or: (a :Bool, b :Bool -> :Bool) {} fun
+
+#<
+Check if at least one values in the array is :Bool and true. All items are executed, so executable arrays that produce a :Bool may be used. The evaluation is stopped when the first true value is encountered.
+@param arr Array of items to check
+@return True if at least one item is true, false otherwise
+>#
+or: (arr :Arr -> :Bool) {} fun
+
+#<
+Negate a boolean value.
+@param b A boolean
+@return True if the boolean is false, false otherwise
+>#
+not: (b :Bool -> :Bool) {} fun
