@@ -1,0 +1,67 @@
+#<
+Add two numbers.
+@param a A number
+@param b A number
+@return The sum of the two numbers
+>#
++: (a :Num, b :Num -> :Num) {} fun
+
+#<
+Concatenate the two strings.
+@param a A string
+@param b A string
+@return The concatenated string
+>#
++: (a :Str, b :Str -> :Str) {} fun
+
+#<
+Subtract two numbers.
+@param a A number
+@param b A number
+@return The difference of the two numbers
+>#
+-: (a :Num, b :Num -> :Num) {} fun
+
+#<
+Multiply two numbers.
+@param a A number
+@param b A number
+@return The product of the two numbers
+>#
+*: (a :Num, b :Num -> :Num) {} fun
+
+#<
+Divide two numbers.
+@param a Dividend
+@param b Divisor
+@return The quotient of the two numbers
+>#
+/: (a :Num, b :Num -> :Flt) {} fun
+
+#<
+Divide two numbers and discard the remainder.
+@param a Dividend
+@param b Divisor
+@return The quotient of the two numbers, without the remainder
+>#
+i/: (a :Num, b :Num -> :Int) {} fun
+
+#<
+Calculate the remainder of a divison.
+@param a Dividend
+@param b Divisor
+@return The remainder of the division
+>#
+mod: (a :Num, b :Num -> :Num) {} fun
+
+#<
+The mathematical constant Pi.
+>#
+3.141 pi!
+
+#<
+Get the signum of a number.
+@param x A number
+@return -1 of x is negative, 1 if x is positive, 0 if x is 0
+>#
+sign: (x :Num -> :Int) {} fun
