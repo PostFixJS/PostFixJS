@@ -24,6 +24,28 @@ class DocParser {
 
     return functions
   }
+
+  /**
+   * Get all variable declarations and related documentation from the given code.
+   * @param {string} code PostFix code
+   * @return {object[]} Variable names with descriptions
+   */
+  static getVariables (code) {
+    const variables = {}
+    const tokens = Lexer.parse(code, { emitComments: true })
+
+    for (let i = 0; i < tokens.length; i++) {
+      const variable = getVariableAt(tokens, i)
+      if (variable !== false) {
+        if (!variables[variable.variable.name]) {
+          variables[variable.variable.name] = variable.variable
+        }
+        i = variable.i
+      }
+    }
+
+    return Object.values(variables)
+  }
 }
 
 function getFunctionAt (tokens, i) {
@@ -59,27 +81,85 @@ function getFunctionAt (tokens, i) {
       description: doc.returns.length > i ? doc.returns[i].description : undefined
     }))
   }
-  i = skipExeArr(tokens, i)
+  i = skipElements(tokens, i, 'EXEARR_START', 'EXEARR_END')
   if (tokens[i] && tokens[i].tokenType === 'REFERENCE' && tokens[i].token === 'fun') {
     return { fn, i }
   }
   return false
 }
 
-function skipExeArr (tokens, i) {
-  let arrs = 1
+function getVariableAt (tokens, i) {
+  const variable = {}
+  let doc
+  if (tokens[i] && tokens[i].tokenType === 'BLOCK_COMMENT') {
+    doc = parseDocComment(tokens[i].token)
+    variable.description = doc.description
+    i++
+  } else {
+    doc = { params: {}, returns: [] }
+    variable.description = undefined
+  }
+
+  if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
+    // :variableName value !
+    const token = tokens[i].token
+    variable.name = token.indexOf(':') === 0
+      ? token.substr(1)
+      : token.substr(0, token.length - 1)
+    i++
+
+    if (i < tokens.length && tokens[i].tokenType === 'DEFINITION') {
+      // maybe the value is a symbol, e.g. :foo bar!
+      i--
+    } else {
+      i = skipElement(tokens, i)
+      if (i === false) return false
+      if (i < tokens.length && tokens[i].token === '!') {
+        return { variable, i }
+      }
+      return false
+    }
+  }
+
+  // value variableName!
+  i = skipElement(tokens, i)
+  if (i === false) return false
+  if (tokens[i].tokenType === 'DEFINITION') {
+    variable.name = tokens[i].token.substr(0, tokens[i].token.length - 1)
+    i++
+    return { variable, i }
+  }
+
+  return false
+}
+
+function skipElements (tokens, i, openToken, closeToken) {
+  let depth = 1
   i++
   for (; i < tokens.length; i++) {
-    if (tokens[i].tokenType === 'EXEARR_START') {
-      arrs++
-    } else if (tokens[i].tokenType === 'EXEARR_END') {
-      arrs--
+    if (tokens[i].tokenType === openToken) {
+      depth++
+    } else if (tokens[i].tokenType === closeToken) {
+      depth--
     }
-    if (arrs === 0) {
+    if (depth === 0) {
       return i + 1
     }
   }
   return false
+}
+
+function skipElement (tokens, i) {
+  switch (tokens[i].tokenType) {
+    case 'PARAM_LIST_START':
+      return skipElements(tokens, i, 'PARAM_LIST_START', 'PARAM_LIST_END')
+    case 'ARR_START':
+      return skipElements(tokens, i, 'ARR_START', 'ARR_END')
+    case 'EXEARR_START':
+      return skipElements(tokens, i, 'EXEARR_START', 'EXEARR_END')
+    default:
+      return i < tokens.length - 1 ? i + 1 : false
+  }
 }
 
 function parseDocComment (comment) {

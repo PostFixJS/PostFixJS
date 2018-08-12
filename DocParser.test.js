@@ -193,3 +193,50 @@ Calculate the factorial of a number.
     `, 'should not throw on invalid @param tags')
   })
 })
+
+test('DocParser finds variable declarations with long syntax', (t) => {
+  t.deepEqual(DocParser.getVariables(`
+#<
+The answer to life, the universe and everything.
+>#
+answer: 42 !
+  `), [{
+    name: 'answer',
+    description: 'The answer to life, the universe and everything.'
+  }])
+})
+
+test('DocParser finds variable declarations with short syntax', (t) => {
+  t.deepEqual(DocParser.getVariables(`
+#<
+The answer to life, the universe and everything.
+>#
+42 answer!
+  `), [{
+    name: 'answer',
+    description: 'The answer to life, the universe and everything.'
+  }])
+})
+
+test('DocParser finds variable declarations with short syntax if the value is a symbol', (t) => {
+  // this is an edge case, because test: could also be the start of the long syntax
+  t.deepEqual(DocParser.getVariables(`
+test: var!
+  `), [{
+    name: 'var',
+    description: undefined
+  }])
+})
+
+test('DocParser only finds the first declaration of a variable', (t) => {
+  t.deepEqual(DocParser.getVariables(`
+#< Test variable >#
+42 test!
+
+#< Re-declare the variable >#
+21 test!
+  `), [{
+    name: 'test',
+    description: 'Test variable'
+  }])
+})
