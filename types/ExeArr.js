@@ -12,6 +12,10 @@ class ExeArr extends Arr {
     }
   }
 
+  getTypeName () {
+    return ':ExeArr'
+  }
+
   toString () {
     return `{ ${this.items.map((item) => item.toString()).join(', ')} }`
   }

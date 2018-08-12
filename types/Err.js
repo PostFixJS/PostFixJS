@@ -7,6 +7,10 @@ class Err extends Obj {
     this.origin = origin
   }
 
+  getTypeName () {
+    return ':Err'
+  }
+
   toString () {
     return `Err(${this.origin.line + 1}:${this.origin.col + 1}, ${this.message})`
   }

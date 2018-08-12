@@ -19,6 +19,10 @@ class Ref extends Obj {
     }
   }
 
+  getTypeName () {
+    return ':Ref'
+  }
+
   toString () {
     return this.name
   }

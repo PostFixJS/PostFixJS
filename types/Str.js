@@ -6,6 +6,10 @@ class Str extends Obj {
     this.value = value
   }
 
+  getTypeName () {
+    return ':Str'
+  }
+
   toString () {
     return `"${this.value}"`
   }

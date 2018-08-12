@@ -6,6 +6,10 @@ class Bool extends Obj {
     this.value = value
   }
 
+  getTypeName () {
+    return ':Bool'
+  }
+
   toString () {
     return this.value ? 'true' : 'false'
   }

@@ -32,6 +32,10 @@ class Lam extends ExeArr {
     return type === this.getTypeName() || type === ':ExeArr'
   }
 
+  getTypeName () {
+    return ':Lam'
+  }
+
   toString () {
     return `${super.toString()} lam`
   }

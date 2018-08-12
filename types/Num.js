@@ -10,6 +10,10 @@ class Num extends Obj {
     return type === this.getTypeName() || type === ':Num'
   }
 
+  getTypeName () {
+    return ':Num'
+  }
+
   toString () {
     return `${this.value}`
   }

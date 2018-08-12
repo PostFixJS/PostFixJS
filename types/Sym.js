@@ -6,6 +6,10 @@ class Sym extends Obj {
     this.name = name
   }
 
+  getTypeName () {
+    return ':Sym'
+  }
+
   toString () {
     return `:${this.name}`
   }

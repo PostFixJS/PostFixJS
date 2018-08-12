@@ -6,6 +6,10 @@ class Arr extends Obj {
     this.items = items
   }
 
+  getTypeName () {
+    return ':Arr'
+  }
+
   toString () {
     return `[ ${this.items.map((item) => item.toString()).join(', ')} ]`
   }

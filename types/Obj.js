@@ -4,7 +4,7 @@ class Obj {
   }
 
   getTypeName () {
-    return `:${this.constructor.name}`
+    return `:Obj`
   }
 
   isAssignableTo (type) {

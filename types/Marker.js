@@ -40,6 +40,10 @@ class Marker extends Obj {
     }
   }
 
+  getTypeName () {
+    return ':Marker'
+  }
+
   toString () {
     switch (this.type) {
       case 'ArrOpen':

@@ -74,6 +74,10 @@ class Params extends Obj {
     }
   }
 
+  getTypeName () {
+    return ':Params'
+  }
+
   toString () {
     const params = this.params
       .map(({ ref, type }) => `${ref.toString()}${type ? ` ${type.toString()}` : ''}`)
