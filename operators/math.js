@@ -186,7 +186,9 @@ module.exports.atan = {
 module.exports.atan2 = {
   name: 'atan2',
   execute (interpreter) {
-    interpreter._stack.push(new types.Flt(Math.atan2(interpreter._stack.popNumber())))
+    const x = interpreter._stack.popNumber()
+    const y = interpreter._stack.popNumber()
+    interpreter._stack.push(new types.Flt(Math.atan2(y.value, x.value)))
   }
 }
 
