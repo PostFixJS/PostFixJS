@@ -65,3 +65,134 @@ Get the signum of a number.
 @return -1 of x is negative, 1 if x is positive, 0 if x is 0
 >#
 sign: (x :Num -> :Int) {} fun
+
+#<
+Get the absolute value of a number.
+@param x A number
+@return Absolute value of the number
+>#
+abs: (x :Num -> :Num) {} fun
+
+#<
+Get the minimum of two numbers.
+@param a A number
+@param b A number
+@return The smaller number
+>#
+min: (a :Num, b :Num -> :Num) {} fun
+
+#<
+Get the maximum of two numbers.
+@param a A number
+@param b A number
+@return The larger number
+>#
+max: (a :Num, b :Num -> :Num) {} fun
+
+#<
+Calculate the sine function at the given angle.
+@param x Angle, in radiants
+@return Value of the sine function at x
+>#
+sin: (x :Num -> :Flt) {} fun
+
+#<
+Calculate the inverse sine function for the given value.
+@param x X value
+@return Value of the inverse sine function at x
+>#
+asine: (x :Num -> :Flt) {} fun
+
+#<
+Calculate the cosine function at the given angle.
+@param x Angle, in radiants
+@return Value of the cosine function at x
+>#
+cos: (x :Num -> :Flt) {} fun
+
+#<
+Calculate the inverse cosine function for the given value.
+@param x X value
+@return Value of the inverse cosine function at x
+>#
+acos: (x :Num -> :Flt) {} fun
+
+#<
+Calculate the tangent function at the given angle.
+@param x Angle, in radiants
+@return Value of the tangent function at x
+>#
+tan: (x :Num -> :Flt) {} fun
+
+#<
+Calculate the inverse tangent function for the given value.
+@param x X value
+@return Value of the inverse tangent function at x
+>#
+atan: (x :Num -> :Flt) {} fun
+
+#<
+Calculate the angle from the X axis to a point.
+@param y Y coordinate of a point
+@param x X coordinate of a point
+@return Angle from the X axis to the point, in radiants
+>#
+atan2: (y :Num, x :Num -> :Flt) {} fun
+
+#<
+Get the nearest integer that is equal to or greater than the given number.
+@param x A number
+@return The nearest integer that is equal to or greater than x
+>#
+ceil: (x :Num -> :Int) {} fun
+
+#<
+Get the nearest integer that is equal to or smaller than the given number.
+@param x A number
+@return The nearest integer that is equal to or smaller than x
+>#
+floor: (x :Num -> :Int) {} fun
+
+#<
+Calculate the square root of a number.
+@param x A number
+@return The square root of x
+>#
+sqrt: (x :Num -> :Flt) {} fun
+
+#<
+Calculate e raised to the power of a value.
+@param x The exponent
+@return e raised to the power of x
+>#
+exp: (x :Num -> :Flt) {} fun
+
+#<
+Calculate a base value raised to the power of a given exponent.
+@param b The base
+@param n The exponent
+@return b raised to the power of n
+>#
+pow: (b :Num, n :Num -> :Flt) {} fun
+
+#<
+Calculate the natural logarithm of a number.
+@param x A number
+@return Natural logarithm of x
+>#
+ln: (x :Num -> :Flt) {} fun
+
+#<
+Calculate the logarithm of a number, with respect to a given base.
+@param x A number
+@param b The base
+@return The logarithm of x with respect to base b
+>#
+log: (x :Num, b :Num -> :Flt) {} fun
+
+#<
+Get the nearest integer of the given number.
+@param x A number
+@return The nearest integer of the number
+>#
+round: (x :Num -> :Int) {} fun
