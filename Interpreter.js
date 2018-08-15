@@ -72,9 +72,13 @@ class Interpreter {
           const operation = new types.Op(builtIn, token)
           this._stack.push(operation)
         } else {
-          const result = builtIn.execute(this, token)
-          if (result != null && result[Symbol.iterator]) {
-            yield * result
+          try {
+            const result = builtIn.execute(this, token)
+            if (result != null && result[Symbol.iterator]) {
+              yield * result
+            }
+          } catch (e) {
+            this._handleExecutionError(e, token)
           }
         }
       } else {
@@ -86,9 +90,13 @@ class Interpreter {
         } else {
           const value = this._dictStack.get(token.token)
           if (value) {
-            const result = value.execute(this)
-            if (result != null && result[Symbol.iterator]) {
-              yield * result
+            try {
+              const result = value.execute(this)
+              if (result != null && result[Symbol.iterator]) {
+                yield * result
+              }
+            } catch (e) {
+              this._handleExecutionError(e, token)
             }
           } else {
             throw new types.Err(`Could not find ${token.token} in the dictionary`, token)
@@ -134,16 +142,7 @@ class Interpreter {
       }
 
       if (obj) {
-        if (this._openExeArrs > 0 && !(obj instanceof types.Marker && (obj.type === 'ExeArrOpen' || obj.type === 'ExeArrClose'))) {
-          this._stack.push(obj)
-        } else if (this._openParamLists > 0 && !(obj instanceof types.Marker && (obj.type === 'ParamsOpen' || obj.type === 'ParamsClose'))) {
-          this._stack.push(obj)
-        } else {
-          const result = obj.execute(this)
-          if (result != null && result[Symbol.iterator]) {
-            yield * result
-          }
-        }
+        yield * this.executeObj(obj)
       } else {
         // This should never happen
         throw new types.Err(`Unknown token type ${token.tokenType} at line ${token.line}:${token.col}, this is most likely a bug in PostFix`, token)
@@ -157,9 +156,13 @@ class Interpreter {
     } else if (this._openParamLists > 0 && !(obj instanceof types.Marker && (obj.type === 'ParamsOpen' || obj.type === 'ParamsClose'))) {
       this._stack.push(obj)
     } else {
-      const result = obj.execute(this)
-      if (result != null && result[Symbol.iterator]) {
-        yield * result
+      try {
+        const result = obj.execute(this)
+        if (result != null && result[Symbol.iterator]) {
+          yield * result
+        }
+      } catch (e) {
+        this._handleExecutionError(e, obj.origin)
       }
     }
   }
@@ -170,7 +173,23 @@ class Interpreter {
    */
   * _run (tokens) {
     for (const token of tokens) {
-      yield * this._execute(token)
+      try {
+        yield * this._execute(token)
+      } catch (e) {
+        this._handleExecutionError(e, token)
+      }
+    }
+  }
+
+  _handleExecutionError (e, token) {
+    if (e === 'STACK_CORRUPTED') {
+      if (this._stack.count === 0) {
+        throw new types.Err('The stack is empty', token)
+      } else {
+        throw new types.Err('Stack access is out of range', token)
+      }
+    } else {
+      throw e
     }
   }
 
