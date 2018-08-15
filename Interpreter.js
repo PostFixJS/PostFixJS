@@ -136,6 +136,8 @@ class Interpreter {
       if (obj) {
         if (this._openExeArrs > 0 && !(obj instanceof types.Marker && (obj.type === 'ExeArrOpen' || obj.type === 'ExeArrClose'))) {
           this._stack.push(obj)
+        } else if (this._openParamLists > 0 && !(obj instanceof types.Marker && (obj.type === 'ParamsOpen' || obj.type === 'ParamsClose'))) {
+          this._stack.push(obj)
         } else {
           const result = obj.execute(this)
           if (result != null && result[Symbol.iterator]) {
@@ -150,9 +152,15 @@ class Interpreter {
   }
 
   * executeObj (obj) {
-    const result = obj.execute(this)
-    if (result != null && result[Symbol.iterator]) {
-      yield * result
+    if (this._openExeArrs > 0 && !(obj instanceof types.Marker && (obj.type === 'ExeArrOpen' || obj.type === 'ExeArrClose'))) {
+      this._stack.push(obj)
+    } else if (this._openParamLists > 0 && !(obj instanceof types.Marker && (obj.type === 'ParamsOpen' || obj.type === 'ParamsClose'))) {
+      this._stack.push(obj)
+    } else {
+      const result = obj.execute(this)
+      if (result != null && result[Symbol.iterator]) {
+        yield * result
+      }
     }
   }
 

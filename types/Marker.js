@@ -32,10 +32,13 @@ class Marker extends Obj {
       const items = interpreter._stack.popUntil((obj) => obj instanceof Marker && obj.type === 'ParamsOpen')
       const params = new Params(items.slice(1), items[0].origin)
       interpreter._stack.push(params)
+      interpreter._openParamLists--
     } else {
       super.execute(interpreter)
       if (this.type === 'ExeArrOpen') {
         interpreter._openExeArrs++
+      } else if (this.type === 'ParamsOpen') {
+        interpreter._openParamLists++
       }
     }
   }
