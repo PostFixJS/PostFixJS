@@ -25,3 +25,9 @@ test('Trying to get elements from below the stack should throw an error', (t) =>
     execute('{ 42 1 copy } exec')
   }, (e) => e instanceof types.Err && e.message === 'Stack access is out of range' && e.origin.line === 0 && e.origin.col === 7)
 })
+
+test('Trying to access the foreign stack in a function should throw an error', (t) => {
+  t.throws(() => {
+    execute('test: { pop } fun 42 test')
+  }, (e) => e instanceof types.Err && e.message === 'Inside :Lam the stack may not be accessed beyond the height it had when the :Lam was invoked')
+})

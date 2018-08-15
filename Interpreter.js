@@ -150,7 +150,7 @@ class Interpreter {
     }
   }
 
-  * executeObj (obj) {
+  * executeObj (obj, handleErrors = true) {
     if (this._openExeArrs > 0 && !(obj instanceof types.Marker && (obj.type === 'ExeArrOpen' || obj.type === 'ExeArrClose'))) {
       this._stack.push(obj)
     } else if (this._openParamLists > 0 && !(obj instanceof types.Marker && (obj.type === 'ParamsOpen' || obj.type === 'ParamsClose'))) {
@@ -162,7 +162,11 @@ class Interpreter {
           yield * result
         }
       } catch (e) {
-        this._handleExecutionError(e, obj.origin)
+        if (handleErrors) {
+          this._handleExecutionError(e, obj.origin)
+        } else {
+          throw e
+        }
       }
     }
   }

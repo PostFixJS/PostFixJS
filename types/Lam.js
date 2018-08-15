@@ -10,9 +10,14 @@ class Lam extends ExeArr {
     const stackHeight = interpreter._stack.forbidPop()
     let nextToken
     try {
-      for (const token of super.execute(interpreter)) {
-        yield token
-        nextToken = token
+      for (const obj of this.items) {
+        yield obj.origin
+        nextToken = obj.origin
+        if (obj instanceof ExeArr) {
+          interpreter._stack.push(obj)
+        } else {
+          yield * interpreter.executeObj(obj, false)
+        }
       }
     } catch (e) {
       if (e === 'STACK_CORRUPTED') {
