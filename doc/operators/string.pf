@@ -1,0 +1,49 @@
+#<
+Remove whitespace from the start and end of a string.
+@param str String
+@return Trimmed string
+>#
+trim: (str :Str -> :Str) {} fun
+
+#<
+Transform a string to lower-case.
+@param str String
+@return String in lower-case
+>#
+lower-case: (str :Str -> :Str) {} fun
+
+#<
+Transform a string to upper-case.
+@param str String
+@return String in upper-case
+>#
+upper-case: (str :Str -> :Str) {} fun
+
+#<
+Get the characters of a string.
+@param str String
+@return Array of character codes
+>#
+str->chars: (str :Str -> :Arr) {} fun
+
+#<
+Create a string from an array of character codes.
+@param chars Characters codes
+@return String with the given character codes
+>#
+chars->str: (chars :Arr -> :Str) {} fun
+
+#<
+Get the character of a given character code.
+@param char Character code
+@return Character as string
+>#
+char->str: (char :Int -> :Str) {} fun
+
+#<
+Split a string using a regular expression. The string is split wherever it matches.
+@param str String
+@param regex A regular expression
+@return Splitted parts
+>#
+split: (str :Str, regex :Str -> :Arr) {} fun

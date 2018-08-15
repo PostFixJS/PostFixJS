@@ -26,13 +26,7 @@ class Interpreter {
     this.registerBuiltIns(require('./operators/logical'))
     this.registerBuiltIns(require('./operators/math'))
     this.registerBuiltIns(require('./operators/stack'))
-
-    this.registerBuiltIn({
-      name: 'trim',
-      execute (interpreter) {
-        interpreter._stack.push(new types.Str(interpreter._stack.popString().value.trim()))
-      }
-    })
+    this.registerBuiltIns(require('./operators/string'))
   }
 
   registerBuiltIn (builtIn) {
