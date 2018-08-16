@@ -1,3 +1,4 @@
+const { vsprintf } = require('sprintf-js')
 const types = require('../types')
 
 module.exports.trim = {
@@ -86,5 +87,25 @@ module.exports.replaceAll = {
     const regex = new RegExp(interpreter._stack.popString().value, 'g')
     const str = interpreter._stack.popString().value
     interpreter._stack.push(new types.Str(str.replace(regex, replaceWith)))
+  }
+}
+
+module.exports.format = {
+  name: 'format',
+  execute (interpreter, token) {
+    const params = interpreter._stack.pop()
+    if (!(params instanceof types.Arr)) {
+      throw new types.Err(`format expects an :Arr with parameters as second argument but got ${params.getTypeName()} instead`, token)
+    }
+    const formatStr = interpreter._stack.popString().value
+    interpreter._stack.push(new types.Str(vsprintf(formatStr, params.items.map((obj) => {
+      if (obj instanceof types.Num) {
+        return obj.value
+      } else if (obj instanceof types.Str) {
+        return obj.value
+      } else {
+        return obj.toString()
+      }
+    }))))
   }
 }

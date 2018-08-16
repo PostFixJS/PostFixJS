@@ -65,3 +65,9 @@ test('replace-all should replace all matches of a regex', (t) => {
   t.is(stack.count, 1)
   t.is(stack.pop().value, 'rrsr')
 })
+
+test('format formats a string, just like C\'s vsprintf', (t) => {
+  const { stack } = execute('"answer to everything = %d" [42] format')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'answer to everything = 42')
+})
