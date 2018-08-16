@@ -57,7 +57,7 @@ mod: (a :Num, b :Num -> :Num) {} fun
 #<
 The mathematical constant Pi.
 >#
-3.141 pi!
+3.141 PI!
 
 #<
 Get the signum of a number.
@@ -101,7 +101,7 @@ Calculate the inverse sine function for the given value.
 @param x X value
 @return Value of the inverse sine function at x
 >#
-asine: (x :Num -> :Flt) {} fun
+asin: (x :Num -> :Flt) {} fun
 
 #<
 Calculate the cosine function at the given angle.

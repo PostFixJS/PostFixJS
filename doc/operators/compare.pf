@@ -86,7 +86,7 @@ Check if two objects are not equal, according to the following rules:
 @param b Object b
 @return true if the objects are not equal, false otherwise
 >#
-=: (a :Obj, b :Obj -> :Bool) {} fun
+!=: (a :Obj, b :Obj -> :Bool) {} fun
 
 #<
 Check if two objects are approximately equal, according to the following rules:

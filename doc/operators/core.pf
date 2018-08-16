@@ -44,3 +44,10 @@ Get the type of an object.
 @return The type of the object
 >#
 type: (obj :Obj -> :Sym) {} fun
+
+#<
+Put a value in the dictionary under the specified name.
+@param name Name of the dictionary entry
+@param value value
+>#
+!: (name :Sym, value :Obj) {} fun
