@@ -68,3 +68,23 @@ module.exports.split = {
     interpreter._stack.push(new types.Arr(str.split(regex).map((part) => new types.Str(part))))
   }
 }
+
+module.exports.replaceFirst = {
+  name: 'replace-first',
+  execute (interpreter) {
+    const replaceWith = interpreter._stack.popString().value
+    const regex = new RegExp(interpreter._stack.popString().value)
+    const str = interpreter._stack.popString().value
+    interpreter._stack.push(new types.Str(str.replace(regex, replaceWith)))
+  }
+}
+
+module.exports.replaceAll = {
+  name: 'replace-all',
+  execute (interpreter) {
+    const replaceWith = interpreter._stack.popString().value
+    const regex = new RegExp(interpreter._stack.popString().value, 'g')
+    const str = interpreter._stack.popString().value
+    interpreter._stack.push(new types.Str(str.replace(regex, replaceWith)))
+  }
+}

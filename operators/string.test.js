@@ -53,3 +53,15 @@ test('split splits a string with a regex', (t) => {
     ['this', 'is', 'a', 'test']
   )
 })
+
+test('replace-first should replace the first match of a regex', (t) => {
+  const { stack } = execute('"test" "[te]" "r" replace-first')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'rest')
+})
+
+test('replace-all should replace all matches of a regex', (t) => {
+  const { stack } = execute('"test" "[^s]" "r" replace-all')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'rrsr')
+})

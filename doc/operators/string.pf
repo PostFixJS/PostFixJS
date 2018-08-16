@@ -47,3 +47,21 @@ Split a string using a regular expression. The string is split wherever it match
 @return Splitted parts
 >#
 split: (str :Str, regex :Str -> :Arr) {} fun
+
+#<
+Replace the first match of a regular expression in a string.
+@param str String
+@param regex A regular expression
+@param replace String to replace the match with
+@return Modified string
+>#
+replace-first: (str :Str, regex :Str, replace :Str -> :Str) {} fun
+
+#<
+Replace the all matches of a regular expression in a string.
+@param str String
+@param regex A regular expression
+@param replace String to replace the matches with
+@return Modified string
+>#
+replace-all: (str :Str, regex :Str, replace :Str -> :Str) {} fun
