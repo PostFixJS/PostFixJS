@@ -1,0 +1,19 @@
+#<
+Get a random float between 0 (inclusive) and 1 (exclusive).
+@return A random float between 0 (inclusive) and 1 (exclusive)
+>#
+rand-flt: (-> :Flt) {} fun
+
+#<
+Get a pseudo-random integer between 0 (inclusive) and n (exclusive).
+@param n Upper bound of the random number, must be positive
+@return A random integer between 0 (inclusive) and n (exclusive)
+>#
+rand-int: (n :Int -> :Int) {} fun
+
+#<
+Initialize the random number generator with the given seed. When initialized
+with the same seed, the generated random numbers will be deterministic.
+@param seed Any number to be used as seed
+>#
+rand-seed: (seed :Int) {} fun

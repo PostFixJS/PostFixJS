@@ -22,6 +22,7 @@
   "dependencies": {
     "get-stdin": "^6.0.0",
     "read": "^1.0.7",
+    "seedrandom": "^2.4.4",
     "sprintf-js": "^1.1.1"
   }
 }
