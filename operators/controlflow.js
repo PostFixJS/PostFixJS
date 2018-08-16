@@ -61,6 +61,12 @@ module.exports.loop = {
     if (!(body instanceof types.ExeArr)) {
       throw new types.Err(`loop expects an :ExeArr but got ${body.getTypeName()}`, token)
     }
+    if (body.items.length === 0) {
+      // edge case to allow interrupting an empty loop
+      while (true) {
+        yield body.origin
+      }
+    }
     try {
       while (true) {
         yield * interpreter.executeObj(body)
