@@ -1,18 +1,25 @@
 #<
 Swap the two topmost objects on the stack.
+@param a An object
+@param b Another object
+@return Object b
+@return Object a
 >#
-swap: () {} fun
+swap: (a :Obj, b :Obj -> :Obj :Obj) {} fun
 
 #<
 Remove the topmost object from the stack.
+@param obj An object
 >#
-pop: () {} fun
+pop: (obj :Obj) {} fun
 
 #<
 Duplicate the topmost object on the stack.
-@return Copy of the topmost object
+@param obj An object
+@return The object
+@return Copy of the object
 >#
-dup: (-> :Obj) {} fun
+dup: (obj :Obj -> :Obj, :Obj) {} fun
 
 #<
 Copy the i-th object (from top) of the stack on top of the stack.
