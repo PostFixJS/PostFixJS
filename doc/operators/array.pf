@@ -62,3 +62,11 @@ Set the item after the first item in the array that is equal to the given key. I
 @return The modified array
 >#
 key-set: (arr :Arr, key :Obj, value :Obj -> :Arr) {} fun
+
+#<
+Shuffle the given array.
+Internally, this function uses rand-int, so it is deterministic when the seed is known.
+@param arr Array
+@return The shuffled array
+>#
+shuffle: (arr :Arr -> :Arr) {} fun

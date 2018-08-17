@@ -40,7 +40,9 @@ class Interpreter {
   registerBuiltIns (builtIns) {
     if (Array.isArray(builtIns)) {
       for (const builtIn of builtIns) {
-        this.registerBuiltIn(builtIn)
+        if (builtIn.name && builtIn.execute) {
+          this.registerBuiltIn(builtIn)
+        }
       }
     } else {
       // object

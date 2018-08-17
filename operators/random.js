@@ -28,3 +28,5 @@ module.exports.randSeed = {
     random = seedrandom(`${seed}`)
   }
 }
+
+module.exports.getRandom = () => random

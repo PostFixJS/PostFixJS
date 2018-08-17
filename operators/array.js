@@ -1,4 +1,5 @@
 const types = require('../types')
+const { getRandom } = require('./random')
 
 module.exports.length = {
   name: 'length',
@@ -115,6 +116,27 @@ module.exports.keySet = {
       }
     }
     interpreter._stack.push(new types.Arr([...array.items, key, value]))
+  }
+}
+
+module.exports.shuffle = {
+  name: 'shuffle',
+  execute (interpreter, token) {
+    const arr = interpreter._stack.pop()
+    if (!(arr instanceof types.Arr)) {
+      throw new types.Err(`shuffle expects an :Arr but got ${arr.getTypeName()} instead`, token)
+    }
+    const items = arr.items.slice()
+
+    // Fisher-Yates shuffle as seen in Knuth's The Art of Computer Programming
+    for (let i = 0; i < arr.items.length; i++) {
+      const rnd = Math.floor((items.length - i) *  getRandom().double() + i)
+      const tmp = items[i]
+      items[i] = items[rnd]
+      items[rnd] = tmp
+    }
+
+    interpreter._stack.push(new types.Arr(items))
   }
 }
 
