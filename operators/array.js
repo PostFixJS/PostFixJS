@@ -1,5 +1,5 @@
 const types = require('../types')
-const { getRandom } = require('./random')
+const { nextInt } = require('./impl/random')
 
 module.exports.length = {
   name: 'length',
@@ -130,7 +130,7 @@ module.exports.shuffle = {
 
     // Fisher-Yates shuffle as seen in Knuth's The Art of Computer Programming
     for (let i = 0; i < arr.items.length; i++) {
-      const rnd = Math.floor((items.length - i) *  getRandom().double() + i)
+      const rnd = nextInt(items.length - i) + i
       const tmp = items[i]
       items[i] = items[rnd]
       items[rnd] = tmp

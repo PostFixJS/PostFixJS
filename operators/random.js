@@ -1,12 +1,10 @@
-const seedrandom = require('seedrandom')
 const types = require('../types')
-
-let random = seedrandom(`${Date.now()}`)
+const random = require('./impl/random')
 
 module.exports.randFlt = {
   name: 'rand-flt',
   execute (interpreter) {
-    interpreter._stack.push(new types.Flt(random.double()))
+    interpreter._stack.push(new types.Flt(random.nextDouble()))
   }
 }
 
@@ -17,16 +15,13 @@ module.exports.randInt = {
     if (n <= 0) {
       throw new types.Err(`rand-int expected a positive upper bound but got ${n} instead`, token)
     }
-    interpreter._stack.push(new types.Int(Math.floor(random.double() * n)))
+    interpreter._stack.push(new types.Int(random.nextInt(n)))
   }
 }
 
 module.exports.randSeed = {
   name: 'rand-seed',
   execute (interpreter) {
-    const seed = interpreter._stack.popNumber().value
-    random = seedrandom(`${seed}`)
+    random.setSeed(interpreter._stack.popNumber().value)
   }
 }
-
-module.exports.getRandom = () => random
