@@ -68,7 +68,7 @@ replace-all: (str :Str, regex :Str, replace :Str -> :Str) {} fun
 
 #<
 Format the given string using the given parameters.
-This uses C-style format string, e.g. `%d` is used for integers, `%s` for strings and so on.
+This uses a C-style format string, e.g. `%d` is used for integers, `%s` for strings and so on.
 @param format Format string
 @param params Parameters
 @return Formatted string
