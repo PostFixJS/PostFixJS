@@ -1,5 +1,6 @@
 const types = require('../types')
 const { nextInt } = require('./impl/random')
+const { isEqual } = require('./impl/compare')
 
 module.exports.length = {
   name: 'length',
@@ -157,28 +158,4 @@ module.exports.reverse = {
       throw new types.Err(`reverse expects an :Arr or :Str but got ${arr.getTypeName()} instead`, token)
     }
   }
-}
-
-function isEqual (a, b) {
-  if (a === b) {
-    return true
-  } else if (a instanceof types.Arr && b instanceof types.Arr) {
-    if (a.items.length === b.items.length) {
-      for (let i = 0; i < a.items.length; i++) {
-        if (!isEqual(a.items[i], b.items[i])) {
-          return false
-        }
-      }
-      return true
-    }
-  } else if (a instanceof types.Num && b instanceof types.Num) {
-    return a.value === b.value
-  } else if (a instanceof types.Str && b instanceof types.Str) {
-    return a.value === b.value
-  } else if (a instanceof types.Bool && b instanceof types.Bool) {
-    return a.value === b.value
-  } else if (a instanceof types.Sym && b instanceof types.Sym) {
-    return a.name === b.name
-  }
-  return false
 }
