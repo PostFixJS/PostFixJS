@@ -11,9 +11,7 @@ if (process.argv[process.argv.length - 1] === '--') {
   process.stdin.on('data', (buf) => lexer.put(buf.toString()))
   process.stdin.on('end', () => {
     try {
-      for (const token of lexer.getTokens()) {
-        interpreter.execute(token)
-      }
+      interpreter.runToCompletion(lexer.getTokens())
     } catch (e) {
       console.error(e.toString())
     }
