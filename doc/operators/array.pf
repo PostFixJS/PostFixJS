@@ -70,3 +70,17 @@ Internally, this function uses rand-int, so it is deterministic when the seed is
 @return The shuffled array
 >#
 shuffle: (arr :Arr -> :Arr) {} fun
+
+#<
+Reverse the given array.
+@param arr Array
+@return A new array with the items in reverse order
+>#
+reverse: (arr :Arr -> :Arr) {} fun
+
+#<
+Reverse the given string.
+@param str String
+@return The reversed string
+>#
+reverse: (str :Str -> :Str) {} fun

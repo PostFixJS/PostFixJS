@@ -103,3 +103,19 @@ test('shuffle shuffles an array', (t) => {
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
   )
 })
+
+test('reverse reverses an array', (t) => {
+  const { stack } = execute('[4 :b "c"] reverse')
+  t.is(stack.count, 1)
+  const items = stack.pop().items
+  t.is(items.length, 3)
+  t.is(items[0].value, 'c')
+  t.is(items[1].name, 'b')
+  t.is(items[2].value, 4)
+})
+
+test('reverse reverts a string', (t) => {
+  const { stack } = execute('"!skrow tI" reverse')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'It works!')
+})

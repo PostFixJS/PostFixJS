@@ -140,6 +140,25 @@ module.exports.shuffle = {
   }
 }
 
+module.exports.reverse = {
+  name: 'reverse',
+  execute (interpreter, token) {
+    const arr = interpreter._stack.pop()
+    if (arr instanceof types.Arr) {
+      // TODO copy the items, if needed
+      interpreter._stack.push(new types.Arr(arr.items.reverse()))
+    } else if (arr instanceof types.Str) {
+      let newStr = ''
+      for (var i = arr.value.length - 1; i >= 0; i--) {
+        newStr += arr.value[i]
+      }
+      interpreter._stack.push(new types.Str(newStr))
+    } else {
+      throw new types.Err(`reverse expects an :Arr or :Str but got ${arr.getTypeName()} instead`, token)
+    }
+  }
+}
+
 function isEqual (a, b) {
   if (a === b) {
     return true
