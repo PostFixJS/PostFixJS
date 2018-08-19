@@ -31,3 +31,8 @@ test('Trying to access the foreign stack in a function should throw an error', (
     execute('test: { pop } fun 42 test')
   }, (e) => e instanceof types.Err && e.message === 'Inside :Lam the stack may not be accessed beyond the height it had when the :Lam was invoked')
 })
+
+test('The interpreter handles excaped quotes properly', (t) => {
+  const { stack } = execute('"\\""')
+  t.is(stack.pop().value, '"')
+})

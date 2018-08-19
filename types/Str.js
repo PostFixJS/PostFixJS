@@ -15,7 +15,11 @@ class Str extends Obj {
   }
 
   static fromToken (token) {
-    const str = new Str(token.token.substr(1, token.token.length - 2))
+    const str = new Str(
+      token.token.substr(1, token.token.length - 2)
+        .replace(/\\"/g, '"')
+        .replace(/\\\\/g, '\\')
+    )
     str.origin = token
     return str
   }
