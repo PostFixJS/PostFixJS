@@ -159,3 +159,30 @@ module.exports.reverse = {
     }
   }
 }
+
+module.exports.append = {
+  name: 'append',
+  execute (interpreter) {
+    const value = interpreter._stack.pop()
+    const array = interpreter._stack.pop()
+    // TODO copy the items, if needed
+    interpreter._stack.push(new types.Arr([...array.items, value]))
+  }
+}
+
+module.exports.remove = {
+  name: 'remove',
+  execute (interpreter) {
+    const value = interpreter._stack.pop()
+    const array = interpreter._stack.pop()
+
+    const removeIndex = array.items.findIndex((obj) => isEqual(obj, value))
+    if (removeIndex >= 0) {
+      const newItems = array.items.slice()
+      newItems.splice(removeIndex, 1)
+      interpreter._stack.push(new types.Arr(newItems))
+    } else {
+      interpreter._stack.push(array)
+    }
+  }
+}

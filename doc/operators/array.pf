@@ -84,3 +84,19 @@ Reverse the given string.
 @return The reversed string
 >#
 reverse: (str :Str -> :Str) {} fun
+
+#<
+Append a value to an array.
+@param arr Array
+@param value Value to append
+@return Modified array
+>#
+append: (arr :Arr, value :Obj) {} fun
+
+#<
+Remove the first item that is equal to the given value from the array.
+@param arr Array
+@param value Value to remove
+@return Array with the first occurence of the given value removed
+>#
+remove: (arr :Arr, value :Obj) {} fun

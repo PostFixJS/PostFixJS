@@ -119,3 +119,21 @@ test('reverse reverts a string', (t) => {
   t.is(stack.count, 1)
   t.is(stack.pop().value, 'It works!')
 })
+
+test('append appends an item to an array', (t) => {
+  const { stack } = execute('["a"] "b" append')
+  t.is(stack.count, 1)
+  t.deepEqual(stack.pop().items.map((obj) => obj.value), ['a', 'b'])
+})
+
+test('remove removes the first occurence of a value in an array', (t) => {
+  const { stack } = execute('[1 1 2 3 1] 1 remove')
+  t.is(stack.count, 1)
+  t.deepEqual(stack.pop().items.map((obj) => obj.value), [1, 2, 3, 1])
+})
+
+test('remove does not modify the array if the value is not found', (t) => {
+  const { stack } = execute('[1 1 2 3 1] 4 remove')
+  t.is(stack.count, 1)
+  t.deepEqual(stack.pop().items.map((obj) => obj.value), [1, 1, 2, 3, 1])
+})
