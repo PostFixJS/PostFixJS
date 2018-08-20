@@ -46,6 +46,13 @@ Get the type of an object.
 type: (obj :Obj -> :Sym) {} fun
 
 #<
+Check if an object is an empty array or executable array or nil.
+@param obj Object
+@return True if the object is an empty array or executable array or nil, false otherwise
+>#
+empty?: (obj :Obj -> :Bool) {} fun
+
+#<
 Put a value in the dictionary under the specified name.
 @param name Name of the dictionary entry
 @param value value

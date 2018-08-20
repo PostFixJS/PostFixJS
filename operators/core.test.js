@@ -28,3 +28,19 @@ test('exec should execute nested ExeArrs', (t) => {
   t.is(stack.count, 1)
   t.is(stack.pop().value, 'pass')
 })
+
+test('empty? returns true for empty arrays and nil', (t) => {
+  const { stack } = execute('{} empty? [] empty? nil empty?')
+  t.is(stack.count, 3)
+  t.is(stack.pop().value, true)
+  t.is(stack.pop().value, true)
+  t.is(stack.pop().value, true)
+})
+
+test('empty? returns false for other objects', (t) => {
+  const { stack } = execute('{1} empty? "hello" empty? 42 empty?')
+  t.is(stack.count, 3)
+  t.is(stack.pop().value, false)
+  t.is(stack.pop().value, false)
+  t.is(stack.pop().value, false)
+})

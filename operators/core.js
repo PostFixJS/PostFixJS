@@ -86,3 +86,17 @@ module.exports.type = {
     interpreter._stack.push(new types.Sym(obj.getTypeName().substr(1)))
   }
 }
+
+module.exports.empty = {
+  name: 'empty?',
+  execute (interpreter) {
+    const obj = interpreter._stack.pop()
+    if (obj instanceof types.Arr) {
+      interpreter._stack.push(new types.Bool(obj.items.length === 0))
+    } else if (obj instanceof types.Nil) {
+      interpreter._stack.push(new types.Bool(true))
+    } else {
+      interpreter._stack.push(new types.Bool(false))
+    }
+  }
+}
