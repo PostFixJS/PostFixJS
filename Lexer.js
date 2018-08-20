@@ -248,6 +248,8 @@ class Lexer {
       case 'true':
       case 'false':
         return 'BOOLEAN'
+      case 'nil':
+        return 'NIL'
     }
 
     // TODO how/where to handle .foo (currently handled by the lexer) and bar.!

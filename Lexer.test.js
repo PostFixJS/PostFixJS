@@ -197,3 +197,12 @@ test('The lexer emitted block comment tokens end where the comment ends', (t) =>
     line: 1
   })
 })
+
+test('The lexer parses nil properly', (t) => {
+  t.deepEqual(Lexer.parse('nil')[0], {
+    token: 'nil',
+    tokenType: 'NIL',
+    col: 0,
+    line: 0
+  })
+})

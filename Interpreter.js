@@ -115,6 +115,9 @@ class Interpreter {
         case 'STRING':
           obj = types.Str.fromToken(token)
           break
+        case 'NIL':
+          obj = types.Nil.fromToken(token)
+          break
         case 'SYMBOL':
           obj = types.Sym.fromToken(token)
           break

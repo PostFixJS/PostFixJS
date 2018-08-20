@@ -6,6 +6,7 @@ const Flt = require('./Flt')
 const Int = require('./Int')
 const Lam = require('./Lam')
 const Marker = require('./Marker')
+const Nil = require('./Nil')
 const Num = require('./Num')
 const Obj = require('./Obj')
 const Op = require('./Op')
@@ -23,6 +24,7 @@ module.exports = {
   Int,
   Lam,
   Marker,
+  Nil,
   Num,
   Obj,
   Op,
