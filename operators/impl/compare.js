@@ -20,6 +20,8 @@ function isEqual (a, b) {
     return a.value === b.value
   } else if (a instanceof types.Sym && b instanceof types.Sym) {
     return a.name === b.name
+  } else if (a instanceof types.Nil && b instanceof types.Nil) {
+    return true
   }
   return false
 }
@@ -39,14 +41,8 @@ function isApproxEqual (a, b, tolerance) {
     }
   } else if (a instanceof types.Num && b instanceof types.Num) {
     return Math.abs(a.value - b.value) <= tolerance
-  } else if (a instanceof types.Str && b instanceof types.Str) {
-    return a.value === b.value
-  } else if (a instanceof types.Bool && b instanceof types.Bool) {
-    return a.value === b.value
-  } else if (a instanceof types.Sym && b instanceof types.Sym) {
-    return a.name === b.name
   }
-  return false
+  return isEqual(a, b)
 }
 
 function getComparableValues (interpreter, token) {
