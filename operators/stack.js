@@ -1,3 +1,5 @@
+const types = require('../types')
+
 module.exports.swap = {
   name: 'swap',
   execute (interpreter) {
@@ -38,5 +40,12 @@ module.exports.clear = {
   name: 'clear',
   execute (interpreter) {
     interpreter._stack.clear()
+  }
+}
+
+module.exports.stackCount = {
+  name: 'stack-count',
+  execute (interpreter) {
+    interpreter._stack.push(new types.Int(interpreter._stack.accessibleCount))
   }
 }

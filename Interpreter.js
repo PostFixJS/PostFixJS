@@ -296,6 +296,18 @@ class Stack {
   }
 
   /**
+   * The number of items on the stack that the program can modify. 
+   * Inside of lambda functions, this may be smaller than the stack count.
+   */
+  get accessibleCount () {
+    if (this._minStackHeight.length === 0) {
+      return this.count
+    } else {
+      return this.count - this._minStackHeight[this._minStackHeight.length - 1]
+    }
+  }
+
+  /**
    * Get the stack. The first element is the bottom-most element.
    * @returns {Obj[]} The stack
    */

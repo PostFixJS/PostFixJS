@@ -32,3 +32,9 @@ copy: (i :Int -> :Obj) {} fun
 Clear the stack.
 >#
 clear: () {} fun
+
+#<
+Get the number of items on the stack. Inside of functions, this only includes items that can be accessed by the function, i.e. those that were pushed onto the stack by this function.
+@return Number of items on the stack
+>#
+stack-count: (-> :Int) {} fun
