@@ -6,7 +6,7 @@
   "scripts": {
     "test": "ava",
     "lint": "standard",
-    "build:operators-doc": "find ./doc/operators/*.pf | xargs cat | node ./scripts/get-declarations.js > ./doc/operators.json"
+    "build:docs": "find ./doc/operators/*.pf | xargs cat | node ./scripts/get-declarations.js > ./doc/operators.json"
   },
   "repository": {
     "type": "git",
