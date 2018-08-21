@@ -1,0 +1,6 @@
+#<
+Get the type of an object.
+@param obj Object
+@return The type of the object
+>#
+type: (obj :Obj -> :Sym) {} fun

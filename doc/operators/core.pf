@@ -39,13 +39,6 @@ Get the value of the given symbol from the current dictionary and put it on the 
 vref: (sym :Sym -> :Obj) {} fun
 
 #<
-Get the type of an object.
-@param obj Object
-@return The type of the object
->#
-type: (obj :Obj -> :Sym) {} fun
-
-#<
 Check if an object is an empty array or executable array or nil.
 @param obj Object
 @return True if the object is an empty array or executable array or nil, false otherwise

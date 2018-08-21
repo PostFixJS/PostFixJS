@@ -16,13 +16,6 @@ test('vref should throw if no symbol is provided', (t) => {
   t.throws(() => execute(`1 vref`)._stack, checkErrorMessage('vref expected :Sym but got :Int'))
 })
 
-test('type should get the type of an Obj', (t) => {
-  const { stack } = execute('42 type')
-  const type = stack.pop()
-  t.true(type instanceof types.Sym)
-  t.is(type.name, 'Int')
-})
-
 test('exec should execute nested ExeArrs', (t) => {
   const { stack } = execute('{"pass"} x! {x} exec')
   t.is(stack.count, 1)

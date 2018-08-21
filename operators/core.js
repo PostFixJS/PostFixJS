@@ -79,15 +79,7 @@ module.exports.vref = {
   }
 }
 
-module.exports.type = {
-  name: 'type',
-  execute (interpreter) {
-    const obj = interpreter._stack.pop()
-    interpreter._stack.push(new types.Sym(obj.getTypeName().substr(1)))
-  }
-}
-
-module.exports.empty = {
+module.exports.isEmpty = {
   name: 'empty?',
   execute (interpreter) {
     const obj = interpreter._stack.pop()
