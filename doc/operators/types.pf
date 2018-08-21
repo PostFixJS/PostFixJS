@@ -4,3 +4,80 @@ Get the type of an object.
 @return The type of the object
 >#
 type: (obj :Obj -> :Sym) {} fun
+
+#<
+Check if the given object is an array or executable array.
+@param obj Object
+@return True if obj is an array or executable array, false otherwise
+>#
+arr?: (obj :Obj -> :Bool) {} fun
+
+#<
+Check if the given object is a boolean.
+@param obj Object
+@return True if obj is a boolean, false otherwise
+>#
+bool?: (obj :Obj -> :Bool) {} fun
+
+#<
+Check if the given object is an executable array.
+@param obj Object
+@return True if obj is an executable array, false otherwise
+>#
+exearr?: (obj :Obj -> :Bool) {} fun
+
+#<
+Check if the given object is a float.
+@param obj Object
+@return True if obj is a float, false otherwise
+>#
+flt?: (obj :Obj -> :Bool) {} fun
+
+#<
+Check if the given object is an integer.
+@param obj Object
+@return True if obj is an integer, false otherwise
+>#
+int?: (obj :Obj -> :Bool) {} fun
+
+#<
+Check if the given object is nil.
+@param obj Object
+@return True if obj is nil, false otherwise
+>#
+nil?: (obj :Obj -> :Bool) {} fun
+
+#<
+Check if the given object is a number.
+@param obj Object
+@return True if obj is a number, false otherwise
+>#
+num?: (obj :Obj -> :Bool) {} fun
+
+#<
+Check if the given object is an object (i.e. not nil).
+@param obj Object
+@return True if obj is an object and not nil.
+>#
+obj?: (obj :Obj -> :Bool) {} fun
+
+#<
+Check if the given object is a parameter list.
+@param obj Object
+@return True if obj is a parameter list, false otherwise
+>#
+params?: (obj :Obj -> :Bool) {} fun
+
+#<
+Check if the given object is a string.
+@param obj Object
+@return True if obj is a string, false otherwise
+>#
+str?: (obj :Obj -> :Bool) {} fun
+
+#<
+Check if the given object is a symbol.
+@param obj Object
+@return True if obj is a symbol, false otherwise
+>#
+sym?: (obj :Obj -> :Bool) {} fun
