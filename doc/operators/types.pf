@@ -81,3 +81,45 @@ Check if the given object is a symbol.
 @return True if obj is a symbol, false otherwise
 >#
 sym?: (obj :Obj -> :Bool) {} fun
+
+#<
+Convert the given object to a string.
+@param obj Object
+@return String representation of the object
+>#
+str: (obj :Obj -> :Str) {} fun
+
+#<
+Convert the given object to a float.
+@param obj Object
+@return Object parsed to a float, or `nil` if not possible
+>#
+flt: (obj :Obj -> :Flt) {} fun
+
+#<
+Convert the given object to an integer.
+@param obj Object
+@return Object parsed to an integer, or `nil` if not possible
+>#
+int: (obj :Obj -> :Int) {} fun
+
+#<
+Convert the given object to a symbol.
+@param obj String or symbol
+@return The specified symbol or a new symbol with the given name if the argument is a string
+>#
+sym: (obj :Obj -> :Sym) {} fun
+
+#<
+Convert the given object to an executable array. If the object is an array, the items are wrapped in an executable array. Otherwise, a new executable array that only contains the given object is created.
+@param obj Object
+@return Executable array
+>#
+exearr: (obj :Obj -> :ExeArr) {} fun
+
+#<
+Convert the given object to an array. If the object is an executable array, the items are wrapped in an array. Otherwise, a new array that only contains the given object is created.
+@param obj Object
+@return Array
+>#
+arr: (obj :Obj -> :Arr) {} fun
