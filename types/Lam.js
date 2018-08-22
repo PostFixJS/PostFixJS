@@ -34,7 +34,7 @@ class Lam extends ExeArr {
   }
 
   isAssignableTo (type) {
-    return type === this.getTypeName() || type === ':ExeArr'
+    return type === ':Obj' || type === ':ExeArr' || type === this.getTypeName()
   }
 
   getTypeName () {

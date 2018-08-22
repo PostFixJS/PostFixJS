@@ -8,7 +8,7 @@ class Obj {
   }
 
   isAssignableTo (type) {
-    return type === this.getTypeName()
+    return type === ':Obj' || type === this.getTypeName()
   }
 }
 

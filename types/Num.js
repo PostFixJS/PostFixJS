@@ -7,7 +7,7 @@ class Num extends Obj {
   }
 
   isAssignableTo (type) {
-    return type === this.getTypeName() || type === ':Num'
+    return type === ':Obj' || type === ':Num' || type === this.getTypeName()
   }
 
   getTypeName () {
