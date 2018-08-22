@@ -296,7 +296,7 @@ class Stack {
   }
 
   /**
-   * The number of items on the stack that the program can modify. 
+   * The number of items on the stack that the program can modify.
    * Inside of lambda functions, this may be smaller than the stack count.
    */
   get accessibleCount () {
