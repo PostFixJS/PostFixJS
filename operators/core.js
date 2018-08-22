@@ -50,6 +50,32 @@ module.exports.lam = {
   }
 }
 
+module.exports.updateLam = {
+  name: 'update-lam',
+  execute (interpreter, token) {
+    const functions = interpreter._stack.pop()
+    if (functions instanceof types.Arr) {
+      for (let functionName of functions.items) {
+        if (!(functionName instanceof types.Sym)) {
+          throw new types.Err(`update-lam expects an :Arr that contains function symbols (:Sym), but the array contains a ${functions.getTypeName()} instead`, token)
+        }
+        const fn = interpreter._dictStack.get(functionName.name)
+        if (fn == null) {
+          throw new types.Err(`update-lam was called for the unknown function ${functionName.toString()}`, token)
+        }
+        if (!(fn instanceof types.Lam)) {
+          throw new types.Err(`update-lam cannot update ${functionName.toString()} because it is not a function`, token)
+        }
+
+        fn.dict = interpreter._dictStack.copyDict()
+        fn.dict['recur'] = fn
+      }
+    } else {
+      throw new types.Err(`update-lam expects an :Arr that contains function symbols (:Sym), but got ${functions.getTypeName()} instead`, token)
+    }
+  }
+}
+
 module.exports.popv = {
   name: 'popv',
   execute (interpreter, token) {

@@ -2,6 +2,30 @@ import test from 'ava'
 const { execute, checkErrorMessage } = require('../test/helpers/util')
 const types = require('../types')
 
+test('update-lam should update the dictionaries of the given functions', (t) => {
+  const { stack } = execute(`
+    1 x!
+    test: (-> :Num) { x } fun
+    2 x!
+    test # should still return 1
+    [:test] update-lam
+    test # should return 2 now
+  `)
+  t.is(stack.count, 2)
+  t.is(stack.pop().value, 2)
+  t.is(stack.pop().value, 1)
+})
+
+test('update-lam should keep recur intact', (t) => {
+  const { stack } = execute(`
+    test: (-> :Obj) { :recur vref } fun
+    [:test] update-lam
+    test
+  `)
+  t.is(stack.count, 1)
+  t.true(stack.pop() instanceof types.Lam)
+})
+
 test('vref should put a value from the dictionary on the stack without executing it', (t) => {
   const { stack } = execute(`{ 42 } a! :a vref`)
   t.is(stack.count, 1)

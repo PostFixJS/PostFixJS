@@ -26,6 +26,12 @@ Create a lambda function.
 lam: (params :Params, body :ExeArr -> :Lam) {} fun
 
 #<
+Take a snapshot of the current dictionary and set copies of it as dictionary of the given functions.
+@param functions Array of symbols of the functions to update
+>#
+update-lam: (functions :Arr) {} fun
+
+#<
 Pop values from the stack and bind them to the parameter list, that is, put them into the current dictionary with the names from the parameter list. An error is thrown if types don't match.
 @param params Parameter list to bind the stack content to
 >#
