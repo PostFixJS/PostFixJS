@@ -1,7 +1,7 @@
 import test from 'ava'
 const Interpreter = require('../Interpreter')
 const Lexer = require('../Lexer')
-const { execute } = require('../test/helpers/util')
+const { execute, executeTimeout } = require('../test/helpers/util')
 
 test('if should execute the first branch if the condition is true', (t) => {
   const { stack } = execute('true { "good" } { "not good" } if')
@@ -29,4 +29,9 @@ test('loop should be interruptible even if empty ', (t) => {
   interpreter.step() // loop
   interpreter.step() // loop the loop once
   t.pass() // if stopping the execution wouldn't be possible, this line would never be reached
+})
+
+test('break should leave a loop', async (t) => {
+  const { stack } = await executeTimeout('{ 1 break } loop', 1000)
+  t.is(stack.count, 1)
 })
