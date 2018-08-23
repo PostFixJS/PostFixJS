@@ -24,11 +24,8 @@ module.exports.fun = {
     }
     const name = interpreter._stack.pop()
 
-    const closure = new types.Lam(body.items)
+    const closure = new types.Lam(body.items, params, interpreter._dictStack.copyDict())
     interpreter._dictStack.put(name.name, closure)
-    closure.params = params
-    closure.dict = interpreter._dictStack.copyDict()
-    closure.dict['recur'] = closure
   }
 }
 
@@ -41,11 +38,7 @@ module.exports.lam = {
       params = interpreter._stack.pop()
     }
 
-    const closure = new types.Lam(body.items)
-    closure.params = params
-    closure.dict = interpreter._dictStack.copyDict()
-    closure.dict['recur'] = closure
-
+    const closure = new types.Lam(body.items, params, interpreter._dictStack.copyDict())
     interpreter._stack.push(closure)
   }
 }
@@ -67,8 +60,7 @@ module.exports.updateLam = {
           throw new types.Err(`update-lam cannot update ${functionName.toString()} because it is not a function`, token)
         }
 
-        fn.dict = interpreter._dictStack.copyDict()
-        fn.dict['recur'] = fn
+        fn.setDict(interpreter._dictStack.copyDict())
       }
     } else {
       throw new types.Err(`update-lam expects an :Arr that contains function symbols (:Sym), but got ${functions.getTypeName()} instead`, token)

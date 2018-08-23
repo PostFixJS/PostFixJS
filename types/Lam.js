@@ -2,6 +2,28 @@ const ExeArr = require('./ExeArr')
 const Err = require('./Err')
 
 class Lam extends ExeArr {
+  /**
+   * Create a new lambda function (executable array with parameters and dictionary).
+   * @param {Obj[]} items Function body
+   * @param {Params} params Parameters and return values
+   * @param {object} dict Copy of the dictionary
+   */
+  constructor (items, params, dict) {
+    super(items)
+    this.params = params
+    this.dict = dict
+    this.dict['recur'] = this
+  }
+
+  /**
+   * Update the dictionary of this lambda function.
+   * @param {object} dict Copy of the new dictionary
+   */
+  setDict (dict) {
+    this.dict = dict
+    this.dict['recur'] = this
+  }
+
   * execute (interpreter) {
     interpreter._dictStack.pushDict(this.dict)
     if (this.params != null) {
