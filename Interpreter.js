@@ -151,7 +151,10 @@ class Interpreter {
     }
   }
 
-  * executeObj (obj, handleErrors = true) {
+  * executeObj (obj, {
+    handleErrors = true,
+    forwardBreak = false
+  } = {}) {
     if (this._openExeArrs > 0 && !(obj instanceof types.Marker && (obj.type === 'ExeArrOpen' || obj.type === 'ExeArrClose'))) {
       this._stack.push(obj)
     } else if (this._openParamLists > 0 && !(obj instanceof types.Marker && (obj.type === 'ParamsOpen' || obj.type === 'ParamsClose'))) {
@@ -163,7 +166,9 @@ class Interpreter {
           yield * result
         }
       } catch (e) {
-        if (handleErrors) {
+        if (forwardBreak && e === 'break') {
+          throw e
+        } else if (handleErrors) {
           this._handleExecutionError(e, obj.origin)
         } else {
           throw e
@@ -193,6 +198,8 @@ class Interpreter {
       } else {
         throw new types.Err('Stack access is out of range', token)
       }
+    } else if (e === 'break') {
+      // do nothing
     } else {
       throw e
     }

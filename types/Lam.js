@@ -16,14 +16,17 @@ class Lam extends ExeArr {
         if (obj instanceof ExeArr) {
           interpreter._stack.push(obj)
         } else {
-          yield * interpreter.executeObj(obj, false)
+          yield * interpreter.executeObj(obj, { handleErrors: false, forwardBreak: true })
         }
       }
     } catch (e) {
       if (e === 'STACK_CORRUPTED') {
         throw new Err('Inside :Lam the stack may not be accessed beyond the height it had when the :Lam was invoked', nextToken)
+      } else if (e === 'break') {
+        // lambda exited with break, skip to return value check
+      } else {
+        throw e
       }
-      throw e
     }
     interpreter._stack.allowPop(stackHeight)
     interpreter._dictStack.popDict()

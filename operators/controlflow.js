@@ -69,7 +69,7 @@ module.exports.loop = {
     }
     try {
       while (true) {
-        yield * interpreter.executeObj(body)
+        yield * interpreter.executeObj(body, { forwardBreak: true })
       }
     } catch (e) {
       if (e !== 'break') {
@@ -94,7 +94,7 @@ module.exports.for = {
           let i
           for (i = lower.value; i < upper.value; i++) {
             interpreter._stack.push(new types.Int(i))
-            yield * interpreter.executeObj(body)
+            yield * interpreter.executeObj(body, { forwardBreak: true })
           }
         } catch (e) {
           if (e !== 'break') {
@@ -110,7 +110,7 @@ module.exports.for = {
         try {
           for (const item of arr.items) {
             interpreter._stack.push(item)
-            yield * interpreter.executeObj(body)
+            yield * interpreter.executeObj(body, { forwardBreak: true })
           }
         } catch (e) {
           if (e !== 'break') {
@@ -121,7 +121,7 @@ module.exports.for = {
         try {
           for (const char of arr.value.split('')) {
             interpreter._stack.push(new types.Str(char))
-            yield * interpreter.executeObj(body)
+            yield * interpreter.executeObj(body, { forwardBreak: true })
           }
         } catch (e) {
           if (e !== 'break') {
@@ -149,7 +149,7 @@ module.exports.fori = {
         for (i = 0; i < arr.items.length; i++) {
           interpreter._stack.push(arr.items[i])
           interpreter._stack.push(new types.Int(i))
-          yield * interpreter.executeObj(body)
+          yield * interpreter.executeObj(body, { forwardBreak: true })
         }
       } catch (e) {
         if (e !== 'break') {
@@ -163,7 +163,7 @@ module.exports.fori = {
         for (i = 0; i < chars.length; i++) {
           interpreter._stack.push(new types.Str(chars[i]))
           interpreter._stack.push(new types.Int(i))
-          yield * interpreter.executeObj(body)
+          yield * interpreter.executeObj(body, { forwardBreak: true })
         }
       } catch (e) {
         if (e !== 'break') {

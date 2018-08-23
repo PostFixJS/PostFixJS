@@ -1,7 +1,7 @@
 import test from 'ava'
 const Interpreter = require('../Interpreter')
 const Lexer = require('../Lexer')
-const { execute, executeTimeout } = require('../test/helpers/util')
+const { execute, executeTimeout, checkErrorMessage } = require('../test/helpers/util')
 
 test('if should execute the first branch if the condition is true', (t) => {
   const { stack } = execute('true { "good" } { "not good" } if')
@@ -34,4 +34,35 @@ test('loop should be interruptible even if empty ', (t) => {
 test('break should leave a loop', async (t) => {
   const { stack } = await executeTimeout('{ 1 break } loop', 1000)
   t.is(stack.count, 1)
+})
+
+test('break should leave an executable array', (t) => {
+  const { stack } = execute('{ 1 break 2 3 } x! x')
+  t.is(stack.count, 1)
+})
+
+test('break should leave an executable array when using exec', (t) => {
+  const { stack } = execute('{ 1 break 2 3 } exec')
+  t.is(stack.count, 1)
+})
+
+test('breakif should leave a loop', async (t) => {
+  const { stack } = await executeTimeout('1 3 { i! 1 true breakif } for', 1000)
+  t.is(stack.count, 1)
+})
+
+test('breakif should leave an executable array', (t) => {
+  const { stack } = execute('{ 1 true breakif 2 3 } exec')
+  t.is(stack.count, 1)
+})
+
+test('break should leave an if body', (t) => {
+  const { stack } = execute('true { 1 2 break 3 4 } if')
+  t.is(stack.count, 2)
+})
+
+test('break should leave a function but not skip return value checks', (t) => {
+  t.throws(() => {
+    execute('fn: (-> :Num) { break "break ignored" err } fun fn')
+  }, checkErrorMessage('Expected fun to return 1 values but it returned 0 values'))
 })
