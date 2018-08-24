@@ -23,6 +23,7 @@ class Interpreter {
     this.registerBuiltIns(require('./operators/compare'))
     this.registerBuiltIns(require('./operators/controlflow'))
     this.registerBuiltIns(require('./operators/core'))
+    this.registerBuiltIns(require('./operators/datadef'))
     this.registerBuiltIns(require('./operators/logical'))
     this.registerBuiltIns(require('./operators/math'))
     this.registerBuiltIns(require('./operators/random'))
@@ -49,6 +50,10 @@ class Interpreter {
       // object
       this.registerBuiltIns(Object.values(builtIns))
     }
+  }
+
+  getBuiltIn (name) {
+    return this._builtIns[name]
   }
 
   /**

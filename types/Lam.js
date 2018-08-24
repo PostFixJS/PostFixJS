@@ -27,7 +27,7 @@ class Lam extends ExeArr {
   * execute (interpreter) {
     interpreter._dictStack.pushDict(this.dict)
     if (this.params != null) {
-      this.params.bind(interpreter)
+      yield * this.params.bind(interpreter)
     }
     const stackHeight = interpreter._stack.forbidPop()
     let nextToken
@@ -54,7 +54,7 @@ class Lam extends ExeArr {
     interpreter._dictStack.popDict()
     const returnCount = interpreter._stack.count - stackHeight
     if (this.params != null) {
-      this.params.checkReturns(interpreter, returnCount)
+      yield * this.params.checkReturns(interpreter, returnCount)
     }
   }
 

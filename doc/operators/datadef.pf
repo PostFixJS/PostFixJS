@@ -1,0 +1,13 @@
+#<
+Define a new data type. This will generate a constructor, a type check function and accessors and put them into the dictionary.
+@param name Name of the type
+@param definition Definition of fields
+>#
+datadef: (name :Sym, definition :Params) {} fun
+
+#<
+Define a union data type that can be one of the given data types. This puts a union type check function into the dictionary.
+@param name Name of the union type
+@param variants Data types the union should contain
+>#
+datadef: (name :Sym, variants :Arr) {} fun

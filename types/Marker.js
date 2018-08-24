@@ -30,7 +30,7 @@ class Marker extends Obj {
       interpreter._stack.push(arr)
     } else if (this.type === 'ParamsClose') {
       const items = interpreter._stack.popUntil((obj) => obj instanceof Marker && obj.type === 'ParamsOpen')
-      const params = new Params(items.slice(1), items[0].origin)
+      const params = Params.fromParamList(items.slice(1), items[0].origin)
       interpreter._stack.push(params)
       interpreter._openParamLists--
     } else {
