@@ -8,7 +8,8 @@ test('all built-ins should have documentation', (t) => {
   for (const builtIn of Object.keys(interpreter._builtIns)) {
     const functionDoc = operatorDocs.functions.filter(({ name }) => name === builtIn)
     const variableDoc = operatorDocs.variables.filter(({ name }) => name === builtIn)
-    t.true(functionDoc.length + variableDoc.length > 0, `${builtIn} should be documented`)
+    const count = functionDoc.length + variableDoc.length > 0
+    t.true(count, `${builtIn} should be documented`)
   }
 })
 
