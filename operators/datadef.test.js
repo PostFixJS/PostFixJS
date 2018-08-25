@@ -69,3 +69,19 @@ test('the datadef updaters update fields of a struct', (t) => {
   t.true(y instanceof types.Int)
   t.is(y.value, 6)
 })
+
+test('datadef can define union types with a union typecheck', (t) => {
+  let { stack } = execute(`
+    Point: [
+      Euclid: (x :Num, y :Num)
+      Polar: (theta :Num, magnitude :Num)
+    ] datadef
+    1 2 euclid.new
+    point?
+    45 2 polar.new
+    point?
+  `)
+  t.is(stack.count, 2)
+  t.is(stack.pop().value, true, 'polar shoud be a point')
+  t.is(stack.pop().value, true, 'euclid should be a point')
+})
