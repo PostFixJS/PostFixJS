@@ -12,7 +12,11 @@ class Err extends Obj {
   }
 
   toString () {
-    return `Err(${this.origin.line + 1}:${this.origin.col + 1}, ${this.message})`
+    if (this.origin) {
+      return `Err(${this.origin.line + 1}:${this.origin.col + 1}, ${this.message})`
+    } else {
+      return `Err(${this.message})`
+    }
   }
 }
 
