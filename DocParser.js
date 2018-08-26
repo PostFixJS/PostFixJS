@@ -82,7 +82,7 @@ function getFunctionAt (tokens, i) {
     }))
   }
   i = skipElements(tokens, i, 'EXEARR_START', 'EXEARR_END')
-  if (tokens[i] && tokens[i].tokenType === 'REFERENCE' && tokens[i].token === 'fun') {
+  if (tokens[i] && tokens[i].tokenType === 'REFERENCE' && (tokens[i].token === 'fun' || tokens[i].token === 'cond-fun')) {
     return { fn, i }
   }
   return false

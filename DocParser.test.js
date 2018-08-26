@@ -194,6 +194,26 @@ Calculate the factorial of a number.
   })
 })
 
+test('DocParser finds cond-fun declarations', (t) => {
+  t.deepEqual(DocParser.getFunctions(`
+#<
+Get a number that depends on x.
+@param x A number
+@return Return value
+>#
+condFun: (x :Int -> :Num) {} cond-fun
+`), [{
+    name: 'condFun',
+    description: 'Get a number that depends on x.',
+    params: [
+      { name: 'x', type: ':Int', description: 'A number' }
+    ],
+    returns: [
+      { type: ':Num', description: 'Return value' }
+    ]
+  }])
+})
+
 test('DocParser finds variable declarations with long syntax', (t) => {
   t.deepEqual(DocParser.getVariables(`
 #<
