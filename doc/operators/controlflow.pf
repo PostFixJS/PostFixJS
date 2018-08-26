@@ -13,6 +13,14 @@ Execute the first condition that returns `true`. Only the executable array of th
 cond: (conditions :Arr) {} fun
 
 #<
+Create a function that wraps `cond`.
+@param name Symbol for the function name
+@param params Parameter list of the function
+@param conditions Array of executable arrays, always pairs of an executable array that calculates a condition and an executable array that is executed if the condition is true
+>#
+cond-fun: (name :Sym, params :Params, conditions :Arr) {} fun
+
+#<
 Execute the given executable array until the loop is exited with `break` or `breakif`.
 @param body Executable array to run in a loop
 >#

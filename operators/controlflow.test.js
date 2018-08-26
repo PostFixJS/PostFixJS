@@ -1,6 +1,7 @@
 import test from 'ava'
 const Interpreter = require('../Interpreter')
 const Lexer = require('../Lexer')
+const types = require('../types')
 const { execute, executeTimeout, checkErrorMessage } = require('../test/helpers/util')
 
 test('if should execute the first branch if the condition is true', (t) => {
@@ -65,4 +66,15 @@ test('break should leave a function but not skip return value checks', (t) => {
   t.throws(() => {
     execute('fn: (-> :Num) { break "break ignored" err } fun fn')
   }, checkErrorMessage('Expected fun to return 1 values but it returned 0 values'))
+})
+
+test('cond-fun should wrap a cond in a function', (t) => {
+  const { dictStack, stack } = execute(`
+    test: (x :Int -> :Int) { { x 0 > } { 42 } { true } { 0 } } cond-fun
+    3 test
+  `)
+  const fun = dictStack.get('test')
+  t.true(fun instanceof types.Lam)
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 42)
 })

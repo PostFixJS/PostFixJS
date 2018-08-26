@@ -54,6 +54,33 @@ module.exports.cond = {
   }
 }
 
+module.exports.condFun = {
+  name: 'cond-fun',
+  execute (interpreter, token) {
+    const pairs = interpreter._stack.pop()
+    if (!(pairs instanceof types.Arr)) {
+      throw new types.Err(`cond-fun expects an array (:Arr) with conditions followed by actions as third argument but got ${pairs.getTypeName()}`, token)
+    }
+    const params = interpreter._stack.pop()
+    if (!(params instanceof types.Params)) {
+      throw new types.Err(`cond-fun expects an parameter list (:Params) as second argument but got ${params.getTypeName()}`, token)
+    }
+    const name = interpreter._stack.pop()
+    if (!(name instanceof types.Sym)) {
+      throw new types.Err(`cond-fun expects a function name (:Sym) as first argument but got ${name.getTypeName()}`, token)
+    }
+
+    interpreter._dictStack.put(name.name, new types.Lam(
+      [
+        pairs,
+        new types.Op(interpreter.getBuiltIn('cond'))
+      ],
+      params,
+      interpreter._dictStack.copyDict()
+    ))
+  }
+}
+
 module.exports.loop = {
   name: 'loop',
   * execute (interpreter, token) {
