@@ -4,23 +4,45 @@ module.exports.datadef = {
   name: 'datadef',
   execute (interpreter, token) {
     const definition = interpreter._stack.pop()
-    const name = new types.Sym(interpreter._stack.pop().name)
+    const nameArg = interpreter._stack.pop()
 
-    // TODO error handling
+    if (!(nameArg instanceof types.Sym)) {
+      throw new types.Err(`datadef expects a name (:Sym) as first argument but got ${definition.getTypeName()} instead`, token)
+    }
+    if (nameArg.name[0].toUpperCase() !== nameArg.name[0]) {
+      throw new types.Err('The first character in the name of a datadef must be capitalized', token)
+    }
 
+    const name = new types.Sym(nameArg.name)
     if (definition instanceof types.Params) {
       defineStruct(interpreter, definition, name)
     } else if (definition instanceof types.Arr) {
+      if (definition.items.length === 0) {
+        throw new types.Err('The datadef union type definition does not contain any variants', token)
+      }
+      if (definition.items.length % 2 !== 0) {
+        throw new types.Err('datadef union type definitions must contain variant names (:Sym) followed by parameter lists (:Params)', token)
+      }
+
       const variants = []
       for (let i = 0; i < definition.items.length - 1; i += 2) {
         const name = definition.items[i]
         const variantDefinition = definition.items[i + 1]
+        if (!(name instanceof types.Sym)) {
+          throw new types.Err(`datadef variant names must be symbols (:Sym) but got ${name.getTypeName()} instead`, name.origin || token)
+        }
+        if (name.name[0].toUpperCase() !== name.name[0]) {
+          throw new types.Err('The first character in the name of datadef variant must be capitalized', token)
+        }
+        if (!(variantDefinition instanceof types.Params)) {
+          throw new types.Err(`datadef variants need a parameter list (:Params) but got ${variantDefinition.getTypeName()} instead`, variantDefinition.origin || token)
+        }
         defineStruct(interpreter, variantDefinition, name)
         variants.push(name)
       }
       defineUnionTest(interpreter, variants, name)
     } else {
-      throw new types.Err(`datadef expects a struct declaration (:Params) or a union type definition (:Arr) but got ${definition.getTypeName()} instead`)
+      throw new types.Err(`datadef expects a struct declaration (:Params) or a union type definition (:Arr) but got ${definition.getTypeName()} instead`, token)
     }
   }
 }
@@ -104,7 +126,7 @@ function defineStruct (interpreter, definition, name) {
       interpreter._dictStack.copyDict()
     )
 
-    // updater
+    // updater (o <index> o <index> get <update> set)
     defs[`${structName}-${param.ref.name}-do`] = new types.Lam(
       [
         oParamRef,
