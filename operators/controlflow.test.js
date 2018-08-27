@@ -78,3 +78,10 @@ test('cond-fun should wrap a cond in a function', (t) => {
   t.is(stack.count, 1)
   t.is(stack.pop().value, 42)
 })
+
+test('cond-fun should define a function that knows itself', (t) => {
+  const { dictStack } = execute('test: () { } cond-fun')
+  const fun = dictStack.get('test')
+  t.true(fun instanceof types.Lam)
+  t.is(fun.dict['test'], fun)
+})

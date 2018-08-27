@@ -2,6 +2,13 @@ import test from 'ava'
 const { execute, checkErrorMessage } = require('../test/helpers/util')
 const types = require('../types')
 
+test('fun should define a function that knows itself', (t) => {
+  const { dictStack } = execute('test: (-> :Obj) { } fun')
+  const fun = dictStack.get('test')
+  t.true(fun instanceof types.Lam)
+  t.is(fun.dict['test'], fun)
+})
+
 test('update-lam should update the dictionaries of the given functions', (t) => {
   const { stack } = execute(`
     1 x!

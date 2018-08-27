@@ -70,14 +70,19 @@ module.exports.condFun = {
       throw new types.Err(`cond-fun expects a function name (:Sym) as first argument but got ${name.getTypeName()}`, token)
     }
 
-    interpreter._dictStack.put(name.name, new types.Lam(
+    const lam = new types.Lam(
       [
         pairs,
         new types.Op(interpreter.getBuiltIn('cond'))
       ],
       params,
-      interpreter._dictStack.copyDict()
-    ))
+      {}
+    )
+    lam.setDict({
+      ...interpreter._dictStack.copyDict(),
+      [name.name]: lam
+    })
+    interpreter._dictStack.put(name.name, lam)
   }
 }
 

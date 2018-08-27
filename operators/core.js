@@ -24,7 +24,11 @@ module.exports.fun = {
     }
     const name = interpreter._stack.pop()
 
-    const closure = new types.Lam(body.items, params, interpreter._dictStack.copyDict())
+    const closure = new types.Lam(body.items, params, {})
+    closure.setDict({
+      ...interpreter._dictStack.copyDict(),
+      [name.name]: closure
+    })
     interpreter._dictStack.put(name.name, closure)
   }
 }
