@@ -1,6 +1,6 @@
 import test from 'ava'
 const types = require('../types')
-const { execute } = require('../test/helpers/util')
+const { execute, checkErrorMessage } = require('../test/helpers/util')
 
 test('datadef generates a constructor function', (t) => {
   let { dictStack } = execute('Point: (x :Num, y :Num) datadef')
@@ -84,4 +84,35 @@ test('datadef can define union types with a union typecheck', (t) => {
   t.is(stack.count, 2)
   t.is(stack.pop().value, true, 'polar shoud be a point')
   t.is(stack.pop().value, true, 'euclid should be a point')
+})
+
+test('types defined by datadef can be used for params and are checked', (t) => {
+  const { stack } = execute(`
+    Point: (x :Num, y :Num) datadef
+    test: (x :Point -> :Point) {
+      x point.x 1 +
+      x point.y 1 +
+      point.new
+    } fun
+    1 2 point.new
+    test
+    point?
+  `)
+  t.is(stack.pop().value, true)
+
+  t.throws(() => {
+    execute(`
+      Point: (x :Num, y :Num) datadef
+      test: (x :Point -> :Point) { 3 } fun
+      1 2 point.new test
+    `)
+  }, checkErrorMessage('Expected return value 1 to be of type :Point but got incompatible type :Int'))
+
+  t.throws(() => {
+    execute(`
+      Point: (x :Num, y :Num) datadef
+      test: (x :Point -> :Point) { 3 } fun
+      42 test
+    `)
+  }, checkErrorMessage('Expected :Point but got incompatible type :Int for parameter x'))
 })
