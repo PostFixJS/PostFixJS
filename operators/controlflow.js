@@ -78,10 +78,9 @@ module.exports.condFun = {
       params,
       {}
     )
-    lam.setDict({
-      ...interpreter._dictStack.copyDict(),
+    lam.setDict(Object.assign(interpreter._dictStack.copyDict(), {
       [name.name]: lam
-    })
+    }))
     interpreter._dictStack.put(name.name, lam)
   }
 }
