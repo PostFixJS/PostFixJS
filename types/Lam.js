@@ -1,5 +1,6 @@
 const ExeArr = require('./ExeArr')
 const Err = require('./Err')
+const InvalidStackAccessError = require('../InvalidStackAccessError')
 
 class Lam extends ExeArr {
   /**
@@ -42,7 +43,7 @@ class Lam extends ExeArr {
         }
       }
     } catch (e) {
-      if (e === 'STACK_CORRUPTED') {
+      if (e instanceof InvalidStackAccessError) {
         throw new Err('Inside :Lam the stack may not be accessed beyond the height it had when the :Lam was invoked', nextToken)
       } else if (e === 'break') {
         // lambda exited with break, skip to return value check

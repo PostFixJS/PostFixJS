@@ -211,7 +211,7 @@ module.exports.fori = {
 module.exports.break = {
   name: 'break',
   execute () {
-    throw 'break'
+    throw 'break' // eslint-disable-line
   }
 }
 
@@ -221,7 +221,7 @@ module.exports.breakif = {
     const cond = interpreter._stack.pop()
     if (cond instanceof types.Bool) {
       if (cond.value) {
-        throw 'break'
+        throw 'break' // eslint-disable-line
       }
     } else {
       throw new types.Err(`breakif expects a :Bool but got ${cond.getTypeName()}`, token)

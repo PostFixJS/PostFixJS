@@ -1,4 +1,5 @@
 const types = require('./types')
+const InvalidStackAccessError = require('./InvalidStackAccessError')
 
 class Interpreter {
   constructor () {
@@ -197,7 +198,7 @@ class Interpreter {
   }
 
   _handleExecutionError (e, token) {
-    if (e === 'STACK_CORRUPTED') {
+    if (e instanceof InvalidStackAccessError) {
       if (this._stack.count === 0) {
         throw new types.Err('The stack is empty', token)
       } else {
@@ -262,7 +263,7 @@ class Stack {
   pop () {
     const minStackHeight = this._minStackHeight[this._minStackHeight.length - 1] || 0
     if (this._stack.length <= minStackHeight) {
-      throw 'STACK_CORRUPTED'
+      throw new InvalidStackAccessError()
     }
     return this._stack.pop()
   }
@@ -293,7 +294,7 @@ class Stack {
   peek (i = 0) {
     const minStackHeight = this._minStackHeight[this._minStackHeight.length - 1] || 0
     if (this._stack.length - i <= minStackHeight) {
-      throw 'STACK_CORRUPTED'
+      throw new InvalidStackAccessError()
     }
     return this._stack[this._stack.length - 1 - i]
   }
