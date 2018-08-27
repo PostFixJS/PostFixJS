@@ -137,3 +137,15 @@ test('remove does not modify the array if the value is not found', (t) => {
   t.is(stack.count, 1)
   t.deepEqual(stack.pop().items.map((obj) => obj.value), [1, 1, 2, 3, 1])
 })
+
+test('remove-at removes an item from an array', (t) => {
+  const { stack } = execute('[1, 2, 3] 2 remove-at')
+  t.is(stack.count, 1)
+  t.deepEqual(stack.pop().items.map((i) => i.value), [1, 2])
+})
+
+test('remove-at removes a character from a string', (t) => {
+  const { stack } = execute('"test" 1 remove-at')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'tst')
+})

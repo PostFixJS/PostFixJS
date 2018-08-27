@@ -100,3 +100,19 @@ Remove the first item that is equal to the given value from the array.
 @return Array with the first occurence of the given value removed
 >#
 remove: (arr :Arr, value :Obj) {} fun
+
+#<
+Remove the item at the given zero-based index from the array.
+@param arr Array
+@param index Zero-based index of the item to remove
+@return Array with the given index removed
+>#
+remove-at: (arr :Arr, index: :Int) {} fun
+
+#<
+Remove the character at the given zero-based index from the string.
+@param str String
+@param index Zero-based index of the character to remove
+@return String with the character at the given index removed
+>#
+remove-at: (str :Str, index: :Int) {} fun

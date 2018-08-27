@@ -180,9 +180,38 @@ module.exports.remove = {
     if (removeIndex >= 0) {
       const newItems = array.items.slice()
       newItems.splice(removeIndex, 1)
+      // TODO copy the items, if needed
       interpreter._stack.push(new types.Arr(newItems))
     } else {
       interpreter._stack.push(array)
+    }
+  }
+}
+
+module.exports.removeAt = {
+  name: 'remove-at',
+  execute (interpreter, token) {
+    const index = interpreter._stack.pop()
+    if (!(index instanceof types.Int)) {
+      throw new types.Err(`remove-at expects an index (:Int) as second argument but got ${index.getTypeName()} instead`)
+    }
+    const array = interpreter._stack.pop()
+
+    if (array instanceof types.Str) {
+      if (index.value < 0 || index.value >= array.value.length) {
+        throw new types.Err(`The index ${index.value} is not in the string (range 0 to ${array.value.length - 1})`, token)
+      }
+      interpreter._stack.push(new types.Str(array.value.substring(0, index.value) + array.value.substr(index.value + 1)))
+    } else if (array instanceof types.Arr) {
+      if (index.value < 0 || index.value >= array.items.length) {
+        throw new types.Err(`The index ${index.value} is not in the array (range 0 to ${array.items.length - 1})`, token)
+      }
+      const newItems = array.items.slice()
+      newItems.splice(index.value, 1)
+      // TODO copy the items, if needed
+      interpreter._stack.push(new types.Arr(newItems))
+    } else {
+      throw new types.Err(`remove-at expects :Arr or :Str as first argument but got ${array.getTypeName()} instead`)
     }
   }
 }
