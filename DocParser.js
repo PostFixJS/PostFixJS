@@ -82,7 +82,7 @@ function getFunctionAt (tokens, i) {
     }))
   }
   i = skipElements(tokens, i, 'EXEARR_START', 'EXEARR_END')
-  if (tokens[i] && tokens[i].tokenType === 'REFERENCE' && (tokens[i].token === 'fun' || tokens[i].token === 'cond-fun')) {
+  if (i !== false && tokens[i].tokenType === 'REFERENCE' && (tokens[i].token === 'fun' || tokens[i].token === 'cond-fun')) {
     return { fn, i }
   }
   return false
@@ -114,7 +114,7 @@ function getVariableAt (tokens, i) {
     } else {
       i = skipElement(tokens, i)
       if (i === false) return false
-      if (i < tokens.length && tokens[i].token === '!') {
+      if (tokens[i].token === '!') {
         return { variable, i }
       }
       return false
@@ -143,7 +143,7 @@ function skipElements (tokens, i, openToken, closeToken) {
       depth--
     }
     if (depth === 0) {
-      return i + 1
+      return i < tokens.length - 1 ? i + 1 : false
     }
   }
   return false
