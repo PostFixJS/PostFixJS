@@ -30,14 +30,21 @@ function parseParamsList (paramsList) {
   }
 
   const params = []
+  let lastComment = null
   for (let i = 1; i < rightArrowPosition; i++) {
     const value = paramsList[i].token
     if (value[0] === ':' || value[value.length - 1] === ':') {
       // this is a symbol
       params[params.length - 1].type = value
+    } else if (isCommentToken(paramsList[i])) {
+      // this is a comment
+      if (paramsList[i].tokenType === 'BLOCK_COMMENT') {
+        lastComment = paramsList[i].token
+      }
     } else {
       // this is a parameter name
-      params.push({ name: value, type: undefined })
+      params.push({ name: value, type: undefined, doc: lastComment })
+      lastComment = undefined
     }
   }
 
@@ -45,7 +52,17 @@ function parseParamsList (paramsList) {
   return { params, returns }
 }
 
+/**
+ * Check if the given token is a comment.
+ * @param {object} token Token
+ * @return True if the token is a comment token, false otherwise
+ */
+function isCommentToken (token) {
+  return token.tokenType === 'BLOCK_COMMENT' || token.tokenType === 'LINE_COMMENT'
+}
+
 module.exports = {
   readParamsList,
-  parseParamsList
+  parseParamsList,
+  isCommentToken
 }

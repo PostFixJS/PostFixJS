@@ -46,6 +46,21 @@ class DocParser {
 
     return Object.values(variables)
   }
+
+  static getDatadefs (code) {
+    const datadefs = []
+    const tokens = Lexer.parse(code, { emitComments: true })
+
+    for (let i = 0; i < tokens.length; i++) {
+      const datadef = getDatadefAt(tokens, i)
+      if (datadef !== false) {
+        datadefs.push(datadef.datadef)
+        i = datadef.i
+      }
+    }
+
+    return datadefs
+  }
 }
 
 function getFunctionAt (tokens, i) {
@@ -128,6 +143,46 @@ function getVariableAt (tokens, i) {
     variable.name = tokens[i].token.substr(0, tokens[i].token.length - 1)
     i++
     return { variable, i }
+  }
+
+  return false
+}
+
+function getDatadefAt (tokens, i) {
+  const datadef = {}
+  let doc
+  if (tokens[i] && tokens[i].tokenType === 'BLOCK_COMMENT') {
+    doc = parseDocComment(tokens[i].token)
+    datadef.description = doc.description
+    i++
+  } else {
+    doc = { fields: [] }
+    datadef.description = undefined
+  }
+
+  if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
+    const token = tokens[i].token
+    datadef.name = token.indexOf(':') === 0
+      ? token.substr(1)
+      : token.substr(0, token.length - 1)
+    i++
+
+    // for structs
+    const params = readParamsList(tokens, i)
+    if (params) {
+      i = params.lastToken + 1
+      const struct = parseParamsList(tokens.slice(params.firstToken, params.lastToken + 1))
+      datadef.fields = struct.params.map((param) => ({
+        name: param.name,
+        type: param.type,
+        description: parseDocComment(param.doc).description
+      }))
+    
+      if (tokens[i] && tokens[i].tokenType === 'REFERENCE' && tokens[i].token === 'datadef') {
+        datadef.type = 'struct'
+        return { datadef, i }
+      }
+    }
   }
 
   return false

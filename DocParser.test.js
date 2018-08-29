@@ -260,3 +260,29 @@ test('DocParser only finds the first declaration of a variable', (t) => {
     description: 'Test variable'
   }])
 })
+
+test('DocParser finds datadef struct declarations', (t) => {
+  t.deepEqual(DocParser.getDatadefs(`
+#< A 2d point. >#
+:Point (
+  #< Position on the x-axis >#
+  x :Num,
+
+  #< Position on the y-axis >#
+  y :Num
+) datadef
+  `), [{
+    name: 'Point',
+    description: 'A 2d point.',
+    type: 'struct',
+    fields: [{
+      name: 'x',
+      type: ':Num',
+      description: 'Position on the x-axis'
+    }, {
+      name: 'y',
+      type: ':Num',
+      description: 'Position on the y-axis'
+    }]
+  }])
+})
