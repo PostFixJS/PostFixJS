@@ -35,7 +35,7 @@ function parseParamsList (paramsList) {
     const value = paramsList[i].token
     if (value[0] === ':' || value[value.length - 1] === ':') {
       // this is a symbol
-      params[params.length - 1].type = value
+      params[params.length - 1].type = normalizeSymbol(value, true)
     } else if (isCommentToken(paramsList[i])) {
       // this is a comment
       if (paramsList[i].tokenType === 'BLOCK_COMMENT') {
@@ -53,6 +53,34 @@ function parseParamsList (paramsList) {
 }
 
 /**
+ * Get the tokens of an array from an array of tokens.
+ * @param {object[]} tokens Array of tokens
+ * @param {number} i Index of a ARR_START token
+ * @returns {object|bool} Index of the first and last token (inclusive) of the array or false if no array is found
+ */
+function readArray (tokens, i) {
+  let depth = 0
+  if (tokens[i] && tokens[i].tokenType === 'ARR_START') {
+    const firstToken = i
+    while (i < tokens.length) {
+      if (tokens[i].tokenType === 'ARR_START') {
+        depth++
+      } else if (tokens[i].tokenType === 'ARR_END') {
+        depth--
+        if (depth === 0) {
+          return {
+            firstToken,
+            lastToken: i
+          }
+        }
+      }
+      i++
+    }
+  }
+  return false
+}
+
+/**
  * Check if the given token is a comment.
  * @param {object} token Token
  * @return True if the token is a comment token, false otherwise
@@ -61,8 +89,22 @@ function isCommentToken (token) {
   return token.tokenType === 'BLOCK_COMMENT' || token.tokenType === 'LINE_COMMENT'
 }
 
+/**
+ * Normalize a symbol name.
+ * @param {string} name Symbol name (with colons)
+ * @param {*} withDots True to prefix the symbol with colons, false to omit them
+ */
+function normalizeSymbol (name, withDots = false) {
+  const cleanName = name.indexOf(':') === 0
+    ? name.substr(1)
+    : name.substr(0, name.length - 1)
+  return withDots ? `:${cleanName}` : cleanName
+}
+
 module.exports = {
   readParamsList,
   parseParamsList,
-  isCommentToken
+  readArray,
+  isCommentToken,
+  normalizeSymbol
 }

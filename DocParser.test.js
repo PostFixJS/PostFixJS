@@ -272,7 +272,7 @@ test('DocParser finds datadef struct declarations', (t) => {
   y :Num
 ) datadef
   `), [{
-    name: 'Point',
+    name: ':Point',
     description: 'A 2d point.',
     type: 'struct',
     fields: [{
@@ -283,6 +283,62 @@ test('DocParser finds datadef struct declarations', (t) => {
       name: 'y',
       type: ':Num',
       description: 'Position on the y-axis'
+    }]
+  }])
+})
+
+test('DocParser finds datadef union type declarations', (t) => {
+  t.deepEqual(DocParser.getDatadefs(`
+#< A 2d point. >#
+Point: [
+  #< An euclidian point. >#
+  Euclid: (
+    #< Position on the x-axis >#
+    x :Num,
+    
+    #< Position on the y-axis >#
+    y :Num
+  )
+
+  #< A point in polar coordinates. >#
+  Polar: (
+    #< The angular coordinate >#
+    theta :Num,
+    
+    #< The radial coordinate >#
+    magnitude :Num
+  )
+] datadef
+  `), [{
+    name: ':Point',
+    description: 'A 2d point.',
+    type: 'union',
+    types: [':Euclid', ':Polar']
+  }, {
+    name: ':Euclid',
+    description: 'An euclidian point.',
+    type: 'struct',
+    fields: [{
+      name: 'x',
+      type: ':Num',
+      description: 'Position on the x-axis'
+    }, {
+      name: 'y',
+      type: ':Num',
+      description: 'Position on the y-axis'
+    }]
+  }, {
+    name: ':Polar',
+    description: 'A point in polar coordinates.',
+    type: 'struct',
+    fields: [{
+      name: 'theta',
+      type: ':Num',
+      description: 'The angular coordinate'
+    }, {
+      name: 'magnitude',
+      type: ':Num',
+      description: 'The radial coordinate'
     }]
   }])
 })

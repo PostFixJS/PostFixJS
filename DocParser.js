@@ -1,5 +1,5 @@
 const Lexer = require('./Lexer')
-const { parseParamsList, readParamsList } = require('./tokenUtils')
+const { parseParamsList, readParamsList, readArray, normalizeSymbol } = require('./tokenUtils')
 
 /**
  * A parser for documentation.
@@ -47,6 +47,11 @@ class DocParser {
     return Object.values(variables)
   }
 
+  /**
+   * Get all datadefs and related documentation from the given code.
+   * @param {string} code PostFix code
+   * @return {object[]} Datadef definitions with descriptions
+   */
   static getDatadefs (code) {
     const datadefs = []
     const tokens = Lexer.parse(code, { emitComments: true })
@@ -54,7 +59,19 @@ class DocParser {
     for (let i = 0; i < tokens.length; i++) {
       const datadef = getDatadefAt(tokens, i)
       if (datadef !== false) {
-        datadefs.push(datadef.datadef)
+        if (datadef.datadef.type === 'union') {
+          datadefs.push({
+            name: datadef.datadef.name,
+            description: datadef.datadef.description,
+            type: 'union',
+            types: datadef.datadef.types.map((type) => type.name)
+          })
+          for (const element of datadef.datadef.types) {
+            datadefs.push(element)
+          }
+        } else {
+          datadefs.push(datadef.datadef)
+        }
         i = datadef.i
       }
     }
@@ -77,9 +94,7 @@ function getFunctionAt (tokens, i) {
 
   if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
     const token = tokens[i].token
-    fn.name = token.indexOf(':') === 0
-      ? token.substr(1)
-      : token.substr(0, token.length - 1)
+    fn.name = normalizeSymbol(token)
   }
   i++
   const params = readParamsList(tokens, i)
@@ -118,9 +133,7 @@ function getVariableAt (tokens, i) {
   if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
     // :variableName value !
     const token = tokens[i].token
-    variable.name = token.indexOf(':') === 0
-      ? token.substr(1)
-      : token.substr(0, token.length - 1)
+    variable.name = normalizeSymbol(token)
     i++
 
     if (i < tokens.length && tokens[i].tokenType === 'DEFINITION') {
@@ -162,25 +175,61 @@ function getDatadefAt (tokens, i) {
 
   if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
     const token = tokens[i].token
-    datadef.name = token.indexOf(':') === 0
-      ? token.substr(1)
-      : token.substr(0, token.length - 1)
+    datadef.name = normalizeSymbol(token, true)
     i++
 
-    // for structs
-    const params = readParamsList(tokens, i)
-    if (params) {
-      i = params.lastToken + 1
-      const struct = parseParamsList(tokens.slice(params.firstToken, params.lastToken + 1))
-      datadef.fields = struct.params.map((param) => ({
-        name: param.name,
-        type: param.type,
-        description: parseDocComment(param.doc).description
-      }))
-    
-      if (tokens[i] && tokens[i].tokenType === 'REFERENCE' && tokens[i].token === 'datadef') {
-        datadef.type = 'struct'
-        return { datadef, i }
+    if (tokens[i].tokenType === 'PARAM_LIST_START') {
+      // struct
+      const params = readParamsList(tokens, i)
+      if (params) {
+        i = params.lastToken + 1
+        if (tokens[i] && tokens[i].tokenType === 'REFERENCE' && tokens[i].token === 'datadef') {
+          const struct = parseParamsList(tokens.slice(params.firstToken, params.lastToken + 1))
+          datadef.type = 'struct'
+          datadef.fields = struct.params.map((param) => ({
+            name: param.name,
+            type: param.type,
+            description: parseDocComment(param.doc).description
+          }))
+          return { datadef, i }
+        }
+      }
+    } else if (tokens[i].tokenType === 'ARR_START') {
+      // union
+      const union = readArray(tokens, i)
+      if (union) {
+        i = union.lastToken + 1
+        if (tokens[i] && tokens[i].tokenType === 'REFERENCE' && tokens[i].token === 'datadef') {
+          datadef.type = 'union'
+          datadef.types = []
+
+          let next = { }
+          for (let i = union.firstToken + 1; i < union.lastToken; i++) {
+            if (tokens[i].tokenType === 'BLOCK_COMMENT') {
+              next.description = parseDocComment(tokens[i].token).description
+            } else if (tokens[i].tokenType === 'SYMBOL') {
+              next.name = normalizeSymbol(tokens[i].token, true)
+              i++
+
+              const params = readParamsList(tokens, i)
+              if (params) {
+                const struct = parseParamsList(tokens.slice(params.firstToken, params.lastToken + 1))
+                next.type = 'struct'
+                next.fields = struct.params.map((param) => ({
+                  name: param.name,
+                  type: param.type,
+                  description: parseDocComment(param.doc).description
+                }))
+
+                datadef.types.push(next)
+                next = {}
+                i = params.lastToken // + 1 is done by the for loop
+              }
+            }
+          }
+
+          return { datadef, i: union.lastToken + 1 }
+        }
       }
     }
   }
