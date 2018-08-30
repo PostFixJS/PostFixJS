@@ -215,3 +215,20 @@ module.exports.removeAt = {
     }
   }
 }
+
+module.exports.find = {
+  name: 'find',
+  execute (interpreter, token) {
+    const value = interpreter._stack.pop()
+    const arrOrStr = interpreter._stack.pop()
+    if (arrOrStr instanceof types.Arr) {
+      const index = arrOrStr.items.findIndex((obj) => isEqual(obj, value))
+      interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
+    } else if (arrOrStr instanceof types.Str) {
+      const index = arrOrStr.value.indexOf(value instanceof types.Str ? value.value : value.toString())
+      interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
+    } else {
+      throw new types.Err(`find expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`)
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import test from 'ava'
 const { execute, checkErrorMessage } = require('../test/helpers/util')
+const types = require('../types')
 
 test('length should return length of strings', (t) => {
   const { stack } = execute('"hello world" length')
@@ -148,4 +149,22 @@ test('remove-at removes a character from a string', (t) => {
   const { stack } = execute('"test" 1 remove-at')
   t.is(stack.count, 1)
   t.is(stack.pop().value, 'tst')
+})
+
+test('find finds the first equal item in an array', (t) => {
+  const { stack } = execute('[1 2 2] 2 find')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 1)
+})
+
+test('find finds the first occurence of a substring in a string', (t) => {
+  const { stack } = execute('"test test" "st" find')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 2)
+})
+
+test('find returns nil if the item was not found', (t) => {
+  const { stack } = execute('"test test" "x" find')
+  t.is(stack.count, 1)
+  t.true(stack.pop() instanceof types.Nil)
 })

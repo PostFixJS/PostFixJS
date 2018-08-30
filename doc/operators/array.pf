@@ -32,7 +32,7 @@ get: (arr :Arr, i :Int -> :Obj) {} fun
 Set the i-th character of a string.
 @param str String
 @param i Zero-based index of a character in the string
-@return The updated string
+@return The updated stringPolar
 >#
 set: (str :Str, i :Int -> :Str) {} fun
 
@@ -116,3 +116,19 @@ Remove the character at the given zero-based index from the string.
 @return String with the character at the given index removed
 >#
 remove-at: (str :Str, index: :Int) {} fun
+
+#<
+Find the index of the first occurence of an object in an array.
+@param arr Array to search in
+@param value Object to search for
+@return Zero-based index of the object in the array or nil if not found
+>#
+find: (arr :Arr, value :Obj) {} fun
+
+#<
+Find the index of the first occurence of a substring in a string.
+@param str String to search in
+@param value Substring to search for
+@param Zero-based index of the substring in the string or nil if not found
+>#
+find: (str :Str, value :Obj) {} fun
