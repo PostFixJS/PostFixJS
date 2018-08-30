@@ -1,10 +1,16 @@
 const types = require('../types')
+const { getDatadefType } = require('./datadef')
 
 module.exports.type = {
   name: 'type',
   execute (interpreter) {
     const obj = interpreter._stack.pop()
-    interpreter._stack.push(new types.Sym(obj.getTypeName().substr(1)))
+    const datadefType = getDatadefType(obj)
+    if (datadefType) {
+      interpreter._stack.push(new types.Sym(datadefType))
+    } else {
+      interpreter._stack.push(new types.Sym(obj.getTypeName().substr(1)))
+    }
   }
 }
 

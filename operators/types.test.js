@@ -9,6 +9,35 @@ test('type should get the type of an Obj', (t) => {
   t.is(type.name, 'Int')
 })
 
+test('type should get the type of struct datadef instances', (t) => {
+  const { stack } = execute(`
+    Point: (x :Num, y :Num) datadef
+    1 2 point.new type
+  `)
+  const type = stack.pop()
+  t.true(type instanceof types.Sym)
+  t.is(type.name, 'Point')
+})
+
+test('type should get the type of union datadef instances', (t) => {
+  const { stack } = execute(`
+    Point: [
+      Euclid: (x :Num, y :Num)
+      Polar: (theta :Num, magnitude :Num)
+    ] datadef
+    1 2 euclid.new
+    type
+    45 2 polar.new
+    type
+  `)
+  const type2 = stack.pop()
+  t.true(type2 instanceof types.Sym)
+  t.is(type2.name, 'Polar')
+  const type1 = stack.pop()
+  t.true(type1 instanceof types.Sym)
+  t.is(type1.name, 'Euclid')
+})
+
 test('arr?', (t) => {
   const { stack } = execute('[] arr? {} arr? 42 arr?')
   t.deepEqual(

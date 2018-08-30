@@ -168,3 +168,19 @@ function defineUnionTest (interpreter, variants, name) {
     interpreter._dictStack.copyDict()
   ))
 }
+
+/**
+ * Check if the given object is an instance of a datadef'ed type.
+ * @param {Obj} Object
+ * @return The name of the type or false if the object is not a datadef type instance
+ */
+module.exports.getDatadefType = (obj) => {
+  if (obj instanceof types.Arr &&
+    obj.items.length >= 2 &&
+    obj.items[0] instanceof types.Sym &&
+    obj.items[0].name === 'datadef' &&
+    obj.items[1] instanceof types.Sym) {
+    return obj.items[1].name
+  }
+  return false
+}
