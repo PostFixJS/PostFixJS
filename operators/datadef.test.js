@@ -80,8 +80,20 @@ test('datadef can define union types with a union typecheck', (t) => {
     point?
     45 2 polar.new
     point?
+    1 2 euclid.new
+    euclid?
+    45 2 polar.new
+    polar?
+    1 2 euclid.new
+    polar?
+    45 2 polar.new
+    euclid?
   `)
-  t.is(stack.count, 2)
+  t.is(stack.count, 6)
+  t.is(stack.pop().value, false, 'polar shoud not be euclid')
+  t.is(stack.pop().value, false, 'euclid should not be polar')
+  t.is(stack.pop().value, true, 'polar shoud be a polar')
+  t.is(stack.pop().value, true, 'euclid should be a euclid')
   t.is(stack.pop().value, true, 'polar shoud be a point')
   t.is(stack.pop().value, true, 'euclid should be a point')
 })
@@ -95,9 +107,10 @@ test('types defined by datadef can be used for params and are checked', (t) => {
       point.new
     } fun
     1 2 point.new
-    test
-    point?
+    test point?
+    "hello" point?
   `)
+  t.is(stack.pop().value, false)
   t.is(stack.pop().value, true)
 
   t.throws(() => {

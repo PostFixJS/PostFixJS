@@ -70,29 +70,17 @@ function defineStruct (interpreter, definition, name) {
     interpreter._dictStack.copyDict()
   )
 
-  // [ { o arr? } { o length 2 >= } { o 0 get :datadef = } { o 1 get <type> = } ] and
-  const oParamRef = new types.Ref('o')
-  const typeChecker = new types.Lam(
-    [
-      new types.Arr([
-        new types.ExeArr([ oParamRef, op('arr?') ]),
-        new types.ExeArr([ oParamRef, op('length'), new types.Int(2), op('>=') ]),
-        new types.ExeArr([ oParamRef, new types.Int(0), op('get'), new types.Sym('datadef'), op('=') ]),
-        new types.ExeArr([ oParamRef, new types.Int(1), op('get'), name, op('=') ])
-      ]),
-      op('and')
-    ],
-    new types.Params(
-      [{ ref: oParamRef, type: new types.Sym('Obj') }],
-      [new types.Sym('Bool')]
-    ),
-    interpreter._dictStack.copyDict()
-  )
+  const typeChecker = new types.Op({
+    execute (interpreter) {
+      interpreter._stack.push(new types.Bool(getDatadefType(interpreter._stack.pop()) === name.name))
+    }
+  })
 
   interpreter._dictStack.put(`${structName}.new`, constructor)
   interpreter._dictStack.put(`${structName}?`, typeChecker)
 
   // getters, setters and updaters
+  const oParamRef = new types.Ref('o')
   const xParamRef = new types.Ref('x')
   for (let i = 0; i < definition.params.length; i++) {
     const param = definition.params[i]
@@ -174,7 +162,7 @@ function defineUnionTest (interpreter, variants, name) {
  * @param {Obj} Object
  * @return The name of the type or false if the object is not a datadef type instance
  */
-module.exports.getDatadefType = (obj) => {
+function getDatadefType (obj) {
   if (obj instanceof types.Arr &&
     obj.items.length >= 2 &&
     obj.items[0] instanceof types.Sym &&
@@ -184,3 +172,5 @@ module.exports.getDatadefType = (obj) => {
   }
   return false
 }
+
+module.exports.getDatadefType = getDatadefType
