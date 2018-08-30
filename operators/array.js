@@ -211,7 +211,7 @@ module.exports.removeAt = {
       // TODO copy the items, if needed
       interpreter._stack.push(new types.Arr(newItems))
     } else {
-      throw new types.Err(`remove-at expects :Arr or :Str as first argument but got ${array.getTypeName()} instead`)
+      throw new types.Err(`remove-at expects :Arr or :Str as first argument but got ${array.getTypeName()} instead`, token)
     }
   }
 }
@@ -227,6 +227,21 @@ module.exports.find = {
     } else if (arrOrStr instanceof types.Str) {
       const index = arrOrStr.value.indexOf(value instanceof types.Str ? value.value : value.toString())
       interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
+    } else {
+      throw new types.Err(`find expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`, token)
+    }
+  }
+}
+
+module.exports.contains = {
+  name: 'contains',
+  execute (interpreter, token) {
+    const value = interpreter._stack.pop()
+    const arrOrStr = interpreter._stack.pop()
+    if (arrOrStr instanceof types.Arr) {
+      interpreter._stack.push(new types.Bool(arrOrStr.items.some((obj) => isEqual(obj, value))))
+    } else if (arrOrStr instanceof types.Str) {
+      interpreter._stack.push(new types.Bool(arrOrStr.value.includes(value instanceof types.Str ? value.value : value.toString())))
     } else {
       throw new types.Err(`find expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`)
     }

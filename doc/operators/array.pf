@@ -128,7 +128,23 @@ find: (arr :Arr, value :Obj -> :Int) {} fun
 #<
 Find the index of the first occurence of a substring in a string.
 @param str String to search in
-@param value Substring to search for
+@param value Value to search for, will be converted to :Str automatically
 @return Zero-based index of the substring in the string or nil if not found
 >#
 find: (str :Str, value :Obj -> :Int) {} fun
+
+#<
+Check if an array contains the given value.
+@param arr Array
+@param value Value
+@return True if the array contains the given value, false otherwise
+>#
+contains: (arr :Arr, value :Obj -> :Bool) {} fun
+
+#<
+Check if a string contains the given value.
+@param str String
+@param value Value, will be converted to :Str automatically
+@return True if the string contains the given value
+>#
+contains: (str :Str, value :Obj -> :Bool) {} fun

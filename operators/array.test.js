@@ -168,3 +168,17 @@ test('find returns nil if the item was not found', (t) => {
   t.is(stack.count, 1)
   t.true(stack.pop() instanceof types.Nil)
 })
+
+test('contains checks if an array contains an item', (t) => {
+  const { stack } = execute('[1 2 3] 3 contains [4 5 6] 7 contains')
+  t.is(stack.count, 2)
+  t.is(stack.pop().value, false)
+  t.is(stack.pop().value, true)
+})
+
+test('contains checks if a string contains a substring', (t) => {
+  const { stack } = execute('"hello" "el" contains "hi" "e" contains')
+  t.is(stack.count, 2)
+  t.is(stack.pop().value, false)
+  t.is(stack.pop().value, true)
+})
