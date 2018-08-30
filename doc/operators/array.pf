@@ -91,7 +91,7 @@ Append a value to an array.
 @param value Value to append
 @return Modified array
 >#
-append: (arr :Arr, value :Obj) {} fun
+append: (arr :Arr, value :Obj -> :Arr) {} fun
 
 #<
 Remove the first item that is equal to the given value from the array.
@@ -99,7 +99,7 @@ Remove the first item that is equal to the given value from the array.
 @param value Value to remove
 @return Array with the first occurence of the given value removed
 >#
-remove: (arr :Arr, value :Obj) {} fun
+remove: (arr :Arr, value :Obj -> :Arr) {} fun
 
 #<
 Remove the item at the given zero-based index from the array.
@@ -107,7 +107,7 @@ Remove the item at the given zero-based index from the array.
 @param index Zero-based index of the item to remove
 @return Array with the given index removed
 >#
-remove-at: (arr :Arr, index: :Int) {} fun
+remove-at: (arr :Arr, index :Int -> :Arr) {} fun
 
 #<
 Remove the character at the given zero-based index from the string.
@@ -115,7 +115,7 @@ Remove the character at the given zero-based index from the string.
 @param index Zero-based index of the character to remove
 @return String with the character at the given index removed
 >#
-remove-at: (str :Str, index: :Int) {} fun
+remove-at: (str :Str, index :Int -> :Str) {} fun
 
 #<
 Find the index of the first occurence of an object in an array.
@@ -123,12 +123,12 @@ Find the index of the first occurence of an object in an array.
 @param value Object to search for
 @return Zero-based index of the object in the array or nil if not found
 >#
-find: (arr :Arr, value :Obj) {} fun
+find: (arr :Arr, value :Obj -> :Int) {} fun
 
 #<
 Find the index of the first occurence of a substring in a string.
 @param str String to search in
 @param value Substring to search for
-@param Zero-based index of the substring in the string or nil if not found
+@return Zero-based index of the substring in the string or nil if not found
 >#
-find: (str :Str, value :Obj) {} fun
+find: (str :Str, value :Obj -> :Int) {} fun

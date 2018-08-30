@@ -100,7 +100,7 @@ Check if two objects are approximately equal, according to the following rules:
 @param tolerance Tolerance for comparing numbers
 @return true if the objects are approximately equal, false otherwise
 >#
-~=: (a :Obj, b :Obj -> :Bool) {} fun
+~=: (a :Obj, b :Obj, tolerance :Num -> :Bool) {} fun
 
 #<
 Check if two objects are not approximately equal, according to the following rules:
@@ -114,4 +114,4 @@ Check if two objects are not approximately equal, according to the following rul
 @param tolerance Tolerance for comparing numbers
 @return true if the objects are not approximately equal, false otherwise
 >#
-!~=: (a :Obj, b :Obj -> :Bool) {} fun
+!~=: (a :Obj, b :Obj, tolerance :Num -> :Bool) {} fun

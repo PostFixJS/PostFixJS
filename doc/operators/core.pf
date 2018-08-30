@@ -5,7 +5,8 @@ Push an error on the stack. This stops the program immediately.
 err: (message :Str) {} fun
 
 #<
-Execute the object that is on top of the stack.
+Execute an object.
+@param obj Object to execute
 >#
 exec: (obj :Obj) {} fun
 
