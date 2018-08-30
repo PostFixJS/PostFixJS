@@ -264,7 +264,7 @@ module.exports.contains = {
     } else if (arrOrStr instanceof types.Str) {
       interpreter._stack.push(new types.Bool(arrOrStr.value.includes(value instanceof types.Str ? value.value : value.toString())))
     } else {
-      throw new types.Err(`find expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`)
+      throw new types.Err(`contains expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`, token)
     }
   }
 }
