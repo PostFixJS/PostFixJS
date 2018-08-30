@@ -134,6 +134,24 @@ Find the index of the first occurence of a substring in a string.
 find: (str :Str, value :Obj -> :Int) {} fun
 
 #<
+Find the index of the first occurence of an object in an array, beginning at the given start index.
+@param arr Array to search in
+@param value Object to search for
+@param startAt Zero-based start index of the search
+@return Zero-based index of the object in the array or nil if not found
+>#
+find-from: (arr :Arr, value :Obj, startAt :Int -> :Int) {} fun
+
+#<
+Find the index of the first occurence of a substring in a string.
+@param str String to search in
+@param value Value to search for, will be converted to :Str automatically
+@param startAt Zero-based start index of the search
+@return Zero-based index of the substring in the string or nil if not found
+>#
+find-from: (str :Str, value :Obj, startAt :Int -> :Int) {} fun
+
+#<
 Check if an array contains the given value.
 @param arr Array
 @param value Value

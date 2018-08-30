@@ -169,6 +169,18 @@ test('find returns nil if the item was not found', (t) => {
   t.true(stack.pop() instanceof types.Nil)
 })
 
+test('find-from finds the first occurence after a given index in an array', (t) => {
+  const { stack } = execute('[2 1 2 3] 2 1 find-from')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 2)
+})
+
+test('find-from finds the first occurence after a given index in a string', (t) => {
+  const { stack } = execute('"hello world" "o" 5 find-from')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 7)
+})
+
 test('contains checks if an array contains an item', (t) => {
   const { stack } = execute('[1 2 3] 3 contains [4 5 6] 7 contains')
   t.is(stack.count, 2)

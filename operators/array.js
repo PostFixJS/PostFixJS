@@ -233,6 +233,27 @@ module.exports.find = {
   }
 }
 
+module.exports.findFrom = {
+  name: 'find-from',
+  execute (interpreter, token) {
+    const startIndex = interpreter._stack.pop()
+    if (!(startIndex instanceof types.Int)) {
+      throw new types.Err(`find-from expects :Int as start index but got ${startIndex.getTypeName()} instead`, token)
+    }
+    const value = interpreter._stack.pop()
+    const arrOrStr = interpreter._stack.pop()
+    if (arrOrStr instanceof types.Arr) {
+      const index = arrOrStr.items.findIndex((obj, i) => i >= startIndex.value && isEqual(obj, value))
+      interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
+    } else if (arrOrStr instanceof types.Str) {
+      const index = arrOrStr.value.indexOf(value instanceof types.Str ? value.value : value.toString(), startIndex.value)
+      interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
+    } else {
+      throw new types.Err(`find-from expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`, token)
+    }
+  }
+}
+
 module.exports.contains = {
   name: 'contains',
   execute (interpreter, token) {
