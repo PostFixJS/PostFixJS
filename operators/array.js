@@ -268,3 +268,38 @@ module.exports.contains = {
     }
   }
 }
+
+module.exports.slice = {
+  name: 'slice',
+  execute (interpreter, token) {
+    let start
+    let end
+    let arrOrStr
+
+    end = interpreter._stack.pop()
+    start = interpreter._stack.pop()
+    if (start instanceof types.Arr || start instanceof types.Str) {
+      arrOrStr = start
+      start = end
+      end = null
+    } else {
+      arrOrStr = interpreter._stack.pop()
+    }
+
+    if (!(start instanceof types.Int)) {
+      throw new types.Err(`slice expects :Int as second argument but got ${start.getTypeName()} instead`, token)
+    }
+    if (end != null && !(end instanceof types.Int)) {
+      throw new types.Err(`slice expects :Int as third argument but got ${end.getTypeName()} instead`, token)
+    }
+
+    if (arrOrStr instanceof types.Arr) {
+      // TODO copy the items, if needed
+      interpreter._stack.push(new types.Arr(arrOrStr.items.slice(start.value, end != null ? end.value : undefined)))
+    } else if (arrOrStr instanceof types.Str) {
+      interpreter._stack.push(new types.Str(arrOrStr.value.substring(start.value, end != null ? end.value : undefined)))
+    } else {
+      throw new types.Err(`slice expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`, token)
+    }
+  }
+}

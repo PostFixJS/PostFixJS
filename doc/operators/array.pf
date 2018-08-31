@@ -166,3 +166,23 @@ Check if a string contains the given value.
 @return True if the string contains the given value
 >#
 contains: (str :Str, value :Obj -> :Bool) {} fun
+
+#<
+Get a portion of an array, including all items from start (inclusive) to
+end (exclusive). If no end is specified, all items from start will be included.
+@param arr Array
+@param start Zero-based index of the first item to include
+@param end Zero-based index of the first item that should not be included (optional)
+@return A new array containing the items in the given range
+>#
+slice: (arr :Arr, start :Int, end :Int -> :Arr) {} fun
+
+#<
+Get a portion of a string, including all characters from start (inclusive) to
+end (exclusive). If no end is specified, all characters from start will be included.
+@param str String
+@param start Zero-based index of the first character to include
+@param end Zero-based index of the first character that should not be included (optional)
+@return The extracted substring
+>#
+slice: (str :Str, start :Int, end :Int -> :Str) {} fun

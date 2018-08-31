@@ -194,3 +194,31 @@ test('contains checks if a string contains a substring', (t) => {
   t.is(stack.pop().value, false)
   t.is(stack.pop().value, true)
 })
+
+test('slice gets a slice of an array', (t) => {
+  const { stack } = execute('[1 2 3 4 5] 1 3 slice')
+  t.is(stack.count, 1)
+  const array = stack.pop()
+  t.true(array instanceof types.Arr)
+  t.deepEqual(array.items.map((i) => i.value), [2, 3])
+})
+
+test('slice gets everything to the end of the array if no end is given', (t) => {
+  const { stack } = execute('[1 2 3 4 5] 1 slice')
+  t.is(stack.count, 1)
+  const array = stack.pop()
+  t.true(array instanceof types.Arr)
+  t.deepEqual(array.items.map((i) => i.value), [2, 3, 4, 5])
+})
+
+test('slice gets a slice of a string', (t) => {
+  const { stack } = execute('"postfix" 4 6 slice')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'fi')
+})
+
+test('slice gets everything to the end of the string if no end is given', (t) => {
+  const { stack } = execute('"postfix" 4 slice')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'fix')
+})
