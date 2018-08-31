@@ -222,3 +222,15 @@ test('slice gets everything to the end of the string if no end is given', (t) =>
   t.is(stack.count, 1)
   t.is(stack.pop().value, 'fix')
 })
+
+test('insert inserts an item into an array', (t) => {
+  const { stack } = execute('[1 2 3] 1 "hello" insert')
+  t.is(stack.count, 1)
+  t.deepEqual(stack.pop().items.map((i) => i.value), [1, 'hello', 2, 3])
+})
+
+test('insert inserts a character into a string', (t) => {
+  const { stack } = execute('"test" 2 65 insert')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'teAst')
+})

@@ -303,3 +303,40 @@ module.exports.slice = {
     }
   }
 }
+
+module.exports.insert = {
+  name: 'insert',
+  execute (interpreter, token) {
+    const obj = interpreter._stack.pop()
+    const index = interpreter._stack.pop()
+    const arrOrStr = interpreter._stack.pop()
+
+    if (!(index instanceof types.Int)) {
+      throw new types.Err(`insert expects :Int as index (second argument) but got ${index.getTypeName()} instead`, token)
+    }
+
+    if (arrOrStr instanceof types.Arr) {
+      // TODO copy the items, if needed
+      if (index.value >= 0 && index.value <= arrOrStr.items.length) {
+        interpreter._stack.push(new types.Arr([
+          ...arrOrStr.items.slice(0, index),
+          obj,
+          ...arrOrStr.items.slice(index)
+        ]))
+      } else {
+        throw new types.Err(`Index ${index.value} is out of range from 0 to ${arrOrStr.items.length}`, token)
+      }
+    } else if (arrOrStr instanceof types.Str) {
+      if (!(obj instanceof types.Int)) {
+        throw new types.Err(`insert expects a character (:Int) to insert into the string but got ${obj.getTypeName()} instead`, token)
+      }
+      if (index.value >= 0 && index.value <= arrOrStr.value.length) {
+        interpreter._stack.push(new types.Str(`${arrOrStr.value.substr(0, index.value)}${String.fromCharCode(obj.value)}${arrOrStr.value.substr(index)}`))
+      } else {
+        throw new types.Err(`Index ${index.value} is out of range from 0 to ${arrOrStr.value.length}`, token)
+      }
+    } else {
+      throw new types.Err(`insert expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`, token)
+    }
+  }
+}

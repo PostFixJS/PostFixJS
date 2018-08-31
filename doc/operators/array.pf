@@ -186,3 +186,21 @@ end (exclusive). If no end is specified, all characters from start will be inclu
 @return The extracted substring
 >#
 slice: (str :Str, start :Int, end :Int -> :Str) {} fun
+
+#<
+Insert an item into an array.
+@param arr Array
+@param index Zero-based index at which to insert the item
+@param value Item to insert
+@return Array with the item inserted
+>#
+insert: (arr :Arr, index :Int, value :Obj -> :Arr) {} fun
+
+#<
+Insert a character into a string.
+@param str String
+@param index Zero-based index at which to insert the character
+@param character Character to insert
+@return String with the character inserted
+>#
+insert: (str :Str, index :Int, character :Int -> :Str) {} fun
