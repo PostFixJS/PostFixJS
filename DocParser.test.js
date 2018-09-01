@@ -342,3 +342,72 @@ Point: [
     }]
   }])
 })
+
+test('DocParser works fine with undocumented union type declarations', (t) => {
+  t.deepEqual(DocParser.getDatadefs(`
+Point: [
+  Euclid: (
+    x :Num,
+    y :Num
+  )
+
+  Polar: (
+    theta :Num,
+    magnitude :Num
+  )
+] datadef
+  `), [{
+    name: ':Point',
+    description: undefined,
+    type: 'union',
+    types: [':Euclid', ':Polar']
+  }, {
+    name: ':Euclid',
+    description: undefined,
+    type: 'struct',
+    fields: [{
+      name: 'x',
+      type: ':Num',
+      description: undefined
+    }, {
+      name: 'y',
+      type: ':Num',
+      description: undefined
+    }]
+  }, {
+    name: ':Polar',
+    description: undefined,
+    type: 'struct',
+    fields: [{
+      name: 'theta',
+      type: ':Num',
+      description: undefined
+    }, {
+      name: 'magnitude',
+      type: ':Num',
+      description: undefined
+    }]
+  }])
+})
+
+test('DocParser works fine with undocumented struct type declarations', (t) => {
+  t.deepEqual(DocParser.getDatadefs(`
+    Polar: (
+      theta :Num,
+      magnitude :Num
+    ) datadef
+  `), [{
+    name: ':Polar',
+    description: undefined,
+    type: 'struct',
+    fields: [{
+      name: 'theta',
+      type: ':Num',
+      description: undefined
+    }, {
+      name: 'magnitude',
+      type: ':Num',
+      description: undefined
+    }]
+  }])
+})

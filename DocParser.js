@@ -189,7 +189,7 @@ function getDatadefAt (tokens, i) {
           datadef.fields = struct.params.map((param) => ({
             name: param.name,
             type: param.type,
-            description: parseDocComment(param.doc).description
+            description: param.doc ? parseDocComment(param.doc).description : undefined
           }))
           return { datadef, i }
         }
@@ -203,7 +203,7 @@ function getDatadefAt (tokens, i) {
           datadef.type = 'union'
           datadef.types = []
 
-          let next = { }
+          let next = { description: undefined }
           for (let i = union.firstToken + 1; i < union.lastToken; i++) {
             if (tokens[i].tokenType === 'BLOCK_COMMENT') {
               next.description = parseDocComment(tokens[i].token).description
@@ -218,11 +218,11 @@ function getDatadefAt (tokens, i) {
                 next.fields = struct.params.map((param) => ({
                   name: param.name,
                   type: param.type,
-                  description: parseDocComment(param.doc).description
+                  description: param.doc ? parseDocComment(param.doc).description : undefined
                 }))
 
                 datadef.types.push(next)
-                next = {}
+                next = { description: undefined }
                 i = params.lastToken // + 1 is done by the for loop
               }
             }
