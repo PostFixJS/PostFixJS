@@ -248,6 +248,23 @@ class Interpreter {
     this._stack.clear()
     this._dictStack.clear()
   }
+
+  /**
+   * Get a copy of this interpreter with the same state (dictionary stack, stack and built-ins).
+   * @return {Interpreter} Copy of this interpreter
+   */
+  copy () {
+    const interpreter = new Interpreter()
+    interpreter._builtIns = this._builtIns
+    // TODO copy objects if needed (or add reference counting later)
+    interpreter._stack._stack = this._stack._stack.slice()
+    interpreter._stack._minStackHeight = this._stack._minStackHeight.slice()
+    interpreter._dictStack._dict = this._dictStack.copyDict()
+    interpreter._dictStack._stack = [interpreter._dictStack._dict]
+    interpreter._openExeArrs = this._openExeArrs
+    interpreter._openParamLists = this._openParamLists
+    return interpreter
+  }
 }
 
 class Stack {
