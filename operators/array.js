@@ -2,6 +2,27 @@ const types = require('../types')
 const { nextInt } = require('./impl/random')
 const { isEqual } = require('./impl/compare')
 
+function keyGet (array, key, defaultValue) {
+  for (let i = 0; i < array.items.length - 1; i++) {
+    if (isEqual(key, array.items[i])) {
+      return array.items[i + 1]
+    }
+  }
+  return defaultValue
+}
+
+function keySet (array, key, value) {
+  for (let i = 0; i < array.items.length - 1; i++) {
+    if (isEqual(key, array.items[i])) {
+      // TODO copy items if needed
+      const newArr = new types.Arr([...array.items])
+      newArr.items[i + 1] = value
+      return newArr
+    }
+  }
+  return new types.Arr([...array.items, key, value])
+}
+
 module.exports.length = {
   name: 'length',
   execute (interpreter, token) {
@@ -90,14 +111,9 @@ module.exports.keyGet = {
     const defaultValue = interpreter._stack.pop()
     const key = interpreter._stack.pop()
     const array = interpreter._stack.pop()
+    // TODO type checks
 
-    for (let i = 0; i < array.items.length - 1; i++) {
-      if (isEqual(key, array.items[i])) {
-        interpreter._stack.push(array.items[i + 1])
-        return
-      }
-    }
-    interpreter._stack.push(defaultValue)
+    interpreter._stack.push(keyGet(array, key, defaultValue))
   }
 }
 
@@ -107,16 +123,25 @@ module.exports.keySet = {
     const value = interpreter._stack.pop()
     const key = interpreter._stack.pop()
     const array = interpreter._stack.pop()
+    // TODO type checks
 
-    for (let i = 0; i < array.items.length - 1; i++) {
-      if (isEqual(key, array.items[i])) {
-        const newArr = new types.Arr([...array.items])
-        newArr.items[i + 1] = value
-        interpreter._stack.push(newArr)
-        return
-      }
-    }
-    interpreter._stack.push(new types.Arr([...array.items, key, value]))
+    interpreter._stack.push(keySet(array, key, value))
+  }
+}
+
+module.exports.update = {
+  name: 'update',
+  * execute (interpreter, token) {
+    const updater = interpreter._stack.pop()
+    const defaultValue = interpreter._stack.pop()
+    const key = interpreter._stack.pop()
+    const array = interpreter._stack.pop()
+    // TODO check types
+
+    interpreter._stack.push(keyGet(array, key, defaultValue))
+    yield * interpreter.executeObj(updater)
+    const newValue = interpreter._stack.pop()
+    interpreter._stack.push(keySet(array, key, newValue))
   }
 }
 
@@ -355,7 +380,7 @@ module.exports.array = {
       const arr = []
       for (let i = 0; i < length.value; i++) {
         interpreter._stack.push(new types.Int(i))
-        yield * initializer.execute(interpreter)
+        yield * interpreter.executeObj(initializer)
         arr.push(interpreter._stack.pop())
       }
       interpreter._stack.push(new types.Arr(arr))

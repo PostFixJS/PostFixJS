@@ -64,6 +64,16 @@ Set the item after the first item in the array that is equal to the given key. I
 key-set: (arr :Arr, key :Obj, value :Obj -> :Arr) {} fun
 
 #<
+Update the value of a key in the array by executing an executable array.
+@param arr Array
+@param key Key
+@param default Default value that is used when the key is not found in the array
+@param updater Executable array that is called with the value of the key (or the default value) on top of the stack and must push the updated value on the stack
+@return The modified array
+>#
+update: (arr :Arr, key :Obj, default :Obj, updater :ExeArr -> :Arr) {} fun
+
+#<
 Shuffle the given array.
 Internally, this function uses rand-int, so it is deterministic when the seed is known.
 @param arr Array

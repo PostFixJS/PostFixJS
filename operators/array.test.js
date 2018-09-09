@@ -95,6 +95,23 @@ test('key-set should append a key and a value to an array', (t) => {
   t.is(arr[1].value, 'hello')
 })
 
+test('update updates a key', (t) => {
+  const { stack } = execute('[:foo "bar" :bar 2] :foo "" { length } update')
+  t.is(stack.count, 1)
+  const arr = stack.pop()
+  t.true(arr instanceof types.Arr)
+  t.is(arr.items[1].value, 3)
+})
+
+test('update adds a missing key', (t) => {
+  const { stack } = execute('[:bar 2] :foo "test" { length } update')
+  t.is(stack.count, 1)
+  const arr = stack.pop()
+  t.true(arr instanceof types.Arr)
+  t.is(arr.items[2].name, 'foo')
+  t.is(arr.items[3].value, 4)
+})
+
 test('shuffle shuffles an array', (t) => {
   // this test could theoretically fail, but it's pretty unlikely
   const { stack } = execute('[ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 ] shuffle')
