@@ -204,3 +204,19 @@ Insert a character into a string.
 @return String with the character inserted
 >#
 insert: (str :Str, index :Int, character :Int -> :Str) {} fun
+
+#<
+Create a new array with the given length and initialize it.
+@param length Length of the array
+@param initializer Executable array that will be executed for every array entry, the zero-based index is put on top of the stack and the value that the executable array pushes onto the stack is put into the array
+@return Array with the given length and values produced by the initializer
+>#
+array: (length :Int, initializer :ExeArr -> :Arr) {} fun
+
+#<
+Create a new array with the given length and set all items to the given value.
+@param length Length of the array
+@param value Value to set all array items to
+@return Array with the given length and values
+>#
+array: (length :Int, value :Obj -> :Arr) {} fun

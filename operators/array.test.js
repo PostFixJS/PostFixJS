@@ -234,3 +234,30 @@ test('insert inserts a character into a string', (t) => {
   t.is(stack.count, 1)
   t.is(stack.pop().value, 'teAst')
 })
+
+test('array creates an array with a given length and initial value', (t) => {
+  const { stack } = execute('5 "test" array')
+  t.is(stack.count, 1)
+  const arr = stack.pop()
+  t.true(arr instanceof types.Arr)
+  t.is(arr.items.length, 5)
+  t.true(arr.items.every((i) => i instanceof types.Str && i.value === 'test'))
+})
+
+test('array creates an array with a given length and initial value', (t) => {
+  const { stack } = execute('5 "test" array')
+  t.is(stack.count, 1)
+  const arr = stack.pop()
+  t.true(arr instanceof types.Arr)
+  t.is(arr.items.length, 5)
+  t.true(arr.items.every((i) => i instanceof types.Str && i.value === 'test'))
+})
+
+test('array creates an array with a given length and runs the initializer function for every index', (t) => {
+  const { stack } = execute('5 { 2 pow } array')
+  t.is(stack.count, 1)
+  const arr = stack.pop()
+  t.true(arr instanceof types.Arr)
+  t.is(arr.items.length, 5)
+  t.deepEqual(arr.items.map((i) => i.value), [0, 1, 4, 9, 16])
+})

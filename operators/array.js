@@ -340,3 +340,32 @@ module.exports.insert = {
     }
   }
 }
+
+module.exports.array = {
+  name: 'array',
+  * execute (interpreter, token) {
+    const initializer = interpreter._stack.pop()
+    const length = interpreter._stack.pop()
+
+    if (!(length instanceof types.Int)) {
+      throw new types.Err(`array expects :Int as length (first argument) but got ${length.getTypeName()} instead`, token)
+    }
+
+    if (initializer instanceof types.ExeArr) {
+      const arr = []
+      for (let i = 0; i < length.value; i++) {
+        interpreter._stack.push(new types.Int(i))
+        yield * initializer.execute(interpreter)
+        arr.push(interpreter._stack.pop())
+      }
+      interpreter._stack.push(new types.Arr(arr))
+    } else {
+      const arr = []
+      for (let i = 0; i < length.value; i++) {
+        // TODO copy the value, if needed
+        arr.push(initializer)
+      }
+      interpreter._stack.push(new types.Arr(arr))
+    }
+  }
+}
