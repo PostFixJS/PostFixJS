@@ -230,3 +230,10 @@ Create a new array with the given length and set all items to the given value.
 @return Array with the given length and values
 >#
 array: (length :Int, value :Obj -> :Arr) {} fun
+
+#<
+Sort an array.
+@param arr Array
+@return Sorted array
+>#
+sort: (arr :Arr -> :Arr) {} fun

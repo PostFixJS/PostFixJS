@@ -1,35 +1,37 @@
 const types = require('../types')
-const { isEqual, isApproxEqual, getComparableValues } = require('./impl/compare')
+const { isEqual, isApproxEqual, compare } = require('./impl/compare')
+
+function compareTop (interpreter, token) {
+  const b = interpreter._stack.pop()
+  const a = interpreter._stack.pop()
+  return compare(a, b, token)
+}
 
 module.exports.lessThan = {
   name: '<',
   execute (interpreter, token) {
-    const { a, b } = getComparableValues(interpreter, token)
-    interpreter._stack.push(new types.Bool(a < b))
+    interpreter._stack.push(new types.Bool(compareTop(interpreter, token) < 0))
   }
 }
 
 module.exports.lessThanOrEqual = {
   name: '<=',
   execute (interpreter, token) {
-    const { a, b } = getComparableValues(interpreter, token)
-    interpreter._stack.push(new types.Bool(a <= b))
+    interpreter._stack.push(new types.Bool(compareTop(interpreter, token) <= 0))
   }
 }
 
 module.exports.greaterThan = {
   name: '>',
   execute (interpreter, token) {
-    const { a, b } = getComparableValues(interpreter, token)
-    interpreter._stack.push(new types.Bool(a > b))
+    interpreter._stack.push(new types.Bool(compareTop(interpreter, token) > 0))
   }
 }
 
 module.exports.greaterThanOrEqual = {
   name: '>=',
   execute (interpreter, token) {
-    const { a, b } = getComparableValues(interpreter, token)
-    interpreter._stack.push(new types.Bool(a >= b))
+    interpreter._stack.push(new types.Bool(compareTop(interpreter, token) >= 0))
   }
 }
 

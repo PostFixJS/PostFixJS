@@ -278,3 +278,11 @@ test('array creates an array with a given length and runs the initializer functi
   t.is(arr.items.length, 5)
   t.deepEqual(arr.items.map((i) => i.value), [0, 1, 4, 9, 16])
 })
+
+test('sort sorts an array', (t) => {
+  const { stack } = execute('[ 6 1 4 7 1 3 ] sort')
+  t.is(stack.count, 1)
+  const sortedArray = stack.pop()
+  t.true(sortedArray instanceof types.Arr)
+  t.deepEqual(sortedArray.items.map((item) => item.value), [1, 1, 3, 4, 6, 7])
+})

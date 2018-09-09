@@ -1,6 +1,6 @@
 const types = require('../types')
 const { nextInt } = require('./impl/random')
-const { isEqual } = require('./impl/compare')
+const { isEqual, compare } = require('./impl/compare')
 
 function keyGet (array, key, defaultValue) {
   for (let i = 0; i < array.items.length - 1; i++) {
@@ -392,5 +392,19 @@ module.exports.array = {
       }
       interpreter._stack.push(new types.Arr(arr))
     }
+  }
+}
+
+module.exports.sort = {
+  name: 'sort',
+  execute (interpreter, token) {
+    const array = interpreter._stack.pop()
+    if (!(array instanceof types.Arr)) {
+      throw new types.Err(`sort expects an :Arr to sort but got ${array.getTypeName()} instead`, token)
+    }
+
+    const sortedArray = array.items.slice() // TODO copy the items if needed
+    sortedArray.sort((a, b) => compare(a, b, token))
+    interpreter._stack.push(new types.Arr(sortedArray))
   }
 }

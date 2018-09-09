@@ -26,6 +26,30 @@ function isEqual (a, b) {
   return false
 }
 
+function compare (a, b, token) {
+  // This compare implementation is ported from the lt/gt methods
+  // of the original PostFix implementation.
+  // :Num, :Num -> compare values
+  // :Str, :Str -> compare values
+  // :Bool, :Bool -> true > false
+  // :Arr, :Arr -> weird case that is not ported yet and might be dropped
+  // all other cases -> cannot compare
+  // To make this consistent with isEqual above, :Sym, :Sym is added, which compares the name
+
+  if (a instanceof types.Num && b instanceof types.Num) {
+    return a.value - b.value
+  } else if (a instanceof types.Str && b instanceof types.Str) {
+    return a.value.localeCompare(b.value)
+  } else if (a instanceof types.Bool && b instanceof types.Bool) {
+    if (a.value === b.value) return 0
+    return a ? 1 : -1 // true > false
+  } else if (a instanceof types.Sym) {
+    return a.name.localeCompare(b.name)
+  } else {
+    throw new types.Err(`Cannot compare ${a.getTypeName()} and ${b.getTypeName()}`, token)
+  }
+}
+
 function isApproxEqual (a, b, tolerance) {
   if (a instanceof types.Arr && b instanceof types.Arr) {
     if (a === b) {
@@ -45,19 +69,6 @@ function isApproxEqual (a, b, tolerance) {
   return isEqual(a, b)
 }
 
-function getComparableValues (interpreter, token) {
-  const b = interpreter._stack.pop()
-  const a = interpreter._stack.pop()
-
-  if (a instanceof types.Num && b instanceof types.Num) {
-    return { a: a.value, b: b.value }
-  } else if (a instanceof types.Str && b instanceof types.Str) {
-    return { a: a.value.localeCompare(b.value), b: 0 }
-  } else {
-    throw new types.Err(`Can only compare :Str with :Str or :Num with :Num but got ${a.getTypeName()} and ${b.getTypeName()}`, token)
-  }
-}
-
+module.exports.compare = compare
 module.exports.isEqual = isEqual
 module.exports.isApproxEqual = isApproxEqual
-module.exports.getComparableValues = getComparableValues
