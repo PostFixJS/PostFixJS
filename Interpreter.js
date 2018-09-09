@@ -30,6 +30,7 @@ class Interpreter {
     this.registerBuiltIns(require('./operators/random'))
     this.registerBuiltIns(require('./operators/stack'))
     this.registerBuiltIns(require('./operators/string'))
+    this.registerBuiltIns(require('./operators/time'))
     this.registerBuiltIns(require('./operators/types'))
   }
 
