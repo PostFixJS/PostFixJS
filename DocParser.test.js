@@ -176,6 +176,15 @@ firstTwo: (arr :Arr -> :Obj :Obj) {} fun
   }])
 })
 
+test('DocParser supports functions without params', (t) => {
+  t.deepEqual(DocParser.getFunctions(`test: {} fun`), [{
+    name: 'test',
+    description: undefined,
+    params: [],
+    returns: []
+  }])
+})
+
 test('DocParser does not crash on broken input', (t) => {
   t.notThrows(() => {
     DocParser.getFunctions(`

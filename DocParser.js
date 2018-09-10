@@ -110,6 +110,9 @@ function getFunctionAt (tokens, i) {
       type,
       description: doc.returns.length > i ? doc.returns[i].description : undefined
     }))
+  } else {
+    fn.params = []
+    fn.returns = []
   }
   i = skipElements(tokens, i, 'EXEARR_START', 'EXEARR_END')
   if (i !== false && tokens[i].tokenType === 'REFERENCE' && (tokens[i].token === 'fun' || tokens[i].token === 'cond-fun')) {
