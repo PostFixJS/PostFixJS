@@ -95,16 +95,16 @@ test('key-set should append a key and a value to an array', (t) => {
   t.is(arr[1].value, 'hello')
 })
 
-test('update updates a key', (t) => {
-  const { stack } = execute('[:foo "bar" :bar 2] :foo "" { length } update')
+test('key-update updates a key', (t) => {
+  const { stack } = execute('[:foo "bar" :bar 2] :foo "" { length } key-update')
   t.is(stack.count, 1)
   const arr = stack.pop()
   t.true(arr instanceof types.Arr)
   t.is(arr.items[1].value, 3)
 })
 
-test('update adds a missing key', (t) => {
-  const { stack } = execute('[:bar 2] :foo "test" { length } update')
+test('key-update adds a missing key', (t) => {
+  const { stack } = execute('[:bar 2] :foo "test" { length } key-update')
   t.is(stack.count, 1)
   const arr = stack.pop()
   t.true(arr instanceof types.Arr)

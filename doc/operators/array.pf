@@ -71,7 +71,7 @@ Update the value of a key in the array by executing an executable array.
 @param updater Executable array that is called with the value of the key (or the default value) on top of the stack and must push the updated value on the stack
 @return The modified array
 >#
-update: (arr :Arr, key :Obj, default :Obj, updater :ExeArr -> :Arr) {} fun
+key-update: (arr :Arr, key :Obj, default :Obj, updater :ExeArr -> :Arr) {} fun
 
 #<
 Shuffle the given array.

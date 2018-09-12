@@ -130,7 +130,7 @@ module.exports.keySet = {
 }
 
 module.exports.update = {
-  name: 'update',
+  name: 'key-update',
   * execute (interpreter, token) {
     const updater = interpreter._stack.pop()
     const defaultValue = interpreter._stack.pop()
