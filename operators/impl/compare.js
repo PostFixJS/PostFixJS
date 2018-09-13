@@ -32,7 +32,7 @@ function compare (a, b, token) {
   // :Num, :Num -> compare values
   // :Str, :Str -> compare values
   // :Bool, :Bool -> true > false
-  // :Arr, :Arr -> weird case that is not ported yet and might be dropped
+  // :Arr, :Arr -> compare first min(a.length, b.length) items, if one is not equal, use that; otherwise compare the array lengths
   // all other cases -> cannot compare
   // To make this consistent with isEqual above, :Sym, :Sym is added, which compares the name
 
@@ -43,8 +43,17 @@ function compare (a, b, token) {
   } else if (a instanceof types.Bool && b instanceof types.Bool) {
     if (a.value === b.value) return 0
     return a ? 1 : -1 // true > false
-  } else if (a instanceof types.Sym) {
+  } else if (a instanceof types.Sym && b instanceof types.Sym) {
     return a.name.localeCompare(b.name)
+  } else if (a instanceof types.Arr && b instanceof types.Arr) {
+    const n = Math.min(a.items.length, b.items.length)
+    for (let i = 0; i < n; i++) {
+      const cmp = compare(a.items[i], b.items[i])
+      if (cmp !== 0) {
+        return cmp
+      }
+    }
+    return a.items.length - b.items.length
   } else {
     throw new types.Err(`Cannot compare ${a.getTypeName()} and ${b.getTypeName()}`, token)
   }
