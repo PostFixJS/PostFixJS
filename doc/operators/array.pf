@@ -74,6 +74,15 @@ Update the value of a key in the array by executing an executable array.
 key-update: (arr :Arr, key :Obj, default :Obj, updater :ExeArr -> :Arr) {} fun
 
 #<
+Update the value of a nested array. The keys are the indices of the value.
+@param arr Array
+@param keys Keys to the position of the value to update
+@param value Value to assign at the given index
+@return The modified array
+>#
+path-set: (arr :Arr, keys :Arr, value :Obj -> :Arr) {} fun
+
+#<
 Shuffle the given array.
 Internally, this function uses rand-int, so it is deterministic when the seed is known.
 @param arr Array

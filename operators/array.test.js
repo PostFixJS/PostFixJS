@@ -112,6 +112,18 @@ test('key-update adds a missing key', (t) => {
   t.is(arr.items[3].value, 4)
 })
 
+test('path-set should set a value in a multi-dimensional array', (t) => {
+  const { stack } = execute('[[], [], [[], [1,2]]] [2 1 1] 42 path-set')
+  t.is(stack.count, 1)
+  t.is(stack.pop().items[2].items[1].items[1].value, 42)
+})
+
+test('path-set should set a value in a one-dimensional array', (t) => {
+  const { stack } = execute('[1,2] [1] 42 path-set')
+  t.is(stack.count, 1)
+  t.is(stack.pop().items[1].value, 42)
+})
+
 test('shuffle shuffles an array', (t) => {
   // this test could theoretically fail, but it's pretty unlikely
   const { stack } = execute('[ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 ] shuffle')

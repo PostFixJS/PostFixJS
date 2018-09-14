@@ -23,6 +23,16 @@ function keySet (array, key, value) {
   return new types.Arr([...array.items, key, value])
 }
 
+function arraySet (array, index, value, token) {
+  if (index.value >= 0 && index.value < array.items.length) {
+    const newArr = new types.Arr([...array.items])
+    newArr.items[index.value] = value
+    return newArr
+  } else {
+    throw new types.Err(`Index is out of range (index is ${index.value} but the :Arr has length ${array.items.length})`, token)
+  }
+}
+
 module.exports.length = {
   name: 'length',
   execute (interpreter, token) {
@@ -74,13 +84,7 @@ module.exports.set = {
 
     if (index instanceof types.Int) {
       if (obj instanceof types.Arr) {
-        if (index.value >= 0 && index.value < obj.items.length) {
-          const newArr = new types.Arr([...obj.items])
-          newArr.items[index.value] = value
-          interpreter._stack.push(newArr)
-        } else {
-          throw new types.Err(`Index is out of range (index is ${index.value} but the :Arr has length ${obj.items.length})`, token)
-        }
+        interpreter._stack.push(arraySet(obj, index, value, token))
       } else if (obj instanceof types.Str) {
         if (index.value >= 0 && index.value < obj.value.length) {
           if (value instanceof types.Str) {
@@ -142,6 +146,46 @@ module.exports.update = {
     yield * interpreter.executeObj(updater)
     const newValue = interpreter._stack.pop()
     interpreter._stack.push(keySet(array, key, newValue))
+  }
+}
+
+module.exports.pathSet = {
+  name: 'path-set',
+  execute (interpreter, token) {
+    const value = interpreter._stack.pop()
+    const path = interpreter._stack.pop()
+    const array = interpreter._stack.pop()
+    // TODO type checks
+
+    let currentArray = array
+    const pathArrays = [array]
+
+    for (let i = 0; i < path.items.length - 1; i++) {
+      const index = path.items[i]
+      if (!(index instanceof types.Int)) {
+        throw new types.Err(`Expected index to be :Int but got ${index.getTypeName()} instead`, token)
+      }
+      if (currentArray instanceof types.Arr) {
+        currentArray = currentArray.items[index.value]
+        pathArrays.push(currentArray)
+      } else if (currentArray != null) {
+        throw new types.Err(`key-set expects :Arr at index ${index.value} but got ${currentArray.getTypeName()} instead`, token)
+      } else {
+        throw new types.Err('key-set expects :Arr but the path did not lead to an :Arr', token)
+      }
+    }
+
+    if (currentArray instanceof types.Arr) {
+      currentArray = arraySet(pathArrays.pop(), path.items[path.items.length - 1], value)
+      for (let i = pathArrays.length - 1; i >= 0; i--) {
+        currentArray = arraySet(pathArrays[i], path.items[i], currentArray, token)
+      }
+      interpreter._stack.push(currentArray)
+    } else if (currentArray != null) {
+      throw new types.Err(`key-set expects :Arr but got ${currentArray.getTypeName()} instead`, token)
+    } else {
+      throw new types.Err('key-set expects :Arr but the path did not lead to an :Arr', token)
+    }
   }
 }
 
