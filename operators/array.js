@@ -189,6 +189,44 @@ module.exports.pathSet = {
   }
 }
 
+module.exports.pathUpdate = {
+  name: 'path-update',
+  * execute (interpreter, token) {
+    const updater = interpreter._stack.pop()
+    const defaultValue = interpreter._stack.pop()
+    const path = interpreter._stack.pop()
+    const array = interpreter._stack.pop()
+    // TODO type checks
+
+    let currentArray = array
+    const pathArrays = [array]
+
+    for (let i = 0; i < path.items.length - 1; i++) {
+      const index = path.items[i]
+      if (currentArray instanceof types.Arr) {
+        currentArray = keyGet(currentArray, index, null)
+        if (currentArray == null) {
+          currentArray = new types.Arr([])
+        }
+        pathArrays.push(currentArray)
+      } else {
+        currentArray = new types.Arr([])
+        pathArrays.push(currentArray)
+      }
+    }
+
+    interpreter._stack.push(keyGet(currentArray, path.items[path.items.length - 1], defaultValue))
+    yield * interpreter.executeObj(updater)
+    const value = interpreter._stack.pop()
+
+    currentArray = keySet(pathArrays.pop(), path.items[path.items.length - 1], value)
+    for (let i = pathArrays.length - 1; i >= 0; i--) {
+      currentArray = keySet(pathArrays[i], path.items[i], currentArray, token)
+    }
+    interpreter._stack.push(currentArray)
+  }
+}
+
 module.exports.shuffle = {
   name: 'shuffle',
   execute (interpreter, token) {

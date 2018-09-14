@@ -83,6 +83,16 @@ Update the value of a nested array. The keys are the indices of the value.
 path-set: (arr :Arr, keys :Arr, value :Obj -> :Arr) {} fun
 
 #<
+Update the value of a key in a nested array by executing an executable array. The keys are the keys of the value.
+@param arr Array
+@param keys Path of keys to the value to update
+@param default Default value that is used when the key is not found in the array
+@param updater Executable array that is called with the value of the key (or the default value) on top of the stack and must push the updated value on the stack
+@return The modified array
+>#
+path-update: (arr :Arr, keys :Arr, default :Obj, updater :ExeArr -> :Arr) {} fun
+
+#<
 Shuffle the given array.
 Internally, this function uses rand-int, so it is deterministic when the seed is known.
 @param arr Array
