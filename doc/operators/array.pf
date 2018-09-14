@@ -83,6 +83,15 @@ Update the value of a nested array. The keys are the indices of the value.
 path-set: (arr :Arr, keys :Arr, value :Obj -> :Arr) {} fun
 
 #<
+Set the value of a key in a nested array. The keys are the keys of the value.
+@param arr Array
+@param keys Path of keys to the value to change
+@param default Value to assign at the given key
+@return The modified array
+>#
+path-key-set: (arr :Arr, keys :Arr, value :Obj -> :Arr) {} fun
+
+#<
 Update the value of a key in a nested array by executing an executable array. The keys are the keys of the value.
 @param arr Array
 @param keys Path of keys to the value to update

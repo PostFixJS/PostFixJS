@@ -124,6 +124,24 @@ test('path-set should set a value in a one-dimensional array', (t) => {
   t.is(stack.pop().items[1].value, 42)
 })
 
+test('path-key-set should set a value in a multi-dimensional array', (t) => {
+  const { stack } = execute('[:a [ :x 2 :b [ :a 1 :c 2 ] ] :b []] [:a :b :c] 42 path-key-set')
+  t.is(stack.count, 1)
+  t.is(stack.pop().items[1].items[3].items[3].value, 42)
+})
+
+test('path-key-set should set a value in a one-dimensional array', (t) => {
+  const { stack } = execute('[:a 1 :b 3] [:b] 2 path-key-set')
+  t.is(stack.count, 1)
+  t.is(stack.pop().items[3].value, 2)
+})
+
+test('path-key-set should set a value in a missing sub-array', (t) => {
+  const { stack } = execute('[] [:x :y :z] 42 path-key-set')
+  t.is(stack.count, 1)
+  t.is(stack.pop().items[1].items[1].items[1].value, 42)
+})
+
 test('path-update should set a value in a multi-dimensional array', (t) => {
   const { stack } = execute('[:a [ :x 2 :b [ :a 1 :c 2 ] ] :b []] [:a :b :c] 0 { 21 * } path-update')
   t.is(stack.count, 1)
