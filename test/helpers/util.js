@@ -30,9 +30,9 @@ function executeTimeout (code, timeout = 1000) {
   const done = new Promise((resolve, reject) => {
     setImmediate(() => {
       const interpreter = new Interpreter()
-      interpreter.startRun(Lexer.parse(code))
+      const stepper = interpreter.startRun(Lexer.parse(code))
       const continueExecution = () => {
-        const { done } = interpreter.step()
+        const { done } = stepper.next()
         if (done) {
           clearTimeout(timeoutTimer)
           resolve(interpreter)

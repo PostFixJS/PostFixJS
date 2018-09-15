@@ -24,11 +24,11 @@ test('if should work inside of ExeArrs', (t) => {
 
 test('loop should be interruptible even if empty ', (t) => {
   const interpreter = new Interpreter()
-  interpreter.startRun(Lexer.parse('{} loop'))
-  interpreter.step() // {
-  interpreter.step() // }
-  interpreter.step() // loop
-  interpreter.step() // loop the loop once
+  const stepper = interpreter.startRun(Lexer.parse('{} loop'))
+  stepper.next() // {
+  stepper.next() // }
+  stepper.next() // loop
+  stepper.next() // loop the loop once
   t.pass() // if stopping the execution wouldn't be possible, this line would never be reached
 })
 

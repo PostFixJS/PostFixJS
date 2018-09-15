@@ -213,24 +213,13 @@ class Interpreter {
   }
 
   /**
-   * Initialize the interpreter to execute the given tokens.
-   * Continue execution by calling `step()`.
+   * Start executing the given tokens. Execution is continued by calling the `next`
+   * function of the returned iterator.
    * @param {Iterable} tokens Tokens
+   * @return Iterator that iterates over the tokens that are executed
    */
   startRun (tokens) {
-    this._stepper = this._run(tokens)
-  }
-
-  /**
-   * Continue execution until the next token.
-   * @returns object An object with a done and value property, value will be the next token
-   */
-  step () {
-    const next = this._stepper.next()
-    if (next.done) {
-      this._stepper = null
-    }
-    return next
+    return this._run(tokens)
   }
 
   /**
