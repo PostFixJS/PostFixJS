@@ -227,7 +227,7 @@ class Interpreter {
    * Breakpoints won't work in this mode.
    * @param {Iterable} tokens Tokens to execute
    */
-  runToCompletion (tokens) {
+  run (tokens) {
     Array.from(this._run(tokens))
   }
 

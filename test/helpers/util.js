@@ -8,7 +8,7 @@ const Interpreter = require('../../Interpreter')
  */
 function execute (code) {
   const interpreter = new Interpreter()
-  interpreter.runToCompletion(Lexer.parse(code))
+  interpreter.run(Lexer.parse(code))
   return {
     stack: interpreter._stack,
     dictStack: interpreter._dictStack
