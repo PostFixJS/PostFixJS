@@ -20,11 +20,12 @@ class Obj {
    * Otherwise, just return this object.
    */
   copy () {
-    if (this.refs === 0 && !this.origin) {
-      return this
-    } else {
-      return this._copyImpl()
-    }
+    return this._copyImpl()
+    // if (this.refs === 0 && !this.origin) {
+    //   return this
+    // } else {
+    //   return this._copyImpl()
+    // }
   }
 }
 
