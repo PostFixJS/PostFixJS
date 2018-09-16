@@ -1,12 +1,15 @@
 const types = require('../types')
+const { checkOperands, popOperand } = require('../typeCheck')
 
 module.exports.plus = {
   name: '+',
-  execute (interpreter) {
+  execute (interpreter, token) {
     const a = interpreter._stack.pop()
     const b = interpreter._stack.pop()
-    interpreter._stack._assertType(a, 'Int', 'Flt', 'Str')
-    interpreter._stack._assertType(b, 'Int', 'Flt', 'Str')
+    checkOperands([
+      { value: a, type: ['Int', 'Flt', 'Str'] },
+      { value: b, type: ['Int', 'Flt', 'Str'] }
+    ], token)
 
     if (a instanceof types.Str || b instanceof types.Str) {
       interpreter._stack.push(new types.Str(b.value + a.value))
@@ -20,9 +23,13 @@ module.exports.plus = {
 
 module.exports.minus = {
   name: '-',
-  execute (interpreter) {
-    const b = interpreter._stack.popNumber()
-    const a = interpreter._stack.popNumber()
+  execute (interpreter, token) {
+    const b = interpreter._stack.pop()
+    const a = interpreter._stack.pop()
+    checkOperands([
+      { value: a, type: ['Int', 'Flt'] },
+      { value: b, type: ['Int', 'Flt'] }
+    ], token)
 
     if (a instanceof types.Flt || b instanceof types.Flt) {
       interpreter._stack.push(new types.Flt(a.value - b.value))
@@ -34,9 +41,13 @@ module.exports.minus = {
 
 module.exports.multiply = {
   name: '*',
-  execute (interpreter) {
-    const b = interpreter._stack.popNumber()
-    const a = interpreter._stack.popNumber()
+  execute (interpreter, token) {
+    const b = interpreter._stack.pop()
+    const a = interpreter._stack.pop()
+    checkOperands([
+      { value: a, type: ['Int', 'Flt'] },
+      { value: b, type: ['Int', 'Flt'] }
+    ], token)
 
     if (a instanceof types.Flt || b instanceof types.Flt) {
       interpreter._stack.push(new types.Flt(a.value * b.value))
@@ -48,27 +59,42 @@ module.exports.multiply = {
 
 module.exports.divide = {
   name: '/',
-  execute (interpreter) {
-    const b = interpreter._stack.popNumber()
-    const a = interpreter._stack.popNumber()
+  execute (interpreter, token) {
+    const b = interpreter._stack.pop()
+    const a = interpreter._stack.pop()
+    checkOperands([
+      { value: a, type: ['Int', 'Flt'] },
+      { value: b, type: ['Int', 'Flt'] }
+    ], token)
+
     interpreter._stack.push(new types.Flt(a.value / b.value))
   }
 }
 
 module.exports.intDivide = {
   name: 'i/',
-  execute (interpreter) {
-    const b = interpreter._stack.popNumber()
-    const a = interpreter._stack.popNumber()
+  execute (interpreter, token) {
+    const b = interpreter._stack.pop()
+    const a = interpreter._stack.pop()
+    checkOperands([
+      { value: a, type: ['Int', 'Flt'] },
+      { value: b, type: ['Int', 'Flt'] }
+    ], token)
+
     interpreter._stack.push(new types.Int(Math.floor(a.value / b.value)))
   }
 }
 
 module.exports.mod = {
   name: 'mod',
-  execute (interpreter) {
-    const b = interpreter._stack.popNumber()
-    const a = interpreter._stack.popNumber()
+  execute (interpreter, token) {
+    const b = interpreter._stack.pop()
+    const a = interpreter._stack.pop()
+    checkOperands([
+      { value: a, type: ['Int', 'Flt'] },
+      { value: b, type: ['Int', 'Flt'] }
+    ], token)
+
     interpreter._stack.push(new types.Int(a.value % b.value))
   }
 }
@@ -82,15 +108,16 @@ module.exports.pi = {
 
 module.exports.sign = {
   name: 'sign',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Int(Math.sign(interpreter._stack.popNumber().value)))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Int(Math.sign(value.value)))
   }
 }
 
 module.exports.abs = {
   name: 'abs',
-  execute (interpreter) {
-    const value = interpreter._stack.popNumber()
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
     if (value instanceof types.Int) {
       interpreter._stack.push(new types.Int(-value.value))
     } else { // value instanceof types.Flt
@@ -101,9 +128,14 @@ module.exports.abs = {
 
 module.exports.min = {
   name: 'min',
-  execute (interpreter) {
-    const a = interpreter._stack.popNumber()
-    const b = interpreter._stack.popNumber()
+  execute (interpreter, token) {
+    const a = interpreter._stack.pop()
+    const b = interpreter._stack.pop()
+    checkOperands([
+      { value: a, type: ['Int', 'Flt'] },
+      { value: b, type: ['Int', 'Flt'] }
+    ], token)
+
     if (a.value <= b.value) {
       if (a instanceof types.Int) {
         interpreter._stack.push(new types.Int(a.value))
@@ -122,9 +154,14 @@ module.exports.min = {
 
 module.exports.max = {
   name: 'max',
-  execute (interpreter) {
-    const a = interpreter._stack.popNumber()
-    const b = interpreter._stack.popNumber()
+  execute (interpreter, token) {
+    const a = interpreter._stack.pop()
+    const b = interpreter._stack.pop()
+    checkOperands([
+      { value: a, type: ['Int', 'Flt'] },
+      { value: b, type: ['Int', 'Flt'] }
+    ], token)
+
     if (a.value >= b.value) {
       if (a instanceof types.Int) {
         interpreter._stack.push(new types.Int(a.value))
@@ -143,111 +180,138 @@ module.exports.max = {
 
 module.exports.sin = {
   name: 'sin',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Flt(Math.sin(interpreter._stack.popNumber())))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Flt(Math.sin(value.value)))
   }
 }
 
 module.exports.asin = {
   name: 'asin',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Flt(Math.asin(interpreter._stack.popNumber())))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Flt(Math.asin(value.value)))
   }
 }
 
 module.exports.cos = {
   name: 'cos',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Flt(Math.cos(interpreter._stack.popNumber())))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Flt(Math.cos(value.value)))
   }
 }
 
 module.exports.acos = {
   name: 'acos',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Flt(Math.acos(interpreter._stack.popNumber())))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Flt(Math.acos(value.value)))
   }
 }
 
 module.exports.tan = {
   name: 'tan',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Flt(Math.tan(interpreter._stack.popNumber())))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Flt(Math.tan(value.value)))
   }
 }
 
 module.exports.atan = {
   name: 'atan',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Flt(Math.atan(interpreter._stack.popNumber())))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Flt(Math.atan(value.value)))
   }
 }
 
 module.exports.atan2 = {
   name: 'atan2',
-  execute (interpreter) {
-    const x = interpreter._stack.popNumber()
-    const y = interpreter._stack.popNumber()
-    interpreter._stack.push(new types.Flt(Math.atan2(y.value, x.value)))
+  execute (interpreter, token) {
+    const y = interpreter._stack.pop()
+    const x = interpreter._stack.pop()
+    checkOperands([
+      { value: x, type: ['Int', 'Flt'] },
+      { value: y, type: ['Int', 'Flt'] }
+    ], token)
+
+    interpreter._stack.push(new types.Flt(Math.atan2(x.value, y.value)))
   }
 }
 
 module.exports.ceil = {
   name: 'ceil',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Int(Math.ceil(interpreter._stack.popNumber())))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Int(Math.ceil(value.value)))
   }
 }
 
 module.exports.floor = {
   name: 'floor',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Int(Math.floor(interpreter._stack.popNumber())))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Int(Math.floor(value.value)))
   }
 }
 
 module.exports.sqrt = {
   name: 'sqrt',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Flt(Math.sqrt(interpreter._stack.popNumber())))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Flt(Math.sqrt(value.value)))
   }
 }
 
 module.exports.exp = {
   name: 'exp',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Flt(Math.exp(interpreter._stack.popNumber())))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Flt(Math.exp(value.value)))
   }
 }
 
 module.exports.pow = {
   name: 'pow',
-  execute (interpreter) {
-    const exponent = interpreter._stack.popNumber()
-    const base = interpreter._stack.popNumber()
+  execute (interpreter, token) {
+    const exponent = interpreter._stack.pop()
+    const base = interpreter._stack.pop()
+    checkOperands([
+      { value: base, name: 'base', type: ['Int', 'Flt'] },
+      { value: exponent, name: 'exponent', type: ['Int', 'Flt'] }
+    ], token)
+
     interpreter._stack.push(new types.Flt(Math.pow(base, exponent)))
   }
 }
 
 module.exports.ln = {
   name: 'ln',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Flt(Math.log(interpreter._stack.popNumber())))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Flt(Math.log(value.value)))
   }
 }
 
 module.exports.log = {
   name: 'log',
-  execute (interpreter) {
-    const b = interpreter._stack.popNumber()
-    const x = interpreter._stack.popNumber()
-    interpreter._stack.push(new types.Flt(Math.log(x) / Math.log(b)))
+  execute (interpreter, token) {
+    const b = interpreter._stack.pop()
+    const x = interpreter._stack.pop()
+    checkOperands([
+      { value: x, type: ['Int', 'Flt'] },
+      { value: b, type: ['Int', 'Flt'] }
+    ], token)
+
+    interpreter._stack.push(new types.Flt(Math.log(x.value) / Math.log(b.value)))
   }
 }
 
 module.exports.round = {
   name: 'round',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Int(Math.round(interpreter._stack.popNumber())))
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
+    interpreter._stack.push(new types.Int(Math.round(value.value)))
   }
 }
