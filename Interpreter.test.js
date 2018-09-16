@@ -42,3 +42,13 @@ test('Reference counting should copy arrays before modification', (t) => {
   t.deepEqual(stack.pop().items.map((i) => i.value), [1, 2, 3])
   t.deepEqual(stack.pop().items.map((i) => i.value), [1, 2])
 })
+
+test('Reference counting should copy deep arrays before modification', (t) => {
+  const { stack } = execute('[ 1, 2, [ 1, 2, 3 ] ] dup [2 1] 42 path-set !=')
+  t.is(stack.pop().value, true)
+})
+
+test('Reference counting should copy objects from the dict', (t) => {
+  const { stack } = execute('[0] x! x 1 append x !=')
+  t.is(stack.pop().value, true)
+})

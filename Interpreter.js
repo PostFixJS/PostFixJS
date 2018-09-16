@@ -376,7 +376,11 @@ class DictStack {
   }
 
   put (key, value) {
+    if (this._dict[key]) {
+      this._dict[key].refs--
+    }
     this._dict[key] = value
+    value.refs++
   }
 
   get (key) {
@@ -393,6 +397,9 @@ class DictStack {
   }
 
   copyDict () {
+    for (const obj of Object.values(this._dict)) {
+      obj.refs++
+    }
     return Object.assign({}, this._dict)
   }
 
