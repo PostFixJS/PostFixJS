@@ -1,6 +1,6 @@
 class Obj {
   constructor () {
-    this.refs = 1
+    this.refs = 0
   }
 
   execute (interpreter) {
@@ -16,18 +16,15 @@ class Obj {
   }
 
   /**
-   * Copy this Obj if there are multiple references to it.
+   * Copy this Obj if there are references to it.
    * Otherwise, just return this object.
    */
   copy () {
-    return this._copyImpl()
-
-    // TODO
-    // if (this.refs <= 1) {
-    //   return this
-    // } else {
-    //   return this._copyImpl()
-    // }
+    if (this.refs === 0 && !this.origin) {
+      return this
+    } else {
+      return this._copyImpl()
+    }
   }
 }
 

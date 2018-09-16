@@ -14,18 +14,19 @@ function keyGet (array, key, defaultValue) {
 function keySet (array, key, value) {
   for (let i = 0; i < array.items.length - 1; i++) {
     if (isEqual(key, array.items[i])) {
-      // TODO copy items if needed
-      const newArr = new types.Arr([...array.items])
+      const newArr = array.copy()
       newArr.items[i + 1] = value
       return newArr
     }
   }
-  return new types.Arr([...array.items, key, value])
+  const newArr = array.copy()
+  newArr.items.push(key, value)
+  return newArr
 }
 
 function arraySet (array, index, value, token) {
   if (index.value >= 0 && index.value < array.items.length) {
-    const newArr = new types.Arr([...array.items])
+    const newArr = array.copy()
     newArr.items[index.value] = value
     return newArr
   } else {
@@ -263,21 +264,20 @@ module.exports.pathUpdate = {
 module.exports.shuffle = {
   name: 'shuffle',
   execute (interpreter, token) {
-    const arr = interpreter._stack.pop()
+    const arr = interpreter._stack.pop().copy()
     if (!(arr instanceof types.Arr)) {
       throw new types.Err(`shuffle expects an :Arr but got ${arr.getTypeName()} instead`, token)
     }
-    const items = arr.items.slice()
 
     // Fisher-Yates shuffle as seen in Knuth's The Art of Computer Programming
     for (let i = 0; i < arr.items.length; i++) {
-      const rnd = nextInt(items.length - i) + i
-      const tmp = items[i]
-      items[i] = items[rnd]
-      items[rnd] = tmp
+      const rnd = nextInt(arr.items.length - i) + i
+      const tmp = arr.items[i]
+      arr.items[i] = arr.items[rnd]
+      arr.items[rnd] = tmp
     }
 
-    interpreter._stack.push(new types.Arr(items))
+    interpreter._stack.push(arr)
   }
 }
 
@@ -286,8 +286,9 @@ module.exports.reverse = {
   execute (interpreter, token) {
     const arr = interpreter._stack.pop()
     if (arr instanceof types.Arr) {
-      // TODO copy the items, if needed
-      interpreter._stack.push(new types.Arr(arr.items.reverse()))
+      const newArr = arr.copy()
+      newArr.items.reverse()
+      interpreter._stack.push(newArr)
     } else if (arr instanceof types.Str) {
       let newStr = ''
       for (var i = arr.value.length - 1; i >= 0; i--) {
@@ -304,9 +305,9 @@ module.exports.append = {
   name: 'append',
   execute (interpreter) {
     const value = interpreter._stack.pop()
-    const array = interpreter._stack.pop()
-    // TODO copy the items, if needed
-    interpreter._stack.push(new types.Arr([...array.items, value]))
+    const array = interpreter._stack.pop().copy()
+    array.items.push(value)
+    interpreter._stack.push(array)
   }
 }
 
@@ -318,10 +319,9 @@ module.exports.remove = {
 
     const removeIndex = array.items.findIndex((obj) => isEqual(obj, value))
     if (removeIndex >= 0) {
-      const newItems = array.items.slice()
-      newItems.splice(removeIndex, 1)
-      // TODO copy the items, if needed
-      interpreter._stack.push(new types.Arr(newItems))
+      const newArray = array.copy()
+      newArray.items.splice(removeIndex, 1)
+      interpreter._stack.push(newArray)
     } else {
       interpreter._stack.push(array)
     }
@@ -346,10 +346,9 @@ module.exports.removeAt = {
       if (index.value < 0 || index.value >= array.items.length) {
         throw new types.Err(`The index ${index.value} is not in the array (range 0 to ${array.items.length - 1})`, token)
       }
-      const newItems = array.items.slice()
-      newItems.splice(index.value, 1)
-      // TODO copy the items, if needed
-      interpreter._stack.push(new types.Arr(newItems))
+      const newArrray = array.copy()
+      newArrray.items.splice(index.value, 1)
+      interpreter._stack.push(newArrray)
     } else {
       throw new types.Err(`remove-at expects :Arr or :Str as first argument but got ${array.getTypeName()} instead`, token)
     }
@@ -434,7 +433,6 @@ module.exports.slice = {
     }
 
     if (arrOrStr instanceof types.Arr) {
-      // TODO copy the items, if needed
       interpreter._stack.push(new types.Arr(arrOrStr.items.slice(start.value, end != null ? end.value : undefined)))
     } else if (arrOrStr instanceof types.Str) {
       interpreter._stack.push(new types.Str(arrOrStr.value.substring(start.value, end != null ? end.value : undefined)))
@@ -456,13 +454,10 @@ module.exports.insert = {
     }
 
     if (arrOrStr instanceof types.Arr) {
-      // TODO copy the items, if needed
       if (index.value >= 0 && index.value <= arrOrStr.items.length) {
-        interpreter._stack.push(new types.Arr([
-          ...arrOrStr.items.slice(0, index),
-          obj,
-          ...arrOrStr.items.slice(index)
-        ]))
+        const newArr = arrOrStr.copy()
+        newArr.items.splice(index, 0, obj)
+        interpreter._stack.push(newArr)
       } else {
         throw new types.Err(`Index ${index.value} is out of range from 0 to ${arrOrStr.items.length}`, token)
       }
@@ -502,7 +497,6 @@ module.exports.array = {
     } else {
       const arr = []
       for (let i = 0; i < length.value; i++) {
-        // TODO copy the value, if needed
         arr.push(initializer)
       }
       interpreter._stack.push(new types.Arr(arr))
@@ -518,8 +512,8 @@ module.exports.sort = {
       throw new types.Err(`sort expects an :Arr to sort but got ${array.getTypeName()} instead`, token)
     }
 
-    const sortedArray = array.items.slice() // TODO copy the items if needed
-    sortedArray.sort((a, b) => compare(a, b, token))
-    interpreter._stack.push(new types.Arr(sortedArray))
+    const sortedArray = array.copy()
+    sortedArray.items.sort((a, b) => compare(a, b, token))
+    interpreter._stack.push(sortedArray)
   }
 }

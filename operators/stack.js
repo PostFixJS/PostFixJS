@@ -20,7 +20,6 @@ module.exports.pop = {
 module.exports.dup = {
   name: 'dup',
   execute (interpreter) {
-    // TODO this won't work once there are Obj classes that change state during execution
     const obj = interpreter._stack.pop()
     interpreter._stack.push(obj)
     interpreter._stack.push(obj)
@@ -30,7 +29,6 @@ module.exports.dup = {
 module.exports.copy = {
   name: 'copy',
   execute (interpreter) {
-    // TODO this won't work once there are Obj classes that change state during execution
     const i = interpreter._stack.popNumber()
     interpreter._stack.push(interpreter._stack.peek(i))
   }

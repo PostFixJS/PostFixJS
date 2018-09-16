@@ -36,3 +36,9 @@ test('The interpreter handles excaped quotes properly', (t) => {
   const { stack } = execute('"\\""')
   t.is(stack.pop().value, '"')
 })
+
+test('Reference counting should copy arrays before modification', (t) => {
+  const { stack } = execute('[1 2] dup 3 append')
+  t.deepEqual(stack.pop().items.map((i) => i.value), [1, 2, 3])
+  t.deepEqual(stack.pop().items.map((i) => i.value), [1, 2])
+})

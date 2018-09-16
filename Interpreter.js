@@ -264,6 +264,7 @@ class Stack {
   }
 
   push (obj) {
+    obj.refs++
     this._stack.push(obj)
   }
 
@@ -272,7 +273,9 @@ class Stack {
     if (this._stack.length <= minStackHeight) {
       throw new InvalidStackAccessError()
     }
-    return this._stack.pop()
+    const top = this._stack.pop()
+    top.refs--
+    return top
   }
 
   /**
@@ -307,6 +310,9 @@ class Stack {
   }
 
   clear () {
+    for (const obj of this._stack) {
+      obj.refs--
+    }
     this._stack = []
     this._minStackHeight = []
   }
