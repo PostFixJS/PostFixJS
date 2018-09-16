@@ -180,6 +180,7 @@ function getDatadefAt (tokens, i) {
     const token = tokens[i].token
     datadef.name = normalizeSymbol(token, true)
     i++
+    if (i >= tokens.length) return false
 
     if (tokens[i].tokenType === 'PARAM_LIST_START') {
       // struct
