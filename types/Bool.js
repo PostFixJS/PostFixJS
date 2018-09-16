@@ -14,11 +14,18 @@ class Bool extends Obj {
     return this.value ? 'true' : 'false'
   }
 
+  copy () {
+    return this.value ? Bool.true : Bool.false
+  }
+
   static fromToken (token) {
     const bool = new Bool(token.token === 'true')
     bool.origin = token
     return bool
   }
 }
+
+Bool.true = new Bool(true)
+Bool.false = new Bool(false)
 
 module.exports = Bool

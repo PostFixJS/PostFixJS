@@ -14,6 +14,15 @@ class Sym extends Obj {
     return `:${this.name}`
   }
 
+  _copyImpl () {
+    // Symbols are immutable
+    if (this.origin) {
+      return new Sym(this.name)
+    } else {
+      return this
+    }
+  }
+
   static fromToken (token) {
     const name = token.token.indexOf(':') === 0
       ? token.token.substr(1)

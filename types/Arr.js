@@ -13,6 +13,10 @@ class Arr extends Obj {
   toString () {
     return `[ ${this.items.map((item) => item.toString()).join(', ')} ]`
   }
+
+  _copyImpl () {
+    return new Arr([...this.items])
+  }
 }
 
 module.exports = Arr

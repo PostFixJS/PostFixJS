@@ -27,6 +27,15 @@ class Ref extends Obj {
     return this.name
   }
 
+  _copyImpl () {
+    // Refs are immutable
+    if (this.origin) {
+      return new Ref(this.name)
+    } else {
+      return this
+    }
+  }
+
   static fromToken (token) {
     const ref = new Ref(token.token)
     ref.origin = token

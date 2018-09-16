@@ -114,6 +114,15 @@ class Params extends Obj {
       return `(${params.length > 0 ? ` ${params}` : ''})`
     }
   }
+
+  _copyImpl () {
+    // Params are immutable
+    if (this.origin) {
+      return new Params(this.params, this.returns)
+    } else {
+      return this
+    }
+  }
 }
 
 module.exports = Params

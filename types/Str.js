@@ -14,6 +14,10 @@ class Str extends Obj {
     return `"${this.value}"`
   }
 
+  _copyImpl () {
+    return new Str(this.value)
+  }
+
   static fromToken (token) {
     const str = new Str(
       token.token.substr(1, token.token.length - 2)

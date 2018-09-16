@@ -27,6 +27,15 @@ class Op extends Obj {
     }
     return this._impl.name
   }
+
+  _copyImpl () {
+    // Ops are immutable
+    if (this.origin) {
+      return new Op(this._impl)
+    } else {
+      return this
+    }
+  }
 }
 
 module.exports = Op

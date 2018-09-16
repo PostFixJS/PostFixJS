@@ -9,11 +9,17 @@ class Nil extends Obj {
     return 'nil'
   }
 
+  _copyImpl () {
+    return Nil.nil
+  }
+
   static fromToken (token) {
     const bool = new Nil()
     bool.origin = token
     return bool
   }
 }
+
+Nil.nil = new Nil()
 
 module.exports = Nil

@@ -19,6 +19,10 @@ class ExeArr extends Arr {
   toString () {
     return `{ ${this.items.map((item) => item.toString()).join(', ')} }`
   }
+
+  _copyImpl () {
+    return new ExeArr([...this.items])
+  }
 }
 
 module.exports = ExeArr

@@ -5,6 +5,10 @@ class Int extends Num {
     return ':Int'
   }
 
+  _copyImpl () {
+    return new Int(this.value)
+  }
+
   static fromToken (token) {
     const int = new Int(parseInt(token.token))
     int.origin = token

@@ -70,6 +70,14 @@ class Lam extends ExeArr {
   toString () {
     return `${super.toString()} lam`
   }
+
+  _copyImpl () {
+    return new Lam(
+      [...this.items],
+      this.params.copy(),
+      Object.assign({}, this.dict)
+    )
+  }
 }
 
 module.exports = Lam

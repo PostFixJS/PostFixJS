@@ -66,6 +66,10 @@ class Marker extends Obj {
     }
   }
 
+  _copyImpl () {
+    return new Marker(this.type)
+  }
+
   static fromToken (token) {
     const marker = new Marker({
       'ARR_START': 'ArrOpen',
