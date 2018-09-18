@@ -1,4 +1,5 @@
 const types = require('../types')
+const { popOperand } = require('../typeCheck')
 
 module.exports.swap = {
   name: 'swap',
@@ -28,8 +29,8 @@ module.exports.dup = {
 
 module.exports.copy = {
   name: 'copy',
-  execute (interpreter) {
-    const i = interpreter._stack.popNumber()
+  execute (interpreter, token) {
+    const i = popOperand(interpreter, { type: 'Int' }, token)
     interpreter._stack.push(interpreter._stack.peek(i))
   }
 }

@@ -5,13 +5,13 @@ const types = require('../types')
 test('length should return length of strings', (t) => {
   const { stack } = execute('"hello world" length')
   t.is(stack.count, 1)
-  t.is(stack.popNumber().value, 11)
+  t.is(stack.pop().value, 11)
 })
 
 test('length should return length of arrays', (t) => {
   const { stack } = execute('["a" "b" "c"] length')
   t.is(stack.count, 1)
-  t.is(stack.popNumber().value, 3)
+  t.is(stack.pop().value, 3)
 })
 
 test('length should throw if the argument is neither :Str nor :Arr', (t) => {
@@ -21,7 +21,7 @@ test('length should throw if the argument is neither :Str nor :Arr', (t) => {
 test('get should get the i-th element of an array', (t) => {
   const { stack } = execute('["a" "b" "c"] 1 get')
   t.is(stack.count, 1)
-  t.is(stack.popString().value, 'b')
+  t.is(stack.pop().value, 'b')
 })
 
 test('get should throw if the index is out of the range of the array', (t) => {
@@ -31,7 +31,7 @@ test('get should throw if the index is out of the range of the array', (t) => {
 test('get should get the i-th character of a string', (t) => {
   const { stack } = execute('"PostFix" 4 get')
   t.is(stack.count, 1)
-  t.is(stack.popString().value, 'F')
+  t.is(stack.pop().value, 'F')
 })
 
 test('get should throw if the index is out of the range of the string', (t) => {

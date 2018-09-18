@@ -293,10 +293,6 @@ class Stack {
     return values.reverse()
   }
 
-  popNumber () {
-    return this._assertType(this.pop(), 'Flt', 'Int')
-  }
-
   popString () {
     return this._assertType(this.pop(), 'Str')
   }

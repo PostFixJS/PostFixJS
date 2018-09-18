@@ -1,4 +1,5 @@
 const types = require('../types')
+const { popOperand } = require('../typeCheck')
 const random = require('./impl/random')
 
 module.exports.randFlt = {
@@ -11,7 +12,7 @@ module.exports.randFlt = {
 module.exports.randInt = {
   name: 'rand-int',
   execute (interpreter, token) {
-    const n = interpreter._stack.popNumber().value
+    const n = popOperand(interpreter, { type: 'Int' }, token)
     if (n <= 0) {
       throw new types.Err(`rand-int expected a positive upper bound but got ${n} instead`, token)
     }
@@ -21,7 +22,8 @@ module.exports.randInt = {
 
 module.exports.randSeed = {
   name: 'rand-seed',
-  execute (interpreter) {
-    random.setSeed(interpreter._stack.popNumber().value)
+  execute (interpreter, token) {
+    const seed = popOperand(interpreter, { type: 'Num' }, token)
+    random.setSeed(seed.value)
   }
 }

@@ -1,5 +1,6 @@
 const types = require('../types')
 const { isEqual, isApproxEqual, compare } = require('./impl/compare')
+const { popOperands } = require('../typeCheck')
 
 function compareTop (interpreter, token) {
   const b = interpreter._stack.pop()
@@ -55,20 +56,24 @@ module.exports.notEqual = {
 
 module.exports.approxEqual = {
   name: '~=',
-  execute (interpreter) {
-    const tolerance = interpreter._stack.popNumber()
-    const a = interpreter._stack.pop()
-    const b = interpreter._stack.pop()
+  execute (interpreter, token) {
+    const [ a, b, tolerance ] = popOperands(interpreter, [
+      { name: 'a' },
+      { name: 'b' },
+      { name: 'tolerance', type: 'Num' }
+    ], token)
     interpreter._stack.push(new types.Bool(isApproxEqual(a, b, tolerance.value)))
   }
 }
 
 module.exports.notApproxEqual = {
   name: '!~=',
-  execute (interpreter) {
-    const tolerance = interpreter._stack.popNumber()
-    const a = interpreter._stack.pop()
-    const b = interpreter._stack.pop()
+  execute (interpreter, token) {
+    const [ a, b, tolerance ] = popOperands(interpreter, [
+      { name: 'a' },
+      { name: 'b' },
+      { name: 'tolerance', type: 'Num' }
+    ], token)
     interpreter._stack.push(new types.Bool(!isApproxEqual(a, b, tolerance.value)))
   }
 }
