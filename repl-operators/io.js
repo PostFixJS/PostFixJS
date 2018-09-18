@@ -1,40 +1,47 @@
 const { format } = require('../operators/impl/format')
-const types = require('../types')
+const { popOperand, popOperands } = require('../typeCheck')
 
 module.exports.print = {
   name: 'print',
-  execute (interpreter) {
-    process.stdout.write(`${interpreter._stack.pop().value}`)
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Num', 'Bool', 'Str'] }, token)
+    process.stdout.write(`${value.value}`)
   }
 }
 
 module.exports.println = {
   name: 'println',
-  execute (interpreter) {
-    process.stdout.write(`${interpreter._stack.pop().value}\n`)
+  execute (interpreter, token) {
+    const value = popOperand(interpreter, { type: ['Num', 'Bool', 'Str'] }, token)
+    process.stdout.write(value.value + '\n')
   }
 }
 
 module.exports.printf = {
   name: 'printf',
   execute (interpreter, token) {
-    const params = interpreter._stack.pop()
-    if (!(params instanceof types.Arr)) {
-      throw new types.Err(`printf expects an :Arr with parameters as second argument but got ${params.getTypeName()} instead`, token)
-    }
-    const formatStr = interpreter._stack.popString().value
-    process.stdout.write(format(formatStr, params))
+    const [ formatStr, params ] = popOperands(interpreter, [
+      { name: 'formatStr', type: 'Str' },
+      { name: 'params', type: 'Arr' }
+    ], token)
+    process.stdout.write(format(formatStr.value, params))
   }
 }
 
 module.exports.printfln = {
   name: 'printfln',
   execute (interpreter, token) {
-    const params = interpreter._stack.pop()
-    if (!(params instanceof types.Arr)) {
-      throw new types.Err(`printfln expects an :Arr with parameters as second argument but got ${params.getTypeName()} instead`, token)
-    }
-    const formatStr = interpreter._stack.popString().value
-    process.stdout.write(`${format(formatStr, params)}\n`)
+    const [ formatStr, params ] = popOperands(interpreter, [
+      { name: 'formatStr', type: 'Str' },
+      { name: 'params', type: 'Arr' }
+    ], token)
+    process.stdout.write(`${format(formatStr.value, params)}\n`)
+  }
+}
+
+module.exports.debugger = {
+  name: 'debugger',
+  execute () {
+    // no-op to make programs from the Web IDE compatible
   }
 }
