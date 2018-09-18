@@ -164,8 +164,7 @@ module.exports.toExeArr = {
     if (value instanceof types.ExeArr) {
       interpreter._stack.push(value)
     } else if (value instanceof types.Arr) {
-      // TODO copy items, if needed
-      interpreter._stack.push(new types.ExeArr(value.items))
+      interpreter._stack.push(new types.ExeArr([...value.items]))
     } else {
       interpreter._stack.push(new types.ExeArr([value]))
     }
@@ -177,8 +176,7 @@ module.exports.toArr = {
   execute (interpreter) {
     const value = interpreter._stack.pop()
     if (value instanceof types.ExeArr) {
-      // TODO copy items, if needed
-      interpreter._stack.push(new types.Arr(value.items))
+      interpreter._stack.push(new types.Arr([...value.items]))
     } else if (value instanceof types.Arr) {
       interpreter._stack.push(value)
     } else {
