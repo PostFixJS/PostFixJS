@@ -8,29 +8,31 @@ function popOperand (interpreter, operand, token) {
 
 function popOperands (interpreter, operands, token) {
   const values = []
-  for (const operand of operands) {
-    values.push(Object.assign({ value: interpreter._stack.pop() }, operand))
+  let i
+  for (i = operands.length - 1; i >= 0; i--) {
+    values.push(Object.assign({ value: interpreter._stack.pop() }, operands[i]))
   }
   values.reverse()
-  checkOperand(values, token)
+  checkOperands(values, token)
   return values.map(({ value }) => value)
 }
 
 function checkOperand (value, operand, token) {
   if (!checkType(value, operand.type)) {
-    const { name, type } = operand
+    const { name, type, index } = operand
     if (name) {
-      throw new types.Err(`Expected operand 1 (${name}) to be ${typeToStr(type)} but got ${value.getTypeName()} instead`, token)
+      throw new types.Err(`Expected operand ${index || 1} (${name}) to be ${typeToStr(type)} but got ${value.getTypeName()} instead`, token)
     } else {
-      throw new types.Err(`Expected operand 1 to be ${typeToStr(type)} but got ${value.getTypeName()} instead`, token)
+      throw new types.Err(`Expected operand ${index || 1} to be ${typeToStr(type)} but got ${value.getTypeName()} instead`, token)
     }
   }
 }
 
 function checkOperands (operands, token) {
-  for (let i = 0; i < operands.length; i++) {
+  let i
+  for (i = 0; i < operands.length; i++) {
     const operand = operands[i]
-    if (!checkType(operand.value, operand.type)) {
+    if (operand.type != null && !checkType(operand.value, operand.type)) {
       const { name, value, type } = operand
       if (name) {
         throw new types.Err(`Expected operand ${i + 1} (${name}) to be ${typeToStr(type)} but got ${value.getTypeName()} instead`, token)

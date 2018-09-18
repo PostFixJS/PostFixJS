@@ -1,6 +1,7 @@
 const types = require('../types')
 const { nextInt } = require('./impl/random')
 const { isEqual, compare } = require('./impl/compare')
+const { popOperand, popOperands, checkOperands } = require('../typeCheck')
 
 function keyGet (array, key, defaultValue) {
   for (let i = 0; i < array.items.length - 1; i++) {
@@ -37,13 +38,11 @@ function arraySet (array, index, value, token) {
 module.exports.length = {
   name: 'length',
   execute (interpreter, token) {
-    const obj = interpreter._stack.pop()
+    const obj = popOperand(interpreter, { type: ['Arr', 'Str'] }, token)
     if (obj instanceof types.Arr) {
       interpreter._stack.push(new types.Int(obj.items.length))
     } else if (obj instanceof types.Str) {
       interpreter._stack.push(new types.Int(obj.value.length))
-    } else {
-      throw new types.Err(`length expects :Arr or :Str but got ${obj.getTypeName()} instead`, token)
     }
   }
 }
@@ -51,27 +50,23 @@ module.exports.length = {
 module.exports.get = {
   name: 'get',
   execute (interpreter, token) {
-    const index = interpreter._stack.pop()
-    const obj = interpreter._stack.pop()
+    const [ obj, index ] = popOperands(interpreter, [
+      { type: ['Arr', 'Str'] },
+      { name: 'index', type: 'Int' }
+    ], token)
 
-    if (index instanceof types.Int) {
-      if (obj instanceof types.Arr) {
-        if (index.value >= 0 && index.value < obj.items.length) {
-          interpreter._stack.push(obj.items[index.value])
-        } else {
-          throw new types.Err(`Index is out of range (index is ${index.value} but the :Arr has length ${obj.items.length})`, token)
-        }
-      } else if (obj instanceof types.Str) {
-        if (index.value >= 0 && index.value < obj.value.length) {
-          interpreter._stack.push(new types.Str(obj.value[index.value]))
-        } else {
-          throw new types.Err(`Index is out of range (index is ${index.value} but the :Str has length ${obj.value.length})`, token)
-        }
+    if (obj instanceof types.Arr) {
+      if (index.value >= 0 && index.value < obj.items.length) {
+        interpreter._stack.push(obj.items[index.value])
       } else {
-        throw new types.Err(`get expects the first argument to be :Arr or :Str but got ${obj.getTypeName()} instead`, token)
+        throw new types.Err(`Index is out of range (index is ${index.value} but the :Arr has length ${obj.items.length})`, token)
       }
-    } else {
-      throw new types.Err(`get expects the second argument to be an :Int but got ${index.getTypeName()} instead`, token)
+    } else if (obj instanceof types.Str) {
+      if (index.value >= 0 && index.value < obj.value.length) {
+        interpreter._stack.push(new types.Str(obj.value[index.value]))
+      } else {
+        throw new types.Err(`Index is out of range (index is ${index.value} but the :Str has length ${obj.value.length})`, token)
+      }
     }
   }
 }
@@ -79,33 +74,29 @@ module.exports.get = {
 module.exports.set = {
   name: 'set',
   execute (interpreter, token) {
-    const value = interpreter._stack.pop()
-    const index = interpreter._stack.pop()
-    const obj = interpreter._stack.pop()
+    const [ obj, index, value ] = popOperands(interpreter, [
+      { name: 'array', type: ['Arr', 'Str'] },
+      { name: 'index', type: 'Int' },
+      {}
+    ], token)
 
-    if (index instanceof types.Int) {
-      if (obj instanceof types.Arr) {
-        interpreter._stack.push(arraySet(obj, index, value, token))
-      } else if (obj instanceof types.Str) {
-        if (index.value >= 0 && index.value < obj.value.length) {
-          if (value instanceof types.Str) {
-            if (value.value.length === 1) {
-              const newStr = new types.Str(`${obj.value.substr(0, index.value)}${value.value}${obj.value.substr(index.value + 1)}`)
-              interpreter._stack.push(newStr)
-            } else {
-              throw new types.Err(`When setting an index of a :Str, the value must be a :Str with a single character, but got :Str with length ${value.value.length} instead`, token)
-            }
+    if (obj instanceof types.Arr) {
+      interpreter._stack.push(arraySet(obj, index, value, token))
+    } else if (obj instanceof types.Str) {
+      if (index.value >= 0 && index.value < obj.value.length) {
+        if (value instanceof types.Str) {
+          if (value.value.length === 1) {
+            const newStr = new types.Str(`${obj.value.substr(0, index.value)}${value.value}${obj.value.substr(index.value + 1)}`)
+            interpreter._stack.push(newStr)
           } else {
-            throw new types.Err(`When setting an index of a :Str, the value must be a :Str with a single character, but got ${obj.getTypeName()} instead`, token)
+            throw new types.Err(`When setting an index of a :Str, the value must be a :Str with a single character, but got :Str with length ${value.value.length} instead`, token)
           }
         } else {
-          throw new types.Err(`Index is out of range (index is ${index.value} but the :Str has length ${obj.value.length})`, token)
+          throw new types.Err(`When setting an index of a :Str, the value must be a :Str with a single character, but got ${obj.getTypeName()} instead`, token)
         }
       } else {
-        throw new types.Err(`set expects the first argument to be :Arr or :Str but got ${obj.getTypeName()} instead`, token)
+        throw new types.Err(`Index is out of range (index is ${index.value} but the :Str has length ${obj.value.length})`, token)
       }
-    } else {
-      throw new types.Err(`set expects the second argument to be an :Int but got ${index.getTypeName()} instead`, token)
     }
   }
 }
@@ -113,10 +104,11 @@ module.exports.set = {
 module.exports.keyGet = {
   name: 'key-get',
   execute (interpreter, token) {
-    const defaultValue = interpreter._stack.pop()
-    const key = interpreter._stack.pop()
-    const array = interpreter._stack.pop()
-    // TODO type checks
+    const [ array, key, defaultValue ] = popOperands(interpreter, [
+      { name: 'array', type: 'Arr' },
+      { name: 'key' },
+      { name: 'defaultValue' }
+    ], token)
 
     interpreter._stack.push(keyGet(array, key, defaultValue))
   }
@@ -125,10 +117,11 @@ module.exports.keyGet = {
 module.exports.keySet = {
   name: 'key-set',
   execute (interpreter, token) {
-    const value = interpreter._stack.pop()
-    const key = interpreter._stack.pop()
-    const array = interpreter._stack.pop()
-    // TODO type checks
+    const [ array, key, value ] = popOperands(interpreter, [
+      { name: 'array', type: 'Arr' },
+      { name: 'key' },
+      { name: 'value' }
+    ], token)
 
     interpreter._stack.push(keySet(array, key, value))
   }
@@ -137,11 +130,12 @@ module.exports.keySet = {
 module.exports.update = {
   name: 'key-update',
   * execute (interpreter, token) {
-    const updater = interpreter._stack.pop()
-    const defaultValue = interpreter._stack.pop()
-    const key = interpreter._stack.pop()
-    const array = interpreter._stack.pop()
-    // TODO check types
+    const [ array, key, defaultValue, updater ] = popOperands(interpreter, [
+      { name: 'array', type: 'Arr' },
+      { name: 'key' },
+      { name: 'defaultValue' },
+      { name: 'updater', type: 'ExeArr' }
+    ], token)
 
     interpreter._stack.push(keyGet(array, key, defaultValue))
     yield * interpreter.executeObj(updater)
@@ -153,10 +147,11 @@ module.exports.update = {
 module.exports.pathSet = {
   name: 'path-set',
   execute (interpreter, token) {
-    const value = interpreter._stack.pop()
-    const path = interpreter._stack.pop()
-    const array = interpreter._stack.pop()
-    // TODO type checks
+    const [ array, path, value ] = popOperands(interpreter, [
+      { name: 'array', type: 'Arr' },
+      { name: 'path', type: 'Arr' },
+      { name: 'value' }
+    ], token)
 
     let currentArray = array
     const pathArrays = [array]
@@ -193,10 +188,11 @@ module.exports.pathSet = {
 module.exports.pathKeySet = {
   name: 'path-key-set',
   * execute (interpreter, token) {
-    const value = interpreter._stack.pop()
-    const path = interpreter._stack.pop()
-    const array = interpreter._stack.pop()
-    // TODO type checks
+    const [ array, path, value ] = popOperands(interpreter, [
+      { name: 'array', type: 'Arr' },
+      { name: 'path', type: 'Arr' },
+      { name: 'value' }
+    ], token)
 
     let currentArray = array
     const pathArrays = [array]
@@ -226,11 +222,12 @@ module.exports.pathKeySet = {
 module.exports.pathUpdate = {
   name: 'path-update',
   * execute (interpreter, token) {
-    const updater = interpreter._stack.pop()
-    const defaultValue = interpreter._stack.pop()
-    const path = interpreter._stack.pop()
-    const array = interpreter._stack.pop()
-    // TODO type checks
+    const [ array, path, defaultValue, updater ] = popOperands(interpreter, [
+      { name: 'array', type: 'Arr' },
+      { name: 'path', type: 'Arr' },
+      { name: 'defaultValue' },
+      { name: 'updater', type: 'ExeArr' }
+    ], token)
 
     let currentArray = array
     const pathArrays = [array]
@@ -264,10 +261,7 @@ module.exports.pathUpdate = {
 module.exports.shuffle = {
   name: 'shuffle',
   execute (interpreter, token) {
-    const arr = interpreter._stack.pop().copy()
-    if (!(arr instanceof types.Arr)) {
-      throw new types.Err(`shuffle expects an :Arr but got ${arr.getTypeName()} instead`, token)
-    }
+    const arr = popOperand(interpreter, { type: 'Arr' }, token).copy()
 
     // Fisher-Yates shuffle as seen in Knuth's The Art of Computer Programming
     for (let i = 0; i < arr.items.length; i++) {
@@ -284,7 +278,8 @@ module.exports.shuffle = {
 module.exports.reverse = {
   name: 'reverse',
   execute (interpreter, token) {
-    const arr = interpreter._stack.pop()
+    const arr = popOperand(interpreter, { type: ['Arr', 'Str'] }, token)
+
     if (arr instanceof types.Arr) {
       const newArr = arr.copy()
       newArr.items.reverse()
@@ -303,19 +298,25 @@ module.exports.reverse = {
 
 module.exports.append = {
   name: 'append',
-  execute (interpreter) {
-    const value = interpreter._stack.pop()
-    const array = interpreter._stack.pop().copy()
-    array.items.push(value)
-    interpreter._stack.push(array)
+  execute (interpreter, token) {
+    const [ array, value ] = popOperands(interpreter, [
+      { name: 'array', type: 'Arr' },
+      { name: 'value' }
+    ], token)
+
+    const newArr = array.copy()
+    newArr.items.push(value)
+    interpreter._stack.push(newArr)
   }
 }
 
 module.exports.remove = {
   name: 'remove',
-  execute (interpreter) {
-    const value = interpreter._stack.pop()
-    const array = interpreter._stack.pop()
+  execute (interpreter, token) {
+    const [ array, value ] = popOperands(interpreter, [
+      { name: 'array', type: 'Arr' },
+      { name: 'value' }
+    ], token)
 
     const removeIndex = array.items.findIndex((obj) => isEqual(obj, value))
     if (removeIndex >= 0) {
@@ -331,11 +332,10 @@ module.exports.remove = {
 module.exports.removeAt = {
   name: 'remove-at',
   execute (interpreter, token) {
-    const index = interpreter._stack.pop()
-    if (!(index instanceof types.Int)) {
-      throw new types.Err(`remove-at expects an index (:Int) as second argument but got ${index.getTypeName()} instead`)
-    }
-    const array = interpreter._stack.pop()
+    const [ array, index ] = popOperands(interpreter, [
+      { name: 'array', type: ['Arr', 'Str'] },
+      { name: 'index', type: 'Int' }
+    ], token)
 
     if (array instanceof types.Str) {
       if (index.value < 0 || index.value >= array.value.length) {
@@ -349,8 +349,6 @@ module.exports.removeAt = {
       const newArrray = array.copy()
       newArrray.items.splice(index.value, 1)
       interpreter._stack.push(newArrray)
-    } else {
-      throw new types.Err(`remove-at expects :Arr or :Str as first argument but got ${array.getTypeName()} instead`, token)
     }
   }
 }
@@ -358,16 +356,17 @@ module.exports.removeAt = {
 module.exports.find = {
   name: 'find',
   execute (interpreter, token) {
-    const value = interpreter._stack.pop()
-    const arrOrStr = interpreter._stack.pop()
+    const [ arrOrStr, value ] = popOperands(interpreter, [
+      { type: ['Arr', 'Str'] },
+      { name: 'value' }
+    ], token)
+
     if (arrOrStr instanceof types.Arr) {
       const index = arrOrStr.items.findIndex((obj) => isEqual(obj, value))
       interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
     } else if (arrOrStr instanceof types.Str) {
       const index = arrOrStr.value.indexOf(value instanceof types.Str ? value.value : value.toString())
       interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
-    } else {
-      throw new types.Err(`find expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`, token)
     }
   }
 }
@@ -375,20 +374,18 @@ module.exports.find = {
 module.exports.findFrom = {
   name: 'find-from',
   execute (interpreter, token) {
-    const startIndex = interpreter._stack.pop()
-    if (!(startIndex instanceof types.Int)) {
-      throw new types.Err(`find-from expects :Int as start index but got ${startIndex.getTypeName()} instead`, token)
-    }
-    const value = interpreter._stack.pop()
-    const arrOrStr = interpreter._stack.pop()
+    const [ arrOrStr, value, startIndex ] = popOperands(interpreter, [
+      { type: ['Arr', 'Str'] },
+      { name: 'value' },
+      { name: 'startAt', type: 'Int' }
+    ], token)
+
     if (arrOrStr instanceof types.Arr) {
       const index = arrOrStr.items.findIndex((obj, i) => i >= startIndex.value && isEqual(obj, value))
       interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
     } else if (arrOrStr instanceof types.Str) {
       const index = arrOrStr.value.indexOf(value instanceof types.Str ? value.value : value.toString(), startIndex.value)
       interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
-    } else {
-      throw new types.Err(`find-from expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`, token)
     }
   }
 }
@@ -396,14 +393,15 @@ module.exports.findFrom = {
 module.exports.contains = {
   name: 'contains',
   execute (interpreter, token) {
-    const value = interpreter._stack.pop()
-    const arrOrStr = interpreter._stack.pop()
+    const [ arrOrStr, value ] = popOperands(interpreter, [
+      { type: ['Arr', 'Str'] },
+      { name: 'value' }
+    ], token)
+
     if (arrOrStr instanceof types.Arr) {
       interpreter._stack.push(new types.Bool(arrOrStr.items.some((obj) => isEqual(obj, value))))
     } else if (arrOrStr instanceof types.Str) {
       interpreter._stack.push(new types.Bool(arrOrStr.value.includes(value instanceof types.Str ? value.value : value.toString())))
-    } else {
-      throw new types.Err(`contains expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`, token)
     }
   }
 }
@@ -421,23 +419,23 @@ module.exports.slice = {
       arrOrStr = start
       start = end
       end = null
+      checkOperands([
+        { value: arrOrStr, type: ['Arr', 'Str'] },
+        { value: start, type: 'Int', name: 'start' }
+      ], token)
     } else {
       arrOrStr = interpreter._stack.pop()
-    }
-
-    if (!(start instanceof types.Int)) {
-      throw new types.Err(`slice expects :Int as second argument but got ${start.getTypeName()} instead`, token)
-    }
-    if (end != null && !(end instanceof types.Int)) {
-      throw new types.Err(`slice expects :Int as third argument but got ${end.getTypeName()} instead`, token)
+      checkOperands([
+        { value: arrOrStr, type: ['Arr', 'Str'] },
+        { value: start, type: 'Int', name: 'start' },
+        { value: end, type: 'Int', name: 'end' }
+      ], token)
     }
 
     if (arrOrStr instanceof types.Arr) {
       interpreter._stack.push(new types.Arr(arrOrStr.items.slice(start.value, end != null ? end.value : undefined)))
     } else if (arrOrStr instanceof types.Str) {
       interpreter._stack.push(new types.Str(arrOrStr.value.substring(start.value, end != null ? end.value : undefined)))
-    } else {
-      throw new types.Err(`slice expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`, token)
     }
   }
 }
@@ -445,13 +443,11 @@ module.exports.slice = {
 module.exports.insert = {
   name: 'insert',
   execute (interpreter, token) {
-    const obj = interpreter._stack.pop()
-    const index = interpreter._stack.pop()
-    const arrOrStr = interpreter._stack.pop()
-
-    if (!(index instanceof types.Int)) {
-      throw new types.Err(`insert expects :Int as index (second argument) but got ${index.getTypeName()} instead`, token)
-    }
+    const [ arrOrStr, index, obj ] = popOperands(interpreter, [
+      { name: 'array', type: ['Arr', 'Str'] },
+      { name: 'index', type: 'Int' },
+      { name: 'value' }
+    ], token)
 
     if (arrOrStr instanceof types.Arr) {
       if (index.value >= 0 && index.value <= arrOrStr.items.length) {
@@ -470,8 +466,6 @@ module.exports.insert = {
       } else {
         throw new types.Err(`Index ${index.value} is out of range from 0 to ${arrOrStr.value.length}`, token)
       }
-    } else {
-      throw new types.Err(`insert expects :Arr or :Str as first argument but got ${arrOrStr.getTypeName()} instead`, token)
     }
   }
 }
@@ -479,12 +473,10 @@ module.exports.insert = {
 module.exports.array = {
   name: 'array',
   * execute (interpreter, token) {
-    const initializer = interpreter._stack.pop()
-    const length = interpreter._stack.pop()
-
-    if (!(length instanceof types.Int)) {
-      throw new types.Err(`array expects :Int as length (first argument) but got ${length.getTypeName()} instead`, token)
-    }
+    const [ length, initializer ] = popOperands(interpreter, [
+      { name: 'length', type: 'Int' },
+      { name: 'initializer' }
+    ], token)
 
     if (initializer instanceof types.ExeArr) {
       const arr = []
@@ -507,11 +499,7 @@ module.exports.array = {
 module.exports.sort = {
   name: 'sort',
   execute (interpreter, token) {
-    const array = interpreter._stack.pop()
-    if (!(array instanceof types.Arr)) {
-      throw new types.Err(`sort expects an :Arr to sort but got ${array.getTypeName()} instead`, token)
-    }
-
+    const array = popOperand(interpreter, { type: 'Arr' }, token).copy()
     const sortedArray = array.copy()
     sortedArray.items.sort((a, b) => compare(a, b, token))
     interpreter._stack.push(sortedArray)

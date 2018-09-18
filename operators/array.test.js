@@ -15,7 +15,7 @@ test('length should return length of arrays', (t) => {
 })
 
 test('length should throw if the argument is neither :Str nor :Arr', (t) => {
-  t.throws(() => execute('42 length'), checkErrorMessage('length expects :Arr or :Str but got :Int instead'))
+  t.throws(() => execute('42 length'), checkErrorMessage('Expected operand 1 to be :Arr or :Str but got :Int instead'))
 })
 
 test('get should get the i-th element of an array', (t) => {
@@ -39,8 +39,8 @@ test('get should throw if the index is out of the range of the string', (t) => {
 })
 
 test('get should throw if it is called with invalid arguments', (t) => {
-  t.throws(() => execute('42 0 get'), checkErrorMessage('get expects the first argument to be :Arr or :Str but got :Int instead'))
-  t.throws(() => execute('"PostFix" false get'), checkErrorMessage('get expects the second argument to be an :Int but got :Bool instead'))
+  t.throws(() => execute('42 0 get'), checkErrorMessage('Expected operand 1 to be :Arr or :Str but got :Int instead'))
+  t.throws(() => execute('"PostFix" false get'), checkErrorMessage('Expected operand 2 (index) to be :Int but got :Bool instead'))
 })
 
 test('set should set the i-th element of an array', (t) => {
