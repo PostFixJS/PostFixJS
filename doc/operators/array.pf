@@ -86,7 +86,7 @@ path-set: (arr :Arr, keys :Arr, value :Obj -> :Arr) {} fun
 Set the value of a key in a nested array. The keys are the keys of the value.
 @param arr Array
 @param keys Path of keys to the value to change
-@param default Value to assign at the given key
+@param value Value to assign at the given key
 @return The modified array
 >#
 path-key-set: (arr :Arr, keys :Arr, value :Obj -> :Arr) {} fun
