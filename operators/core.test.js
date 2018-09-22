@@ -68,3 +68,7 @@ test('empty? returns false for other objects', async (t) => {
   t.is(stack.pop().value, false)
   t.is(stack.pop().value, false)
 })
+
+test('err stops the program immediately', async (t) => {
+  await throwsErrorMessage(t, () => execute('"some error" err'), checkErrorMessage('some error'))
+})
