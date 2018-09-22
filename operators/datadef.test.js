@@ -1,15 +1,15 @@
 import test from 'ava'
 const types = require('../types')
-const { execute, checkErrorMessage } = require('../test/helpers/util')
+const { execute, checkErrorMessage, throwsErrorMessage } = require('../test/helpers/util')
 
-test('datadef generates a constructor function', (t) => {
-  let { dictStack } = execute('Point: (x :Num, y :Num) datadef')
+test('datadef generates a constructor function', async (t) => {
+  let { dictStack } = await execute('Point: (x :Num, y :Num) datadef')
   const constructor = dictStack.get('point.new')
   t.true(constructor instanceof types.Lam)
 })
 
-test('the datadef constructor constructs a struct', (t) => {
-  let { stack } = execute(`
+test('the datadef constructor constructs a struct', async (t) => {
+  let { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
     3 4 point.new
   `)
@@ -23,8 +23,8 @@ test('the datadef constructor constructs a struct', (t) => {
   t.is(point.items[3].value, 4)
 })
 
-test('the type checker checks the type', (t) => {
-  let { stack } = execute(`
+test('the type checker checks the type', async (t) => {
+  let { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
     3 4 point.new point?
     42 point?
@@ -34,8 +34,8 @@ test('the type checker checks the type', (t) => {
   t.is(stack.pop().value, true)
 })
 
-test('the datadef getters get fields of a struct', (t) => {
-  let { stack } = execute(`
+test('the datadef getters get fields of a struct', async (t) => {
+  let { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
     3 4 point.new
     point.x
@@ -46,8 +46,8 @@ test('the datadef getters get fields of a struct', (t) => {
   t.is(x.value, 3)
 })
 
-test('the datadef setters set fields of a struct', (t) => {
-  let { stack } = execute(`
+test('the datadef setters set fields of a struct', async (t) => {
+  let { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
     3 4 point.new
     42 point-y-set point.y
@@ -58,8 +58,8 @@ test('the datadef setters set fields of a struct', (t) => {
   t.is(y.value, 42)
 })
 
-test('the datadef updaters update fields of a struct', (t) => {
-  let { stack } = execute(`
+test('the datadef updaters update fields of a struct', async (t) => {
+  let { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
     3 4 point.new
     { 2 * } point-x-do point.x
@@ -70,8 +70,8 @@ test('the datadef updaters update fields of a struct', (t) => {
   t.is(y.value, 6)
 })
 
-test('datadef can define union types with a union typecheck', (t) => {
-  let { stack } = execute(`
+test('datadef can define union types with a union typecheck', async (t) => {
+  let { stack } = await execute(`
     Point: [
       Euclid: (x :Num, y :Num)
       Polar: (theta :Num, magnitude :Num)
@@ -98,8 +98,8 @@ test('datadef can define union types with a union typecheck', (t) => {
   t.is(stack.pop().value, true, 'euclid should be a point')
 })
 
-test('types defined by datadef can be used for params and are checked', (t) => {
-  const { stack } = execute(`
+test('types defined by datadef can be used for params and are checked', async (t) => {
+  const { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
     test: (x :Point -> :Point) {
       x point.x 1 +
@@ -113,19 +113,15 @@ test('types defined by datadef can be used for params and are checked', (t) => {
   t.is(stack.pop().value, false)
   t.is(stack.pop().value, true)
 
-  t.throws(() => {
-    execute(`
-      Point: (x :Num, y :Num) datadef
-      test: (x :Point -> :Point) { 3 } fun
-      1 2 point.new test
-    `)
-  }, checkErrorMessage('Expected return value 1 to be of type :Point but got incompatible type :Int'))
+  await throwsErrorMessage(t, () => execute(`
+    Point: (x :Num, y :Num) datadef
+    test: (x :Point -> :Point) { 3 } fun
+    1 2 point.new test
+  `), checkErrorMessage('Expected return value 1 to be of type :Point but got incompatible type :Int'))
 
-  t.throws(() => {
-    execute(`
-      Point: (x :Num, y :Num) datadef
-      test: (x :Point -> :Point) { 3 } fun
-      42 test
-    `)
-  }, checkErrorMessage('Expected :Point but got incompatible type :Int for parameter x'))
+  await throwsErrorMessage(t, () => execute(`
+    Point: (x :Num, y :Num) datadef
+    test: (x :Point -> :Point) { 3 } fun
+    42 test
+  `), checkErrorMessage('Expected :Point but got incompatible type :Int for parameter x'))
 })

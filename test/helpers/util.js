@@ -6,9 +6,9 @@ const Interpreter = require('../../Interpreter')
  * @param {string} code Code to execute
  * @returns {object} Object that contains the stack and dictStack
  */
-function execute (code) {
+async function execute (code) {
   const interpreter = new Interpreter()
-  interpreter.run(Lexer.parse(code))
+  await interpreter.run(Lexer.parse(code)).promise
   return {
     stack: interpreter._stack,
     dictStack: interpreter._dictStack
@@ -22,34 +22,19 @@ function execute (code) {
  * @param {number} timeout Execution timeout, in milliseconds
  * @returns {object} Promise of an object that contains the stack and dictStack
  */
-function executeTimeout (code, timeout = 1000) {
-  let cancel = false
-  const timeoutTimer = setTimeout(() => {
-    cancel = true
-  }, timeout)
-  const done = new Promise((resolve, reject) => {
-    setImmediate(() => {
-      const interpreter = new Interpreter()
-      const stepper = interpreter.startRun(Lexer.parse(code))
-      const continueExecution = () => {
-        const { done } = stepper.next()
-        if (done) {
-          clearTimeout(timeoutTimer)
-          resolve(interpreter)
-        } else if (cancel) {
-          clearTimeout(timeoutTimer)
-          reject(new Error(`Execution timed out after ${timeout} ms`))
-        } else {
-          setImmediate(continueExecution)
-        }
-      }
-      continueExecution()
-    })
-  })
-  return done.then((interpreter) => ({
+async function executeTimeout (code, timeout = 1000) {
+  const interpreter = new Interpreter()
+  const { cancel, step } = interpreter.startRun(Lexer.parse(code))
+  const timeoutId = setTimeout(cancel, timeout)
+  let done = false
+  while (!done) {
+    done = (await step()).done
+  }
+  clearTimeout(timeoutId)
+  return {
     stack: interpreter._stack,
     dictStack: interpreter._dictStack
-  }))
+  }
 }
 
 /**
@@ -63,8 +48,24 @@ function checkErrorMessage (expectedMessage) {
   }
 }
 
+/**
+ * Check if the given function throws.
+ * @param {object} t Ava test object
+ * @param {Function} fn Function that should throw
+ * @param {Function} checkError Error message validator
+ */
+async function throwsErrorMessage (t, fn, checkError) {
+  try {
+    await fn()
+    t.fail()
+  } catch (e) {
+    t.true(checkError(e))
+  }
+}
+
 module.exports = {
   checkErrorMessage,
   execute,
-  executeTimeout
+  executeTimeout,
+  throwsErrorMessage
 }

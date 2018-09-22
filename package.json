@@ -16,7 +16,7 @@
   "license": "UNLICENSED",
   "homepage": "https://bitbucket.org/leMaik/postfixjs#readme",
   "devDependencies": {
-    "ava": "^0.25.0",
+    "ava": "1.0.0-beta.8",
     "standard": "^11.0.1"
   },
   "dependencies": {

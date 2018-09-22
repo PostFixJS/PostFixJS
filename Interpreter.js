@@ -219,9 +219,73 @@ class Interpreter {
    * Start executing the given tokens. Execution is continued by calling the `next`
    * function of the returned iterator.
    * @param {Iterable} tokens Tokens
-   * @return Iterator that iterates over the tokens that are executed
+   * @return A promise for the whole execution, a cancel function and a step function that iterates over the tokens that are executed
    */
   startRun (tokens) {
+    const { token, cancel } = createCancellationToken()
+    const stepper = this._run(tokens)
+
+    // this holds a cancel function for the Promise the interpreter waits for
+    // so that it can be cancelled when the execution is cancelled
+    const cancelPromise = { cancel: null }
+    token.onCancel(() => {
+      if (cancelPromise.cancel != null) {
+        cancelPromise.cancel()
+      }
+    })
+
+    let resolveRun, rejectRun
+    const promise = new Promise((resolve, reject) => {
+      resolveRun = resolve
+      rejectRun = reject
+    })
+    const step = async () => {
+      while (true) {
+        try {
+          const { done, value } = stepper.next()
+          if (value && value.promise) {
+            cancelPromise.cancel = value.cancel
+            try {
+              await value.promise
+              cancelPromise.cancel = null
+              if (token.cancelled) {
+                rejectRun(new Error('Cancelled'))
+                return { value, done: true }
+              }
+            } catch (e) {
+              cancelPromise.cancel = null
+              if (!token.cancelled) {
+                rejectRun(e)
+                return { value, done: true }
+              }
+            }
+          } else if (done) {
+            resolveRun()
+            return { value, done }
+          } else if (token.cancelled) {
+            rejectRun(new Error('Cancelled'))
+            return { value, done: true }
+          } else {
+            return { value, done }
+          }
+        } catch (e) {
+          rejectRun(e)
+        }
+      }
+    }
+
+    return {
+      cancel,
+      promise,
+      step
+    }
+  }
+
+  /**
+   * Run all tokens.
+   * @param {Iterable} tokens Tokens to execute
+   */
+  run (tokens) {
     const { token, cancel } = createCancellationToken()
     const stepper = this._run(tokens)
 
@@ -245,17 +309,11 @@ class Interpreter {
               const { done, value } = stepper.next()
               if (value && value.promise) {
                 cancelPromise.cancel = value.cancel
-                try {
-                  await value.promise
-                  cancelPromise.cancel = null
-                  if (!token.cancelled) {
-                    return continueExecution()
-                  }
-                } catch (e) {
-                  cancelPromise.cancel = null
-                  if (!token.cancelled) {
-                    reject(e)
-                  }
+                await value.promise
+                cancelPromise.cancel = null
+                if (token.cancelled) {
+                  reject(new Error('Cancelled'))
+                  return
                 }
               } else if (done) {
                 isDone = true
@@ -266,21 +324,15 @@ class Interpreter {
                 return
               }
             } catch (e) {
+              cancelPromise.cancel = null
               reject(e)
+              return
             }
           }
         }
         continueExecution()
       })
     }
-  }
-
-  /**
-   * Run all tokens.
-   * @param {Iterable} tokens Tokens to execute
-   */
-  async run (tokens) {
-    await this.startRun(tokens).promise
   }
 
   /**

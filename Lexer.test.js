@@ -138,7 +138,7 @@ test('Brackets are self-delimiting tokens', t => {
   }])
 })
 
-test('The lexer parses scientific notation', (t) => {
+test('The lexer parses scientific notation', async (t) => {
   t.deepEqual(Lexer.parse('7e-8'), [{
     token: '7e-8',
     tokenType: 'FLOAT',
@@ -161,7 +161,7 @@ test('The lexer parses scientific notation', (t) => {
   }])
 })
 
-test('The lexer emits tokens for line comments when emitComments is true', (t) => {
+test('The lexer emits tokens for line comments when emitComments is true', async (t) => {
   t.deepEqual(Lexer.parse('42 # answer to all questions', { emitComments: true }), [{
     token: '42',
     tokenType: 'INTEGER',
@@ -175,7 +175,7 @@ test('The lexer emits tokens for line comments when emitComments is true', (t) =
   }])
 })
 
-test('The lexer emits tokens for block comments when emitComments is true', (t) => {
+test('The lexer emits tokens for block comments when emitComments is true', async (t) => {
   t.deepEqual(Lexer.parse('42 #< this is a\nmulti-line\n#< nested >#\nblock comment >#', { emitComments: true }), [{
     token: '42',
     tokenType: 'INTEGER',
@@ -189,7 +189,7 @@ test('The lexer emits tokens for block comments when emitComments is true', (t) 
   }])
 })
 
-test('The lexer emitted block comment tokens end where the comment ends', (t) => {
+test('The lexer emitted block comment tokens end where the comment ends', async (t) => {
   t.deepEqual(Lexer.parse('\n #< test ># \n', { emitComments: true })[0], {
     token: '#< test >#',
     tokenType: 'BLOCK_COMMENT',
@@ -198,7 +198,7 @@ test('The lexer emitted block comment tokens end where the comment ends', (t) =>
   })
 })
 
-test('The lexer parses nil properly', (t) => {
+test('The lexer parses nil properly', async (t) => {
   t.deepEqual(Lexer.parse('nil')[0], {
     token: 'nil',
     tokenType: 'NIL',

@@ -11,7 +11,7 @@ if (process.argv[process.argv.length - 1] === '--') {
   process.stdin.on('data', (buf) => lexer.put(buf.toString()))
   process.stdin.on('end', async () => {
     try {
-      await interpreter.run(lexer.getTokens())
+      await interpreter.run(lexer.getTokens()).promise
     } catch (e) {
       console.error(e.toString())
     }
@@ -35,7 +35,7 @@ async function repl () {
       })
       lexer.put(input + '\n')
       try {
-        await interpreter.run(lexer.getTokens())
+        await interpreter.run(lexer.getTokens()).promise
       } catch (e) {
         console.error(e.toString())
       }

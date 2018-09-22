@@ -1,7 +1,7 @@
 import test from 'ava'
 import DocParser from './DocParser'
 
-test('DocParser gets the signature of a function', (t) => {
+test('DocParser gets the signature of a function', async (t) => {
   const functions = DocParser.getFunctions(`
 #<
 Calculate the factorial of the given number.
@@ -25,7 +25,7 @@ fac: (n :Int -> :Int) {
   }])
 })
 
-test('DocParser gets the signature of an undocumented function', (t) => {
+test('DocParser gets the signature of an undocumented function', async (t) => {
   const functions = DocParser.getFunctions(`
 fac: (n :Int -> :Int) {
   { n n 1 - recur * } { 1 } n 1 > if
@@ -44,7 +44,7 @@ fac: (n :Int -> :Int) {
   }])
 })
 
-test('DocParser supports missing function descriptions', (t) => {
+test('DocParser supports missing function descriptions', async (t) => {
   const functions = DocParser.getFunctions(`
 #<
 @param n Some number
@@ -64,7 +64,7 @@ foo: (n :Int -> :Str) {} fun
   }])
 })
 
-test('DocParser supports missing @param tags', (t) => {
+test('DocParser supports missing @param tags', async (t) => {
   const functions = DocParser.getFunctions(`
 #<
 A function that does things.
@@ -85,7 +85,7 @@ foo: (n :Int -> :Str) {} fun
   }])
 })
 
-test('DocParser supports incomplete @param tags', (t) => {
+test('DocParser supports incomplete @param tags', async (t) => {
   const functions = DocParser.getFunctions(`
 #<
 A function that does things.
@@ -109,7 +109,7 @@ foo: (a b -> :Str) {} fun
   }])
 })
 
-test('DocParser supports missing @return tags', (t) => {
+test('DocParser supports missing @return tags', async (t) => {
   const functions = DocParser.getFunctions(`
 #<
 A function that does things.
@@ -127,7 +127,7 @@ foo: (-> :Str) {} fun
   }])
 })
 
-test('DocParser supports functions that return nothing', (t) => {
+test('DocParser supports functions that return nothing', async (t) => {
   t.deepEqual(DocParser.getFunctions('noop: (->) {} fun'), [{
     name: 'noop',
     description: undefined,
@@ -154,7 +154,7 @@ test('DocParser supports functions that return nothing', (t) => {
   }])
 })
 
-test('DocParser supports functions with multiple return values', (t) => {
+test('DocParser supports functions with multiple return values', async (t) => {
   t.deepEqual(DocParser.getFunctions(`
 #<
 Get the first two elements of an array.
@@ -176,7 +176,7 @@ firstTwo: (arr :Arr -> :Obj :Obj) {} fun
   }])
 })
 
-test('DocParser supports functions without params', (t) => {
+test('DocParser supports functions without params', async (t) => {
   t.deepEqual(DocParser.getFunctions(`test: {} fun`), [{
     name: 'test',
     description: undefined,
@@ -185,7 +185,7 @@ test('DocParser supports functions without params', (t) => {
   }])
 })
 
-test('DocParser does not crash on broken input', (t) => {
+test('DocParser does not crash on broken input', async (t) => {
   t.notThrows(() => {
     DocParser.getFunctions(`
 #<
@@ -203,7 +203,7 @@ Calculate the factorial of a number.
   })
 })
 
-test('DocParser finds cond-fun declarations', (t) => {
+test('DocParser finds cond-fun declarations', async (t) => {
   t.deepEqual(DocParser.getFunctions(`
 #<
 Get a number that depends on x.
@@ -223,7 +223,7 @@ condFun: (x :Int -> :Num) {} cond-fun
   }])
 })
 
-test('DocParser finds variable declarations with long syntax', (t) => {
+test('DocParser finds variable declarations with long syntax', async (t) => {
   t.deepEqual(DocParser.getVariables(`
 #<
 The answer to life, the universe and everything.
@@ -235,7 +235,7 @@ answer: 42 !
   }])
 })
 
-test('DocParser finds variable declarations with short syntax', (t) => {
+test('DocParser finds variable declarations with short syntax', async (t) => {
   t.deepEqual(DocParser.getVariables(`
 #<
 The answer to life, the universe and everything.
@@ -247,7 +247,7 @@ The answer to life, the universe and everything.
   }])
 })
 
-test('DocParser finds variable declarations with short syntax if the value is a symbol', (t) => {
+test('DocParser finds variable declarations with short syntax if the value is a symbol', async (t) => {
   // this is an edge case, because test: could also be the start of the long syntax
   t.deepEqual(DocParser.getVariables(`
 test: var!
@@ -257,7 +257,7 @@ test: var!
   }])
 })
 
-test('DocParser only finds the first declaration of a variable', (t) => {
+test('DocParser only finds the first declaration of a variable', async (t) => {
   t.deepEqual(DocParser.getVariables(`
 #< Test variable >#
 42 test!
@@ -270,7 +270,7 @@ test('DocParser only finds the first declaration of a variable', (t) => {
   }])
 })
 
-test('DocParser finds datadef struct declarations', (t) => {
+test('DocParser finds datadef struct declarations', async (t) => {
   t.deepEqual(DocParser.getDatadefs(`
 #< A 2d point. >#
 :Point (
@@ -296,7 +296,7 @@ test('DocParser finds datadef struct declarations', (t) => {
   }])
 })
 
-test('DocParser finds datadef union type declarations', (t) => {
+test('DocParser finds datadef union type declarations', async (t) => {
   t.deepEqual(DocParser.getDatadefs(`
 #< A 2d point. >#
 Point: [
@@ -352,7 +352,7 @@ Point: [
   }])
 })
 
-test('DocParser works fine with undocumented union type declarations', (t) => {
+test('DocParser works fine with undocumented union type declarations', async (t) => {
   t.deepEqual(DocParser.getDatadefs(`
 Point: [
   Euclid: (
@@ -399,7 +399,7 @@ Point: [
   }])
 })
 
-test('DocParser works fine with undocumented struct type declarations', (t) => {
+test('DocParser works fine with undocumented struct type declarations', async (t) => {
   t.deepEqual(DocParser.getDatadefs(`
     Polar: (
       theta :Num,
