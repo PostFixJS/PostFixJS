@@ -18,7 +18,7 @@ module.exports.sleep = {
     yield {
       cancel,
       promise: new Promise((resolve) => {
-        const timeoutId = setTimeout(() => resolve, duration)
+        const timeoutId = setTimeout(resolve, duration)
         token.onCancel(() => clearTimeout(timeoutId))
       })
     }

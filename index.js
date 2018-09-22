@@ -9,9 +9,9 @@ interpreter.registerBuiltIns(require('./repl-operators/io'))
 if (process.argv[process.argv.length - 1] === '--') {
   process.stdin.resume()
   process.stdin.on('data', (buf) => lexer.put(buf.toString()))
-  process.stdin.on('end', () => {
+  process.stdin.on('end', async () => {
     try {
-      interpreter.run(lexer.getTokens())
+      await interpreter.run(lexer.getTokens())
     } catch (e) {
       console.error(e.toString())
     }
@@ -21,19 +21,28 @@ if (process.argv[process.argv.length - 1] === '--') {
   repl()
 }
 
-function repl () {
-  read({ prompt: '>' }, (err, input) => {
-    if (!err) {
+async function repl () {
+  while (true) {
+    try {
+      const input = await new Promise((resolve, reject) => {
+        read({ prompt: '>' }, (err, input) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(input)
+          }
+        })
+      })
       lexer.put(input + '\n')
       try {
-        interpreter.run(lexer.getTokens())
+        await interpreter.run(lexer.getTokens())
       } catch (e) {
         console.error(e.toString())
       }
       console.log(interpreter._stack._stack.map(obj => obj.toString()).join(', '))
-      repl()
-    } else {
+    } catch (e) {
       console.log('')
+      return
     }
-  })
+  }
 }
