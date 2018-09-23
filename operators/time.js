@@ -1,5 +1,6 @@
 const types = require('../types')
 const createCancellationToken = require('../util/cancellationToken')
+const { popOperand } = require('../typeCheck')
 
 module.exports.time = {
   name: 'time',
@@ -10,16 +11,15 @@ module.exports.time = {
 
 module.exports.sleep = {
   name: 'sleep',
-  * execute (interpreter) {
-    // TODO type check
-    const duration = interpreter._stack.pop().value
+  * execute (interpreter, token) {
+    const duration = popOperand(interpreter, { type: 'Int' }, token)
 
-    const { token, cancel } = createCancellationToken()
+    const { token: cancelToken, cancel } = createCancellationToken()
     yield {
       cancel,
       promise: new Promise((resolve) => {
         const timeoutId = setTimeout(resolve, duration)
-        token.onCancel(() => clearTimeout(timeoutId))
+        cancelToken.onCancel(() => clearTimeout(timeoutId))
       })
     }
   }

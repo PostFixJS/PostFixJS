@@ -3,3 +3,9 @@ Get the current time in milliseconds since January 1, 1970 00:00:00 UTC.
 @return Current time in milliseconds
 ># 
 time: (-> :Int) {} fun
+
+#<
+Pause execution for the given delay.
+@param delay Sleep time in milliseconds
+>#
+sleep: (delay :Int) {} fun
