@@ -189,7 +189,7 @@ class Interpreter {
 
   /**
    * Create an Iterator that will execute the given tokens.
-   * @param {Iterable} tokens Tokens
+   * @param {Iterable} tokens Tokens to execute
    */
   * _run (tokens) {
     for (const token of tokens) {
@@ -198,6 +198,18 @@ class Interpreter {
       } catch (e) {
         this._handleExecutionError(e, token)
       }
+    }
+  }
+
+  /**
+   * Create an Iterator that will execute the given object.
+   * @param {Obj} obj Object to execute
+   */
+  * _runObj (obj) {
+    try {
+      yield * this.executeObj(obj)
+    } catch (e) {
+      this._handleExecutionError(e, obj.origin)
     }
   }
 
@@ -281,13 +293,8 @@ class Interpreter {
     }
   }
 
-  /**
-   * Run all tokens.
-   * @param {Iterable} tokens Tokens to execute
-   */
-  run (tokens) {
+  _runStepper (stepper) {
     const { token, cancel } = createCancellationToken()
-    const stepper = this._run(tokens)
 
     // this holds a cancel function for the Promise the interpreter waits for
     // so that it can be cancelled when the execution is cancelled
@@ -333,6 +340,22 @@ class Interpreter {
         continueExecution()
       })
     }
+  }
+
+  /**
+   * Run all tokens.
+   * @param {Iterable} tokens Tokens to execute
+   */
+  run (tokens) {
+    return this._runStepper(this._run(tokens))
+  }
+
+  /**
+   * Run a single object.
+   * @param {Obj} obj Object to execute
+   */
+  runObj (obj) {
+    return this._runStepper(this._runObj(obj))
   }
 
   /**
