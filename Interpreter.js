@@ -227,15 +227,8 @@ class Interpreter {
     }
   }
 
-  /**
-   * Start executing the given tokens. Execution is continued by calling the `next`
-   * function of the returned iterator.
-   * @param {Iterable} tokens Tokens
-   * @return A promise for the whole execution, a cancel function and a step function that iterates over the tokens that are executed
-   */
-  startRun (tokens) {
+  _startRunStepper (stepper) {
     const { token, cancel } = createCancellationToken()
-    const stepper = this._run(tokens)
 
     // this holds a cancel function for the Promise the interpreter waits for
     // so that it can be cancelled when the execution is cancelled
@@ -291,6 +284,26 @@ class Interpreter {
       promise,
       step
     }
+  }
+
+  /**
+   * Start executing the given tokens. Execution is continued by calling the `step`
+   * function of the returned object.
+   * @param {Iterable} tokens Tokens
+   * @return A promise for the whole execution, a cancel function and a step function that iterates over the tokens that are executed
+   */
+  startRun (tokens) {
+    return this._startRunStepper(this._run(tokens))
+  }
+
+  /**
+   * Start executing the given object. Execution is continued by calling the `step`
+   * function of the returned object.
+   * @param {Iterable} tokens Tokens
+   * @return A promise for the whole execution, a cancel function and a step function that iterates over the tokens that are executed
+   */
+  startRunObj (obj) {
+    return this._startRunStepper(this._runObj(obj))
   }
 
   _runStepper (stepper) {
