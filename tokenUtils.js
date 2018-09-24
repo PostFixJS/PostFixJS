@@ -34,8 +34,10 @@ function parseParamsList (paramsList) {
   for (let i = 1; i < rightArrowPosition; i++) {
     const value = paramsList[i].token
     if (value[0] === ':' || value[value.length - 1] === ':') {
-      // this is a symbol
-      params[params.length - 1].type = normalizeSymbol(value, true)
+      if (params.length > 0) {
+        // this is a symbol
+        params[params.length - 1].type = normalizeSymbol(value, true)
+      }
     } else if (isCommentToken(paramsList[i])) {
       // this is a comment
       if (paramsList[i].tokenType === 'BLOCK_COMMENT') {
