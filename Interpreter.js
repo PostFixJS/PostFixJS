@@ -1,5 +1,6 @@
 const types = require('./types')
 const InvalidStackAccessError = require('./InvalidStackAccessError')
+const BreakError = require('./BreakError')
 const Stack = require('./Stack')
 const DictStack = require('./DictStack')
 const createCancellationToken = require('./util/cancellationToken')
@@ -162,8 +163,7 @@ class Interpreter {
   }
 
   * executeObj (obj, {
-    handleErrors = true,
-    forwardBreak = false
+    handleErrors = true
   } = {}) {
     if (this._openExeArrs > 0 && !(obj instanceof types.Marker && (obj.type === 'ExeArrOpen' || obj.type === 'ExeArrClose'))) {
       this._stack.push(obj)
@@ -176,7 +176,7 @@ class Interpreter {
           yield * result
         }
       } catch (e) {
-        if (forwardBreak && e === 'break') {
+        if (e instanceof BreakError) {
           throw e
         } else if (handleErrors) {
           this._handleExecutionError(e, obj.origin)
@@ -220,8 +220,8 @@ class Interpreter {
       } else {
         throw new types.Err('Stack access is out of range', token)
       }
-    } else if (e === 'break') {
-      // do nothing
+    } else if (e instanceof BreakError) {
+      throw new types.Err(`${e.operator} can only be used in a loop`, token)
     } else {
       throw e
     }

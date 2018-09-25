@@ -1,6 +1,7 @@
 const ExeArr = require('./ExeArr')
 const Err = require('./Err')
 const InvalidStackAccessError = require('../InvalidStackAccessError')
+const BreakError = require('../BreakError')
 
 class Lam extends ExeArr {
   /**
@@ -39,14 +40,15 @@ class Lam extends ExeArr {
         if (obj instanceof ExeArr) {
           interpreter._stack.push(obj)
         } else {
-          yield * interpreter.executeObj(obj, { handleErrors: false, forwardBreak: true })
+          yield * interpreter.executeObj(obj, { handleErrors: false })
         }
       }
     } catch (e) {
       if (e instanceof InvalidStackAccessError) {
         throw new Err('Inside :Lam the stack may not be accessed beyond the height it had when the :Lam was invoked', nextToken)
-      } else if (e === 'break') {
-        // lambda exited with break, skip to return value check
+      } else if (e instanceof BreakError) {
+        // break was used outside of a loop
+        throw new Err('break can only be used in a loop', nextToken)
       } else {
         throw e
       }

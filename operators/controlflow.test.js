@@ -37,35 +37,31 @@ test('break should leave a loop', async (t) => {
   t.is(stack.count, 1)
 })
 
-test('break should leave an executable array', async (t) => {
-  const { stack } = await execute('{ 1 break 2 3 } x! x')
-  t.is(stack.count, 1)
+test('break should throw an error when used outside of a loop', async (t) => {
+  await throwsErrorMessage(t, () => execute('{ 1 break 2 3 } x! x'), checkErrorMessage('break can only be used in a loop'))
 })
 
-test('break should leave an executable array when using exec', async (t) => {
-  const { stack } = await execute('{ 1 break 2 3 } exec')
-  t.is(stack.count, 1)
+test('break should throw an error when when used outside of a loop when using exec', async (t) => {
+  await throwsErrorMessage(t, () => execute('{ 1 break 2 3 } exec'), checkErrorMessage('break can only be used in a loop'))
 })
 
 test('breakif should leave a loop', async (t) => {
-  const { stack } = await executeTimeout('1 3 { i! 1 true breakif } for', 1000)
+  const { stack } = await executeTimeout('1 3 { i! 1 true breakif 3 4 5 } for', 1000)
   t.is(stack.count, 1)
 })
 
-test('breakif should leave an executable array', async (t) => {
-  const { stack } = await execute('{ 1 true breakif 2 3 } exec')
-  t.is(stack.count, 1)
+test('breakif should throw an error when used outside of a loop', async (t) => {
+  await throwsErrorMessage(t, () => execute('{ 1 true breakif 2 3 } exec'), checkErrorMessage('breakif can only be used in a loop'))
 })
 
-test('break should leave an if body', async (t) => {
-  const { stack } = await execute('true { 1 2 break 3 4 } if')
+test('break should leave a a loop around an if body', async (t) => {
+  const { stack } = await executeTimeout('{ true { 1 2 break 3 4 } if 1 2 3 } loop', 1000)
   t.is(stack.count, 2)
 })
 
-test('break should leave a function but not skip return value checks', async (t) => {
-  await throwsErrorMessage(t, async () => {
-    await execute('fn: (-> :Num) { break "break ignored" err } fun fn')
-  }, checkErrorMessage('Expected fun to return 1 values but it returned 0 values'))
+test('break should not leave a function', async (t) => {
+  const { stack } = await execute('fn: (-> :Num) { { break } loop 42 } fun fn')
+  t.is(stack.pop().value, 42)
 })
 
 test('cond-fun should wrap a cond in a function', async (t) => {

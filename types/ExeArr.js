@@ -7,7 +7,7 @@ class ExeArr extends Arr {
       if (obj instanceof ExeArr) {
         interpreter._stack.push(obj)
       } else {
-        yield * interpreter.executeObj(obj, { forwardBreak: true })
+        yield * interpreter.executeObj(obj)
       }
     }
   }

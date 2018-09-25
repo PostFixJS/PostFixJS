@@ -1,4 +1,5 @@
 const types = require('../types')
+const BreakError = require('../BreakError')
 
 module.exports.if = {
   name: 'if',
@@ -92,18 +93,18 @@ module.exports.loop = {
     if (!(body instanceof types.ExeArr)) {
       throw new types.Err(`loop expects an :ExeArr but got ${body.getTypeName()}`, token)
     }
-    if (body.items.length === 0) {
-      // edge case to allow interrupting an empty loop
-      while (true) {
-        yield body.origin
-      }
-    }
     try {
+      if (body.items.length === 0) {
+        // edge case to allow interrupting an empty loop
+        while (true) {
+          yield body.origin
+        }
+      }
       while (true) {
-        yield * interpreter.executeObj(body, { forwardBreak: true })
+        yield * interpreter.executeObj(body)
       }
     } catch (e) {
-      if (e !== 'break') {
+      if (!(e instanceof BreakError)) {
         throw e
       }
     }
@@ -125,10 +126,10 @@ module.exports.for = {
           let i
           for (i = lower.value; i < upper.value; i++) {
             interpreter._stack.push(new types.Int(i))
-            yield * interpreter.executeObj(body, { forwardBreak: true })
+            yield * interpreter.executeObj(body)
           }
         } catch (e) {
-          if (e !== 'break') {
+          if (!(e instanceof BreakError)) {
             throw e
           }
         }
@@ -141,10 +142,10 @@ module.exports.for = {
         try {
           for (const item of arr.items) {
             interpreter._stack.push(item)
-            yield * interpreter.executeObj(body, { forwardBreak: true })
+            yield * interpreter.executeObj(body)
           }
         } catch (e) {
-          if (e !== 'break') {
+          if (!(e instanceof BreakError)) {
             throw e
           }
         }
@@ -152,10 +153,10 @@ module.exports.for = {
         try {
           for (const char of arr.value.split('')) {
             interpreter._stack.push(new types.Str(char))
-            yield * interpreter.executeObj(body, { forwardBreak: true })
+            yield * interpreter.executeObj(body)
           }
         } catch (e) {
-          if (e !== 'break') {
+          if (!(e instanceof BreakError)) {
             throw e
           }
         }
@@ -180,10 +181,10 @@ module.exports.fori = {
         for (i = 0; i < arr.items.length; i++) {
           interpreter._stack.push(arr.items[i])
           interpreter._stack.push(new types.Int(i))
-          yield * interpreter.executeObj(body, { forwardBreak: true })
+          yield * interpreter.executeObj(body)
         }
       } catch (e) {
-        if (e !== 'break') {
+        if (!(e instanceof BreakError)) {
           throw e
         }
       }
@@ -194,10 +195,10 @@ module.exports.fori = {
         for (i = 0; i < chars.length; i++) {
           interpreter._stack.push(new types.Str(chars[i]))
           interpreter._stack.push(new types.Int(i))
-          yield * interpreter.executeObj(body, { forwardBreak: true })
+          yield * interpreter.executeObj(body)
         }
       } catch (e) {
-        if (e !== 'break') {
+        if (!(e instanceof BreakError)) {
           throw e
         }
       }
@@ -210,7 +211,7 @@ module.exports.fori = {
 module.exports.break = {
   name: 'break',
   execute () {
-    throw 'break' // eslint-disable-line
+    throw new BreakError('break')
   }
 }
 
@@ -220,7 +221,7 @@ module.exports.breakif = {
     const cond = interpreter._stack.pop()
     if (cond instanceof types.Bool) {
       if (cond.value) {
-        throw 'break' // eslint-disable-line
+        throw new BreakError('breakif')
       }
     } else {
       throw new types.Err(`breakif expects a :Bool but got ${cond.getTypeName()}`, token)
