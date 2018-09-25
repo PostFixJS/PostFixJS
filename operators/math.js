@@ -17,8 +17,11 @@ module.exports.plus = {
       interpreter._stack.push(new types.Arr([...b.items, ...a.items]))
     } else if (a instanceof types.Flt || b instanceof types.Flt) {
       interpreter._stack.push(new types.Flt(b.value + a.value))
-    } else {
+    } else if (a instanceof types.Int && b instanceof types.Int) {
       interpreter._stack.push(new types.Int(b.value + a.value))
+    } else {
+      // trying to concatenate an :Arr with anything other than :Arr
+      throw new types.Err(`+ can not concatenate ${a.getTypeName()} and ${b.getTypeName()}`, token)
     }
   }
 }
