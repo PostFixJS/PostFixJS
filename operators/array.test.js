@@ -332,3 +332,11 @@ test('sort sorts an array', async (t) => {
   t.true(sortedArray instanceof types.Arr)
   t.deepEqual(sortedArray.items.map((item) => item.value), [1, 1, 3, 4, 6, 7])
 })
+
+test('+ should concatenate two array', async (t) => {
+  const { stack } = await execute('[1 2] [3 4] +')
+  t.is(stack.count, 1)
+  const array = stack.pop()
+  t.true(array instanceof types.Arr)
+  t.deepEqual(array.items.map((item) => item.value), [1, 2, 3, 4])
+})

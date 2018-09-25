@@ -7,12 +7,14 @@ module.exports.plus = {
     const a = interpreter._stack.pop()
     const b = interpreter._stack.pop()
     checkOperands([
-      { value: a, type: ['Int', 'Flt', 'Str'] },
-      { value: b, type: ['Int', 'Flt', 'Str'] }
+      { value: a, type: ['Int', 'Flt', 'Str', 'Arr'] },
+      { value: b, type: ['Int', 'Flt', 'Str', 'Arr'] }
     ], token)
 
     if (a instanceof types.Str || b instanceof types.Str) {
       interpreter._stack.push(new types.Str(b.value + a.value))
+    } else if (a instanceof types.Arr && b instanceof types.Arr) {
+      interpreter._stack.push(new types.Arr([...b.items, ...a.items]))
     } else if (a instanceof types.Flt || b instanceof types.Flt) {
       interpreter._stack.push(new types.Flt(b.value + a.value))
     } else {
