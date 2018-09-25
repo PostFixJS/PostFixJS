@@ -15,6 +15,14 @@ Concatenate the two strings.
 +: (a :Str, b :Str -> :Str) {} fun
 
 #<
+Concatenate the two arrays.
+@param a An array
+@param b An array
+@return The concatenated array
+>#
++: (a :Arr, b :Arr -> :Arr) {} fun
+
+#<
 Subtract two numbers.
 @param a A number
 @param b A number
