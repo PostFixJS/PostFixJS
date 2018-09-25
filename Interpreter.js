@@ -176,9 +176,7 @@ class Interpreter {
           yield * result
         }
       } catch (e) {
-        if (e instanceof BreakError) {
-          throw e
-        } else if (handleErrors) {
+        if (!(e instanceof BreakError) && handleErrors) {
           this._handleExecutionError(e, obj.origin)
         } else {
           throw e
