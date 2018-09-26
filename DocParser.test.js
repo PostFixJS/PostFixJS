@@ -420,3 +420,8 @@ test('DocParser works fine with undocumented struct type declarations', async (t
     }]
   }])
 })
+
+test('DocParser does not crash on invalid input', (t) => {
+  // not a variable declaration, but could be one
+  t.deepEqual(DocParser.getVariables(':Test'), [])
+})

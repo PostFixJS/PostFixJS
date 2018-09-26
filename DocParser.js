@@ -258,6 +258,9 @@ function skipElements (tokens, i, openToken, closeToken) {
 }
 
 function skipElement (tokens, i) {
+  if (i >= tokens.length) {
+    return false
+  }
   switch (tokens[i].tokenType) {
     case 'PARAM_LIST_START':
       return skipElements(tokens, i, 'PARAM_LIST_START', 'PARAM_LIST_END')
