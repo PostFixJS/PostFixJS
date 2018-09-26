@@ -23,6 +23,10 @@ class Bool extends Obj {
     bool.origin = token
     return bool
   }
+
+  static valueOf (value) {
+    return value ? Bool.true : Bool.false
+  }
 }
 
 Bool.true = new Bool(true)

@@ -71,8 +71,9 @@ function defineStruct (interpreter, definition, name) {
   )
 
   const typeChecker = new types.Op({
+    name: `${structName}?`,
     execute (interpreter) {
-      interpreter._stack.push(new types.Bool(getDatadefType(interpreter._stack.pop()) === name.name))
+      interpreter._stack.push(types.Bool.valueOf(getDatadefType(interpreter._stack.pop()) === name.name))
     }
   })
 
