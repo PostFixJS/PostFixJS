@@ -33,6 +33,14 @@ test('update-lam should keep recur intact', async (t) => {
   t.true(stack.pop() instanceof types.Lam)
 })
 
+test('popv should bind values to variables', async (t) => {
+  const { stack, dictStack } = await execute('1 2 3 (a b c) popv')
+  t.is(stack.count, 0)
+  t.is(dictStack.get('a').value, 1)
+  t.is(dictStack.get('b').value, 2)
+  t.is(dictStack.get('c').value, 3)
+})
+
 test('vref should put a value from the dictionary on the stack without executing it', async (t) => {
   const { stack } = await execute(`{ 42 } a! :a vref`)
   t.is(stack.count, 1)
