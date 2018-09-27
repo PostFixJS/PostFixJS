@@ -54,6 +54,14 @@ Set the i-th item of an array.
 set: (arr :Arr, i :Int -> :Arr) {} fun
 
 #<
+Set the item after the first item in the array that is equal to the given key. If the key is not found, it is appended to the array.
+@param arr Array
+@param key Key
+@return The updated array
+>#
+set: (arr :Arr, key :Obj -> :Arr) {} fun
+
+#<
 Get the item after the first item in the array that is equal to the given key.
 E.g., `[ :a 1 :b 2 ] :a 0 key-get` would return the value after `:a`, which is `1`.
 @param arr Array
