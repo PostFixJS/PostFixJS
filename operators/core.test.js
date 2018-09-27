@@ -31,7 +31,7 @@ test('fun can define functions without an arrow and return values in the param l
   await throwsErrorMessage(t, () => execute(`
     brokenSum: (a b) { pop a + } fun # underflows due to the pop
     2 3 brokenSum
-  `), checkErrorMessage('Inside :Lam the stack may not be accessed beyond the height it had when the :Lam was invoked'))
+  `), checkErrorMessage('Stack underflow in function or lambda expression'))
 })
 
 test('fun can define functions with an arrow and return values in the param list that check the resulting stack height and prevent underflows', async (t) => {

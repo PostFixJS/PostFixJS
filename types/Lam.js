@@ -46,7 +46,7 @@ class Lam extends ExeArr {
       }
     } catch (e) {
       if (e instanceof InvalidStackAccessError) {
-        throw new Err('Inside :Lam the stack may not be accessed beyond the height it had when the :Lam was invoked', nextToken)
+        throw new Err('Stack underflow in function or lambda expression', nextToken)
       } else if (e instanceof BreakError) {
         // break was used outside of a loop
         throw new Err(`${e.operator} can only be used in a loop`, nextToken)

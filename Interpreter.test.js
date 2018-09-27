@@ -29,7 +29,7 @@ test('Trying to get elements from below the stack should throw an error', async 
 test('Trying to access the foreign stack in a function with a parameter list should throw an error', async (t) => {
   await throwsErrorMessage(t, async () => {
     await execute('test: () { pop } fun 42 test')
-  }, (e) => e instanceof types.Err && e.message === 'Inside :Lam the stack may not be accessed beyond the height it had when the :Lam was invoked')
+  }, (e) => e instanceof types.Err && e.message === 'Stack underflow in function or lambda expression')
 })
 
 test('The interpreter handles excaped quotes properly', async (t) => {
