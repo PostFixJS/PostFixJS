@@ -28,6 +28,18 @@ test('get should throw if the index is out of the range of the array', async (t)
   await throwsErrorMessage(t, () => execute('[1,2,3] 3 get'), checkErrorMessage('Index is out of range (index is 3 but the :Arr has length 3)'))
 })
 
+test('get should get a key if the index is not an int', async (t) => {
+  const { stack } = await execute('[:a 1 :b 2] :b get')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 2)
+})
+
+test('get should return nil if a key does not exist', async (t) => {
+  const { stack } = await execute('[:a 1 :b 2] :c get')
+  t.is(stack.count, 1)
+  t.true(stack.pop() instanceof types.Nil)
+})
+
 test('get should get the i-th character of a string', async (t) => {
   const { stack } = await execute('"PostFix" 4 get')
   t.is(stack.count, 1)
@@ -40,7 +52,7 @@ test('get should throw if the index is out of the range of the string', async (t
 
 test('get should throw if it is called with invalid arguments', async (t) => {
   await throwsErrorMessage(t, () => execute('42 0 get'), checkErrorMessage('Expected operand 1 to be :Arr or :Str but got :Int instead'))
-  await throwsErrorMessage(t, () => execute('"PostFix" false get'), checkErrorMessage('Expected operand 2 (index) to be :Int but got :Bool instead'))
+  await throwsErrorMessage(t, () => execute('"PostFix" false get'), checkErrorMessage('Expected an :Int as index for strings but got :Bool instead'))
 })
 
 test('set should set the i-th element of an array', async (t) => {

@@ -21,20 +21,28 @@ module.exports.get = {
   execute (interpreter, token) {
     const [ obj, index ] = popOperands(interpreter, [
       { type: ['Arr', 'Str'] },
-      { name: 'index', type: 'Int' }
+      { type: 'Obj' }
     ], token)
 
     if (obj instanceof types.Arr) {
-      if (index.value >= 0 && index.value < obj.items.length) {
-        interpreter._stack.push(obj.items[index.value])
+      if (index instanceof types.Num) {
+        if (index.value >= 0 && index.value < obj.items.length) {
+          interpreter._stack.push(obj.items[index.value | 0])
+        } else {
+          throw new types.Err(`Index is out of range (index is ${index.value} but the :Arr has length ${obj.items.length})`, token)
+        }
       } else {
-        throw new types.Err(`Index is out of range (index is ${index.value} but the :Arr has length ${obj.items.length})`, token)
+        interpreter._stack.push(keyGet(obj, index, types.Nil.nil))
       }
     } else if (obj instanceof types.Str) {
-      if (index.value >= 0 && index.value < obj.value.length) {
-        interpreter._stack.push(new types.Str(obj.value[index.value]))
+      if (index instanceof types.Num) {
+        if (index.value >= 0 && index.value < obj.value.length) {
+          interpreter._stack.push(new types.Str(obj.value[index.value | 0]))
+        } else {
+          throw new types.Err(`Index is out of range (index is ${index.value} but the :Str has length ${obj.value.length})`, token)
+        }
       } else {
-        throw new types.Err(`Index is out of range (index is ${index.value} but the :Str has length ${obj.value.length})`, token)
+        throw new types.Err(`Expected an :Int as index for strings but got ${index.getTypeName()} instead`, token)
       }
     }
   }
