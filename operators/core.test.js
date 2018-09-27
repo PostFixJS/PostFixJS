@@ -20,6 +20,34 @@ test('fun can define functions without a parameter list that do not check for un
   t.is(fun.params, null)
 })
 
+test('fun can define functions without an arrow and return values in the param list that do not check the resulting stack height but do check for underflows', async (t) => {
+  const { stack } = await execute(`
+    sum: (a b) { a b + } fun
+    2 3 sum
+  `)
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 5)
+
+  await throwsErrorMessage(t, () => execute(`
+    brokenSum: (a b) { pop a + } fun # underflows due to the pop
+    2 3 brokenSum
+  `), checkErrorMessage('Inside :Lam the stack may not be accessed beyond the height it had when the :Lam was invoked'))
+})
+
+test('fun can define functions with an arrow and return values in the param list that check the resulting stack height and prevent underflows', async (t) => {
+  const { stack } = await execute(`
+    sum: (a b -> :Int) { a b + } fun
+    2 3 sum
+  `)
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 5)
+
+  await throwsErrorMessage(t, () => execute(`
+    brokenSum: (a b ->) { a b + } fun # expects 0 return values
+    2 3 brokenSum
+  `), checkErrorMessage('Expected fun to return 0 values but it returned 1 values'))
+})
+
 test('update-lam should update the dictionaries of the given functions', async (t) => {
   const { stack } = await execute(`
     1 x!

@@ -1,6 +1,7 @@
 const Obj = require('./Obj')
 const Sym = require('./Sym')
 const Err = require('./Err')
+const Ref = require('./Ref')
 
 class Params extends Obj {
   constructor (params, returns, origin) {
@@ -11,39 +12,40 @@ class Params extends Obj {
   }
 
   static fromParamList (rawParams, origin) {
-    const types = require('./') // Params is a circular dependency; this wouldn't be required with es6 imports
+    const Marker = require('./Marker') // Marker<>Params is a circular dependency; this wouldn't be required with es6 imports
 
-    let rightArrowPosition = rawParams.findIndex((p) => p instanceof types.Marker && p.type === 'RightArrow')
+    let rightArrowPosition = rawParams.findIndex((p) => p instanceof Marker && p.type === 'RightArrow')
+    const params = []
+    const returns = rightArrowPosition >= 0 ? rawParams.slice(rightArrowPosition + 1) : null
     if (rightArrowPosition < 0) {
       rightArrowPosition = rawParams.length
     }
 
-    const params = []
-    const returns = rawParams.slice(rightArrowPosition + 1)
-
     for (let i = 0; i < rightArrowPosition; i++) {
       const o = rawParams[i]
-      if (!((o instanceof types.Ref) || (o instanceof types.Sym))) {
+      if (!((o instanceof Ref) || (o instanceof Sym))) {
         throw new Err(`Found ${o.getTypeName()} in the parameter list, but it may only contain variable names and type names.`, origin)
       }
-      if (i === 0 && o instanceof types.Sym) {
+      if (i === 0 && o instanceof Sym) {
         throw new Err(`Found type name at the beginning of the parameter list but expected to find a variable name at the first position.`, origin)
       }
-      if (i > 0 && o instanceof types.Sym && !(rawParams[i - 1] instanceof types.Ref)) {
+      if (i > 0 && o instanceof Sym && !(rawParams[i - 1] instanceof Ref)) {
         throw new Err(`Found two type names in a row in the parameter list but expected a type name to follow a variable name.`, origin)
       }
 
-      if (o instanceof types.Ref) {
+      if (o instanceof Ref) {
         params.push({ ref: o })
       }
-      if (o instanceof types.Sym) {
+      if (o instanceof Sym) {
         params[params.length - 1].type = o
       }
     }
 
-    for (const r of returns) {
-      if (!(r instanceof Sym)) {
-        throw new Err(`Found ${r.getTypeName()} in the return list, but it may only contain type names (e.g. :Int or :Flt).`, origin)
+    if (returns != null) {
+      for (const r of returns) {
+        if (!(r instanceof Sym)) {
+          throw new Err(`Found ${r.getTypeName()} in the return list, but it may only contain type names (e.g. :Int or :Flt).`, origin)
+        }
       }
     }
 
@@ -72,6 +74,10 @@ class Params extends Obj {
   }
 
   * checkReturns (interpreter, returnCount) {
+    if (this.returns == null) {
+      return
+    }
+
     if (returnCount !== this.returns.length) {
       if (returnCount >= 0) {
         throw new Err(`Expected fun to return ${this.returns.length} values but it returned ${returnCount} values`, this.origin)
