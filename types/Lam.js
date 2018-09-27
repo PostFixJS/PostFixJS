@@ -28,10 +28,11 @@ class Lam extends ExeArr {
 
   * execute (interpreter) {
     interpreter._dictStack.pushDict(this.dict)
+    let stackHeight
     if (this.params != null) {
       yield * this.params.bind(interpreter)
+      stackHeight = interpreter._stack.forbidPop()
     }
-    const stackHeight = interpreter._stack.forbidPop()
     let nextToken
     try {
       for (const obj of this.items) {
@@ -53,10 +54,10 @@ class Lam extends ExeArr {
         throw e
       }
     }
-    interpreter._stack.allowPop(stackHeight)
     interpreter._dictStack.popDict()
-    const returnCount = interpreter._stack.count - stackHeight
     if (this.params != null) {
+      interpreter._stack.allowPop(stackHeight)
+      const returnCount = interpreter._stack.count - stackHeight
       yield * this.params.checkReturns(interpreter, returnCount)
     }
   }

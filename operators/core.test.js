@@ -9,6 +9,17 @@ test('fun should define a function that knows itself', async (t) => {
   t.is(fun.dict['test'], fun)
 })
 
+test('fun can define functions without a parameter list that do not check for underflows', async (t) => {
+  const { dictStack, stack } = await execute(`
+    test: { 2 + dup } fun
+    2 test
+  `)
+  t.is(stack.count, 2) // 2 + 2 = 4, dup = 4 4
+  const fun = dictStack.get('test')
+  t.true(fun instanceof types.Lam)
+  t.is(fun.params, null)
+})
+
 test('update-lam should update the dictionaries of the given functions', async (t) => {
   const { stack } = await execute(`
     1 x!
