@@ -52,27 +52,39 @@ module.exports.set = {
   name: 'set',
   execute (interpreter, token) {
     const [ obj, index, value ] = popOperands(interpreter, [
-      { name: 'array', type: ['Arr', 'Str'] },
-      { name: 'index', type: 'Int' },
+      { type: ['Arr', 'Str'] },
+      { type: 'Obj' },
       {}
     ], token)
 
     if (obj instanceof types.Arr) {
-      interpreter._stack.push(arraySet(obj, index, value, token))
-    } else if (obj instanceof types.Str) {
-      if (index.value >= 0 && index.value < obj.value.length) {
-        if (value instanceof types.Str) {
-          if (value.value.length === 1) {
-            const newStr = new types.Str(`${obj.value.substr(0, index.value)}${value.value}${obj.value.substr(index.value + 1)}`)
-            interpreter._stack.push(newStr)
-          } else {
-            throw new types.Err(`When setting an index of a :Str, the value must be a :Str with a single character, but got :Str with length ${value.value.length} instead`, token)
-          }
+      if (index instanceof types.Num) {
+        if (index.value >= 0 && index.value < obj.items.length) {
+          interpreter._stack.push(arraySet(obj, index, value, token))
         } else {
-          throw new types.Err(`When setting an index of a :Str, the value must be a :Str with a single character, but got ${obj.getTypeName()} instead`, token)
+          throw new types.Err(`Index is out of range (index is ${index.value} but the :Arr has length ${obj.items.length})`, token)
         }
       } else {
-        throw new types.Err(`Index is out of range (index is ${index.value} but the :Str has length ${obj.value.length})`, token)
+        interpreter._stack.push(keySet(obj, index, value))
+      }
+    } else if (obj instanceof types.Str) {
+      if (index instanceof types.Num) {
+        if (index.value >= 0 && index.value < obj.value.length) {
+          if (value instanceof types.Str) {
+            if (value.value.length === 1) {
+              const newStr = new types.Str(`${obj.value.substr(0, index.value)}${value.value}${obj.value.substr(index.value + 1)}`)
+              interpreter._stack.push(newStr)
+            } else {
+              throw new types.Err(`When setting an index of a :Str, the value must be a :Str with a single character, but got :Str with length ${value.value.length} instead`, token)
+            }
+          } else {
+            throw new types.Err(`When setting an index of a :Str, the value must be a :Str with a single character, but got ${obj.getTypeName()} instead`, token)
+          }
+        } else {
+          throw new types.Err(`Index is out of range (index is ${index.value} but the :Str has length ${obj.value.length})`, token)
+        }
+      } else {
+        throw new types.Err(`Expected an :Int as index for strings but got ${index.getTypeName()} instead`, token)
       }
     }
   }

@@ -61,13 +61,29 @@ test('set should set the i-th element of an array', async (t) => {
   t.deepEqual(stack.pop().items.map((i) => i.value), [1, 2, 4])
 })
 
+test('set should throw if the index is out of the range of the array', async (t) => {
+  await throwsErrorMessage(t, () => execute('[1,2,3] 3 42 set'), checkErrorMessage('Index is out of range (index is 3 but the :Arr has length 3)'))
+})
+
+test('set should set a key of an array if the index is not an int', async (t) => {
+  const { stack } = await execute('[:a 1 :b 4 :c 3] :b 2 set')
+  t.is(stack.pop().items[3].value, 2)
+})
+
 test('set should set the i-th character of a string', async (t) => {
   const { stack } = await execute('"accent" 4 "p" set')
   t.is(stack.count, 1)
   t.is(stack.pop().value, 'accept')
 })
 
-// TODO specify when set should throw
+test('set should throw if the index is out of the range of the string', async (t) => {
+  await throwsErrorMessage(t, () => execute('"PostFix" 42 "a" set'), checkErrorMessage('Index is out of range (index is 42 but the :Str has length 7)'))
+})
+
+test('set should throw if it is called with invalid arguments', async (t) => {
+  await throwsErrorMessage(t, () => execute('42 0 3 set'), checkErrorMessage('Expected operand 1 to be :Arr or :Str but got :Int instead'))
+  await throwsErrorMessage(t, () => execute('"PostFix" false "x" set'), checkErrorMessage('Expected an :Int as index for strings but got :Bool instead'))
+})
 
 test('key-get should get a value by its key', async (t) => {
   const { stack } = await execute('[foo: "bar", bar: 2] :bar 0 key-get')
