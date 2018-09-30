@@ -370,11 +370,13 @@ class Interpreter {
   }
 
   /**
-   * Reset the interpreter (i.e. clear the stack and the dictionary stack).
+   * Reset the interpreter (i.e. clear the stack and the dictionary stack and reset internal state).
    */
   reset () {
     this._stack.clear()
     this._dictStack.clear()
+    this._openExeArrs = 0
+    this._openParamLists = 0
   }
 
   /**
