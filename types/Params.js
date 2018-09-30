@@ -112,12 +112,11 @@ class Params extends Obj {
     const params = this.params
       .map(({ ref, type }) => `${ref.toString()}${type ? ` ${type.toString()}` : ''}`)
       .join(', ')
-    const returns = this.returns.map((r) => r.toString()).join(', ')
-
-    if (returns.length > 0) {
+    if (this.returns != null) {
+      const returns = this.returns.map((r) => r.toString()).join(', ')
       return `(${params.length > 0 ? ` ${params}` : ''} -> ${returns} )`
     } else {
-      return `(${params.length > 0 ? ` ${params}` : ''})`
+      return `(${params.length > 0 ? ` ${params} ` : ''})`
     }
   }
 
