@@ -48,6 +48,17 @@ test('fun can define functions with an arrow and return values in the param list
   `), checkErrorMessage('Expected fun to return 0 values but it returned 1 values'))
 })
 
+test('lam can define functions without a parameter list that do not check for underflows', async (t) => {
+  const { dictStack, stack } = await execute(`
+    { 2 + dup } lam test!
+    2 test
+  `)
+  t.is(stack.count, 2) // 2 + 2 = 4, dup = 4 4
+  const fun = dictStack.get('test')
+  t.true(fun instanceof types.Lam)
+  t.is(fun.params, null)
+})
+
 test('update-lam should update the dictionaries of the given functions', async (t) => {
   const { stack } = await execute(`
     1 x!

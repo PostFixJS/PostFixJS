@@ -37,7 +37,7 @@ module.exports.lam = {
   execute (interpreter) {
     const body = interpreter._stack.pop()
     let params = null
-    if (interpreter._stack.peek() instanceof types.Params) {
+    if (interpreter._stack.accessibleCount > 0 && interpreter._stack.peek() instanceof types.Params) {
       params = interpreter._stack.pop()
     }
 

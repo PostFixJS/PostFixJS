@@ -22,6 +22,12 @@ test('if should work inside of ExeArrs', async (t) => {
   t.is(stack.pop().value, 'good')
 })
 
+test('if should work if the else part is omitted', async (t) => {
+  const { stack } = await execute('true {"good"} if')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'good')
+})
+
 test('loop should be interruptible even if empty ', async (t) => {
   const interpreter = new Interpreter()
   const stepper = interpreter.startRun(Lexer.parse('{} loop'))
