@@ -114,7 +114,7 @@ class Params extends Obj {
       .join(', ')
     if (this.returns != null) {
       const returns = this.returns.map((r) => r.toString()).join(', ')
-      return `(${params.length > 0 ? ` ${params}` : ''} -> ${returns} )`
+      return `(${params.length > 0 ? ` ${params}` : ''} -> ${returns.length > 0 ? `${returns} ` : ''})`
     } else {
       return `(${params.length > 0 ? ` ${params} ` : ''})`
     }
