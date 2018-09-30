@@ -17,12 +17,13 @@ class DictStack {
   }
 
   pushDict (dict) {
-    this._stack.push(this._dict)
+    this._stack.push(dict)
     this._dict = dict
   }
 
   popDict () {
-    this._dict = this._stack.pop()
+    this._stack.pop()
+    this._dict = this._stack[this._stack.length - 1]
   }
 
   copyDict () {
