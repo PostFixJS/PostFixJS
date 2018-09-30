@@ -1,5 +1,5 @@
 import test from 'ava'
-const { execute } = require('../test/helpers/util')
+const { execute, throwsErrorMessage, checkErrorMessage } = require('../test/helpers/util')
 
 // TODO add more tests
 
@@ -28,4 +28,6 @@ test('arrays should be comparable and have a well-defined order', async (t) => {
 
   t.is((await execute('[2, 3] [2] =')).stack.pop().value, false)
   t.is((await execute('[2, 3] [2, 3] =')).stack.pop().value, true)
+
+  await throwsErrorMessage(t, () => execute('[1] ["2"] <'), checkErrorMessage('Cannot compare :Int and :Str at index 0'))
 })

@@ -48,9 +48,13 @@ function compare (a, b, token) {
   } else if (a instanceof types.Arr && b instanceof types.Arr) {
     const n = Math.min(a.items.length, b.items.length)
     for (let i = 0; i < n; i++) {
-      const cmp = compare(a.items[i], b.items[i])
-      if (cmp !== 0) {
-        return cmp
+      try {
+        const cmp = compare(a.items[i], b.items[i])
+        if (cmp !== 0) {
+          return cmp
+        }
+      } catch (e) {
+        throw new types.Err(`Cannot compare ${a.items[i].getTypeName()} and ${b.items[i].getTypeName()} at index ${i}`, token)
       }
     }
     return a.items.length - b.items.length
