@@ -270,6 +270,16 @@ test('DocParser only finds the first declaration of a variable', async (t) => {
   }])
 })
 
+test('DocParser finds two successive variable definitions', async (t) => {
+  t.deepEqual(DocParser.getVariables('21 a! 42 b!'), [{
+    name: 'a',
+    description: undefined
+  }, {
+    name: 'b',
+    description: undefined
+  }])
+})
+
 test('DocParser finds datadef struct declarations', async (t) => {
   t.deepEqual(DocParser.getDatadefs(`
 #< A 2d point. >#

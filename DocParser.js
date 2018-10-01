@@ -157,7 +157,6 @@ function getVariableAt (tokens, i) {
   if (i === false) return false
   if (tokens[i].tokenType === 'DEFINITION') {
     variable.name = tokens[i].token.substr(0, tokens[i].token.length - 1)
-    i++
     return { variable, i }
   }
 
