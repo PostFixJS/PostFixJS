@@ -1,0 +1,34 @@
+#<
+Test if the given value is equal to the expected value.
+@param actual Actual value
+@param expected Expected value
+>#
+test=: (actual, expected) {} fun
+
+#<
+Test if the given value is not equal to a value.
+@param actual Actual value
+@param notExpected Value that the actual value should not be equal to
+>#
+test!=: (actual, notExpected) {} fun
+
+#<
+Test if the given value is approximately equal to the expected value.
+@param actual Actual value
+@param expected Expected value
+@param tolerance Tolerance for comparing numbers
+>#
+test~=: (actual, expected, tolerance :Num) {} fun
+
+#<
+Test if the given value is not approximately equal to a value.
+@param actual Actual value
+@param notExpected Value that the actual value should not be approximately equal to
+@param tolerance Tolerance for comparing numbers
+>#
+test!~=: (actual, notExpected, tolerance :Num) {} fun
+
+#<
+Show test statistics, i.e. the number of passed, failed and total tests.
+>#
+test-stats: {} fun
