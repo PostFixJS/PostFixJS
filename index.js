@@ -5,6 +5,7 @@ const Interpreter = require('./Interpreter')
 const lexer = new Lexer()
 const interpreter = new Interpreter()
 interpreter.registerBuiltIns(require('./repl-operators/io'))
+interpreter.setTestReporter(require('./repl-operators/testReporter'))
 
 if (process.argv[process.argv.length - 1] === '--') {
   process.stdin.resume()

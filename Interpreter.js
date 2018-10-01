@@ -34,6 +34,7 @@ class Interpreter {
     this.registerBuiltIns(require('./operators/random'))
     this.registerBuiltIns(require('./operators/stack'))
     this.registerBuiltIns(require('./operators/string'))
+    this.registerBuiltIns(require('./operators/test'))
     this.registerBuiltIns(require('./operators/time'))
     this.registerBuiltIns(require('./operators/types'))
   }
@@ -60,6 +61,14 @@ class Interpreter {
 
   getBuiltIn (name) {
     return this._builtIns[name]
+  }
+
+  setTestReporter (reporter) {
+    this._testReporter = reporter
+  }
+
+  get testReporter () {
+    return this._testReporter
   }
 
   /**
@@ -386,6 +395,7 @@ class Interpreter {
   copy () {
     const interpreter = new Interpreter()
     interpreter._builtIns = this._builtIns
+    interpreter._testReporter = this._testReporter
     // TODO copy objects if needed (or add reference counting later)
     interpreter._stack._stack = this._stack._stack.slice()
     interpreter._stack._minStackHeight = this._stack._minStackHeight.slice()
