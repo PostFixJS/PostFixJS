@@ -50,6 +50,7 @@ function showStats () {
       }
     }
   }
+  reset()
 }
 
 function reset () {

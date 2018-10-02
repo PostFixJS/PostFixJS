@@ -55,6 +55,5 @@ module.exports.testStats = {
   name: 'test-stats',
   execute (interpreter) {
     interpreter.testReporter.showStats()
-    interpreter.testReporter.reset()
   }
 }
