@@ -77,7 +77,7 @@ function defineStruct (interpreter, definition, name) {
     }
   })
 
-  interpreter._dictStack.put(`${structName}.new`, constructor)
+  interpreter._dictStack.put(structName, constructor)
   interpreter._dictStack.put(`${structName}?`, typeChecker)
 
   // getters, setters and updaters
@@ -87,7 +87,7 @@ function defineStruct (interpreter, definition, name) {
     const param = definition.params[i]
 
     // getter (o <index> get)
-    defs[`${structName}.${param.ref.name}`] = new types.Lam(
+    defs[`${structName}-${param.ref.name}`] = new types.Lam(
       [
         oParamRef,
         new types.Int(i + 2),

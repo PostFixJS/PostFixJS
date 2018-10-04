@@ -12,7 +12,7 @@ test('type should get the type of an Obj', async (t) => {
 test('type should get the type of struct datadef instances', async (t) => {
   const { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
-    1 2 point.new type
+    1 2 point type
   `)
   const type = stack.pop()
   t.true(type instanceof types.Sym)
@@ -25,9 +25,9 @@ test('type should get the type of union datadef instances', async (t) => {
       Euclid: (x :Num, y :Num)
       Polar: (theta :Num, magnitude :Num)
     ] datadef
-    1 2 euclid.new
+    1 2 euclid
     type
-    45 2 polar.new
+    45 2 polar
     type
   `)
   const type2 = stack.pop()

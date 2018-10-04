@@ -4,14 +4,14 @@ const { execute, checkErrorMessage, throwsErrorMessage } = require('../test/help
 
 test('datadef generates a constructor function', async (t) => {
   let { dictStack } = await execute('Point: (x :Num, y :Num) datadef')
-  const constructor = dictStack.get('point.new')
+  const constructor = dictStack.get('point')
   t.true(constructor instanceof types.Lam)
 })
 
 test('the datadef constructor constructs a struct', async (t) => {
   let { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
-    3 4 point.new
+    3 4 point
   `)
   t.is(stack.count, 1)
   const point = stack.pop()
@@ -26,7 +26,7 @@ test('the datadef constructor constructs a struct', async (t) => {
 test('the type checker checks the type', async (t) => {
   let { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
-    3 4 point.new point?
+    3 4 point point?
     42 point?
   `)
   t.is(stack.count, 2)
@@ -37,8 +37,8 @@ test('the type checker checks the type', async (t) => {
 test('the datadef getters get fields of a struct', async (t) => {
   let { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
-    3 4 point.new
-    point.x
+    3 4 point
+    point-x
   `)
   t.is(stack.count, 1)
   const x = stack.pop()
@@ -49,8 +49,8 @@ test('the datadef getters get fields of a struct', async (t) => {
 test('the datadef setters set fields of a struct', async (t) => {
   let { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
-    3 4 point.new
-    42 point-y-set point.y
+    3 4 point
+    42 point-y-set point-y
   `)
   t.is(stack.count, 1)
   const y = stack.pop()
@@ -61,8 +61,8 @@ test('the datadef setters set fields of a struct', async (t) => {
 test('the datadef updaters update fields of a struct', async (t) => {
   let { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
-    3 4 point.new
-    { 2 * } point-x-do point.x
+    3 4 point
+    { 2 * } point-x-do point-x
   `)
   t.is(stack.count, 1)
   const y = stack.pop()
@@ -76,17 +76,17 @@ test('datadef can define union types with a union typecheck', async (t) => {
       Euclid: (x :Num, y :Num)
       Polar: (theta :Num, magnitude :Num)
     ] datadef
-    1 2 euclid.new
+    1 2 euclid
     point?
-    45 2 polar.new
+    45 2 polar
     point?
-    1 2 euclid.new
+    1 2 euclid
     euclid?
-    45 2 polar.new
+    45 2 polar
     polar?
-    1 2 euclid.new
+    1 2 euclid
     polar?
-    45 2 polar.new
+    45 2 polar
     euclid?
   `)
   t.is(stack.count, 6)
@@ -102,11 +102,11 @@ test('types defined by datadef can be used for params and are checked', async (t
   const { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
     test: (x :Point -> :Point) {
-      x point.x 1 +
-      x point.y 1 +
-      point.new
+      x point-x 1 +
+      x point-y 1 +
+      point
     } fun
-    1 2 point.new
+    1 2 point
     test point?
     "hello" point?
   `)
@@ -116,7 +116,7 @@ test('types defined by datadef can be used for params and are checked', async (t
   await throwsErrorMessage(t, () => execute(`
     Point: (x :Num, y :Num) datadef
     test: (x :Point -> :Point) { 3 } fun
-    1 2 point.new test
+    1 2 point test
   `), checkErrorMessage('Expected return value 1 to be of type :Point but got incompatible type :Int'))
 
   await throwsErrorMessage(t, () => execute(`
