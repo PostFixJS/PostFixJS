@@ -1,31 +1,35 @@
 const { format } = require('./impl/format')
 const types = require('../types')
+const { popOperand, popOperands } = require('../typeCheck')
 
 module.exports.trim = {
   name: 'trim',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Str(interpreter._stack.popString().value.trim()))
+  execute (interpreter, token) {
+    const str = popOperand(interpreter, { type: 'Str' }, token)
+    interpreter._stack.push(new types.Str(str.value.trim()))
   }
 }
 
 module.exports.lowerCase = {
   name: 'lower-case',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Str(interpreter._stack.popString().value.toLowerCase()))
+  execute (interpreter, token) {
+    const str = popOperand(interpreter, { type: 'Str' }, token)
+    interpreter._stack.push(new types.Str(str.value.toLowerCase()))
   }
 }
 
 module.exports.upperCase = {
   name: 'upper-case',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Str(interpreter._stack.popString().value.toUpperCase()))
+  execute (interpreter, token) {
+    const str = popOperand(interpreter, { type: 'Str' }, token)
+    interpreter._stack.push(new types.Str(str.value.toUpperCase()))
   }
 }
 
 module.exports.strToChars = {
   name: 'str->chars',
-  execute (interpreter) {
-    const str = interpreter._stack.popString()
+  execute (interpreter, token) {
+    const str = popOperand(interpreter, { type: 'Str' }, token)
     const charCodes = []
     for (let i = 0; i < str.value.length; i++) {
       charCodes.push(new types.Int(str.value.charCodeAt(i)))
@@ -37,11 +41,7 @@ module.exports.strToChars = {
 module.exports.charsToStr = {
   name: 'chars->str',
   execute (interpreter, token) {
-    const chars = interpreter._stack.pop()
-    if (!(chars instanceof types.Arr)) {
-      throw new types.Err(`chars->str expects an :Arr with :Int values but got ${chars.getTypeName()} instead`, token)
-    }
-
+    const chars = popOperand(interpreter, { type: 'Arr' }, token)
     let str = ''
     for (const char of chars.items) {
       if (!(char instanceof types.Int)) {
@@ -56,48 +56,57 @@ module.exports.charsToStr = {
 
 module.exports.charToStr = {
   name: 'char->str',
-  execute (interpreter) {
-    interpreter._stack.push(new types.Str(String.fromCharCode(interpreter._stack.pop().value)))
+  execute (interpreter, token) {
+    const char = popOperand(interpreter, { type: 'Int' }, token)
+    interpreter._stack.push(new types.Str(String.fromCharCode(char)))
   }
 }
 
 module.exports.split = {
   name: 'split',
-  execute (interpreter) {
-    const regex = new RegExp(interpreter._stack.popString().value)
-    const str = interpreter._stack.popString().value
-    interpreter._stack.push(new types.Arr(str.split(regex).map((part) => new types.Str(part))))
+  execute (interpreter, token) {
+    const [str, regexStr] = popOperands(interpreter, [
+      { type: 'Str', name: 'string' },
+      { type: 'Str', name: 'regex' }
+    ], token)
+    const regex = new RegExp(regexStr.value)
+    interpreter._stack.push(new types.Arr(str.value.split(regex).map((part) => new types.Str(part))))
   }
 }
 
 module.exports.replaceFirst = {
   name: 'replace-first',
-  execute (interpreter) {
-    const replaceWith = interpreter._stack.popString().value
-    const regex = new RegExp(interpreter._stack.popString().value)
-    const str = interpreter._stack.popString().value
-    interpreter._stack.push(new types.Str(str.replace(regex, replaceWith)))
+  execute (interpreter, token) {
+    const [str, regexStr, replaceWith] = popOperands(interpreter, [
+      { type: 'Str', name: 'string' },
+      { type: 'Str', name: 'regex' },
+      { type: 'Str', name: 'replaceWith' }
+    ], token)
+    const regex = new RegExp(regexStr.value)
+    interpreter._stack.push(new types.Str(str.value.replace(regex, replaceWith.value)))
   }
 }
 
 module.exports.replaceAll = {
   name: 'replace-all',
-  execute (interpreter) {
-    const replaceWith = interpreter._stack.popString().value
-    const regex = new RegExp(interpreter._stack.popString().value, 'g')
-    const str = interpreter._stack.popString().value
-    interpreter._stack.push(new types.Str(str.replace(regex, replaceWith)))
+  execute (interpreter, token) {
+    const [str, regexStr, replaceWith] = popOperands(interpreter, [
+      { type: 'Str', name: 'string' },
+      { type: 'Str', name: 'regex' },
+      { type: 'Str', name: 'replaceWith' }
+    ], token)
+    const regex = new RegExp(regexStr.value, 'g')
+    interpreter._stack.push(new types.Str(str.value.replace(regex, replaceWith.value)))
   }
 }
 
 module.exports.format = {
   name: 'format',
   execute (interpreter, token) {
-    const params = interpreter._stack.pop()
-    if (!(params instanceof types.Arr)) {
-      throw new types.Err(`format expects an :Arr with parameters as second argument but got ${params.getTypeName()} instead`, token)
-    }
-    const formatStr = interpreter._stack.popString().value
-    interpreter._stack.push(new types.Str(format(formatStr, params)))
+    const [formatStr, params] = popOperands(interpreter, [
+      { type: 'Str', name: 'formatStr' },
+      { type: 'Arr', name: 'params' }
+    ], token)
+    interpreter._stack.push(new types.Str(format(formatStr.value, params)))
   }
 }
