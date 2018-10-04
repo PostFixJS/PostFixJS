@@ -335,6 +335,12 @@ test('insert inserts a character into a string', async (t) => {
   t.is(stack.pop().value, 'teAst')
 })
 
+test('insert inserts a string into a string', async (t) => {
+  const { stack } = await execute('"ac" 1 " b " insert')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 'a b c')
+})
+
 test('array creates an array with a given length and initial value', async (t) => {
   const { stack } = await execute('5 "test" array')
   t.is(stack.count, 1)

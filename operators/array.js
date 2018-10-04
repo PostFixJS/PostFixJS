@@ -447,11 +447,14 @@ module.exports.insert = {
         throw new types.Err(`Index ${index.value} is out of range from 0 to ${arrOrStr.items.length}`, token)
       }
     } else if (arrOrStr instanceof types.Str) {
-      if (!(obj instanceof types.Int)) {
-        throw new types.Err(`insert expects a character (:Int) to insert into the string but got ${obj.getTypeName()} instead`, token)
-      }
       if (index.value >= 0 && index.value <= arrOrStr.value.length) {
-        interpreter._stack.push(new types.Str(`${arrOrStr.value.substr(0, index.value)}${String.fromCharCode(obj.value)}${arrOrStr.value.substr(index)}`))
+        if (obj instanceof types.Int) {
+          interpreter._stack.push(new types.Str(`${arrOrStr.value.substr(0, index.value)}${String.fromCharCode(obj.value)}${arrOrStr.value.substr(index)}`))
+        } else if (obj instanceof types.Str) {
+          interpreter._stack.push(new types.Str(`${arrOrStr.value.substr(0, index.value)}${obj.value}${arrOrStr.value.substr(index)}`))
+        } else {
+          throw new types.Err(`insert expects a character (:Int) or a :Str to insert into the string but got ${obj.getTypeName()} instead`, token)
+        }
       } else {
         throw new types.Err(`Index ${index.value} is out of range from 0 to ${arrOrStr.value.length}`, token)
       }
