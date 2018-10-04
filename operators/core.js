@@ -1,5 +1,5 @@
 const types = require('../types')
-const { popOperands, popOperand } = require('../typeCheck')
+const { popOperand } = require('../typeCheck')
 
 module.exports.err = {
   name: 'err',

@@ -1,20 +1,18 @@
 const types = require('../types')
-const { checkOperands, popOperand } = require('../typeCheck')
+const { checkOperands, popOperand, popOperands } = require('../typeCheck')
 
 module.exports.plus = {
   name: '+',
   execute (interpreter, token) {
-    const a = interpreter._stack.pop()
-    const b = interpreter._stack.pop()
-    checkOperands([
-      { value: a, type: ['Num', 'Str', 'Arr'] },
-      { value: b, type: ['Num', 'Str', 'Arr'] }
+    const [a, b] = popOperands(interpreter, [
+      { type: ['Num', 'Str', 'Arr'] },
+      { type: ['Num', 'Str', 'Arr'] }
     ], token)
 
     if (a instanceof types.Str && b instanceof types.Str) {
-      interpreter._stack.push(new types.Str(b.value + a.value))
+      interpreter._stack.push(new types.Str(a.value + b.value))
     } else if (a instanceof types.Arr && b instanceof types.Arr) {
-      interpreter._stack.push(new types.Arr([...b.items, ...a.items]))
+      interpreter._stack.push(new types.Arr([...a.items, ...b.items]))
     } else if (a instanceof types.Num && b instanceof types.Num) {
       if (a instanceof types.Flt || b instanceof types.Flt) {
         interpreter._stack.push(new types.Flt(b.value + a.value))
@@ -22,7 +20,7 @@ module.exports.plus = {
         interpreter._stack.push(new types.Int(b.value + a.value))
       }
     } else {
-      throw new types.Err(`+ can only add numbers and concatenate strings or arrays, but got ${b.getTypeName()} and ${a.getTypeName()}`, token)
+      throw new types.Err(`+ can only add numbers and concatenate strings or arrays, but got ${a.getTypeName()} and ${b.getTypeName()}`, token)
     }
   }
 }
@@ -30,11 +28,9 @@ module.exports.plus = {
 module.exports.minus = {
   name: '-',
   execute (interpreter, token) {
-    const b = interpreter._stack.pop()
-    const a = interpreter._stack.pop()
-    checkOperands([
-      { value: a, type: ['Int', 'Flt'] },
-      { value: b, type: ['Int', 'Flt'] }
+    const [a, b] = popOperands(interpreter, [
+      { type: ['Int', 'Flt'] },
+      { type: ['Int', 'Flt'] }
     ], token)
 
     if (a instanceof types.Flt || b instanceof types.Flt) {
@@ -48,11 +44,9 @@ module.exports.minus = {
 module.exports.multiply = {
   name: '*',
   execute (interpreter, token) {
-    const b = interpreter._stack.pop()
-    const a = interpreter._stack.pop()
-    checkOperands([
-      { value: a, type: ['Int', 'Flt'] },
-      { value: b, type: ['Int', 'Flt'] }
+    const [a, b] = popOperands(interpreter, [
+      { type: ['Int', 'Flt'] },
+      { type: ['Int', 'Flt'] }
     ], token)
 
     if (a instanceof types.Flt || b instanceof types.Flt) {
@@ -66,11 +60,9 @@ module.exports.multiply = {
 module.exports.divide = {
   name: '/',
   execute (interpreter, token) {
-    const b = interpreter._stack.pop()
-    const a = interpreter._stack.pop()
-    checkOperands([
-      { value: a, type: ['Int', 'Flt'] },
-      { value: b, type: ['Int', 'Flt'] }
+    const [a, b] = popOperands(interpreter, [
+      { type: ['Int', 'Flt'] },
+      { type: ['Int', 'Flt'] }
     ], token)
 
     interpreter._stack.push(new types.Flt(a.value / b.value))
@@ -80,11 +72,9 @@ module.exports.divide = {
 module.exports.intDivide = {
   name: 'i/',
   execute (interpreter, token) {
-    const b = interpreter._stack.pop()
-    const a = interpreter._stack.pop()
-    checkOperands([
-      { value: a, type: ['Int', 'Flt'] },
-      { value: b, type: ['Int', 'Flt'] }
+    const [a, b] = popOperands(interpreter, [
+      { type: ['Int', 'Flt'] },
+      { type: ['Int', 'Flt'] }
     ], token)
 
     interpreter._stack.push(new types.Int(Math.floor(a.value / b.value)))
