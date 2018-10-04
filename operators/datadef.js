@@ -2,8 +2,8 @@ const types = require('../types')
 
 module.exports.datadef = {
   name: 'datadef',
-  execute (interpreter, token) {
-    const definition = interpreter._stack.pop()
+  * execute (interpreter, token) {
+    let definition = interpreter._stack.pop()
     const nameArg = interpreter._stack.pop()
 
     if (!(nameArg instanceof types.Sym)) {
@@ -17,6 +17,14 @@ module.exports.datadef = {
     if (definition instanceof types.Params) {
       defineStruct(interpreter, definition, name)
     } else if (definition instanceof types.Arr) {
+      if (definition instanceof types.ExeArr) {
+        // convert the :ExeArr to :Arr by executing it
+        yield * interpreter.executeObj(new types.Marker('ArrOpen'))
+        yield * interpreter.executeObj(definition)
+        yield * interpreter.executeObj(new types.Marker('ArrClose'))
+        definition = interpreter._stack.pop()
+      }
+
       if (definition.items.length === 0) {
         throw new types.Err('The datadef union type definition does not contain any variants', token)
       }

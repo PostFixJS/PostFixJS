@@ -98,6 +98,21 @@ test('datadef can define union types with a union typecheck', async (t) => {
   t.is(stack.pop().value, true, 'euclid should be a point')
 })
 
+test('datadef can define union types with :ExeArr syntax', async (t) => {
+  let { stack, dictStack } = await execute(`
+    Point: {
+      Euclid: (x :Num, y :Num)
+      Polar: (theta :Num, magnitude :Num)
+    } datadef
+
+    1 2 euclid point?
+  `)
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, true)
+  const constructor = dictStack.get('point?')
+  t.true(constructor instanceof types.Lam)
+})
+
 test('types defined by datadef can be used for params and are checked', async (t) => {
   const { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
