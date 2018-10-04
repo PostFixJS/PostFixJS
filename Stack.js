@@ -1,5 +1,4 @@
 const InvalidStackAccessError = require('./InvalidStackAccessError')
-const types = require('./types')
 
 class Stack {
   constructor () {
@@ -35,10 +34,6 @@ class Stack {
       values.push(value)
     } while (!condition(value))
     return values.reverse()
-  }
-
-  popString () {
-    return this._assertType(this.pop(), 'Str')
   }
 
   peek (i = 0) {
@@ -79,13 +74,6 @@ class Stack {
    */
   getElements () {
     return this._stack
-  }
-
-  _assertType (obj, ...expectedTypes) {
-    if (!expectedTypes.some((t) => obj instanceof types[t])) {
-      throw new types.Err(`Expected ${expectedTypes.join(' or ')} but got ${obj.getTypeName()}`, obj.origin)
-    }
-    return obj
   }
 
   /**
