@@ -102,7 +102,7 @@ test('vref should throw if the reference is not found', async (t) => {
 })
 
 test('vref should throw if no symbol is provided', async (t) => {
-  await throwsErrorMessage(t, () => execute(`1 vref`), checkErrorMessage('vref expected :Sym but got :Int'))
+  await throwsErrorMessage(t, () => execute(`1 vref`), checkErrorMessage('Expected operand 1 to be :Sym but got :Int instead'))
 })
 
 test('exec should execute nested ExeArrs', async (t) => {

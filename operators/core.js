@@ -1,9 +1,11 @@
 const types = require('../types')
+const { popOperands, popOperand } = require('../typeCheck')
 
 module.exports.err = {
   name: 'err',
   execute (interpreter, token) {
-    throw new types.Err(interpreter._stack.pop().value, token)
+    const message = popOperand(interpreter, { type: 'Str' }, token)
+    throw new types.Err(message.value, token)
   }
 }
 
@@ -17,6 +19,7 @@ module.exports.exec = {
 module.exports.fun = {
   name: 'fun',
   execute (interpreter) {
+    // TODO parameter type check
     const body = interpreter._stack.pop()
     let params = null
     if (interpreter._stack.peek() instanceof types.Params) {
@@ -35,6 +38,7 @@ module.exports.fun = {
 module.exports.lam = {
   name: 'lam',
   execute (interpreter) {
+    // TODO parameter type check
     const body = interpreter._stack.pop()
     let params = null
     if (interpreter._stack.accessibleCount > 0 && interpreter._stack.peek() instanceof types.Params) {
@@ -74,28 +78,20 @@ module.exports.updateLam = {
 module.exports.popv = {
   name: 'popv',
   * execute (interpreter, token) {
-    const params = interpreter._stack.pop()
-    if (params instanceof types.Params) {
-      yield * params.bind(interpreter)
-    } else {
-      throw new types.Err(`popv expected :Params but got ${params.getTypeName()}`, token)
-    }
+    const params = popOperand(interpreter, { type: 'Params' }, token)
+    yield * params.bind(interpreter)
   }
 }
 
 module.exports.vref = {
   name: 'vref',
   execute (interpreter, token) {
-    const sym = interpreter._stack.pop()
-    if (sym instanceof types.Sym) {
-      const ref = interpreter._dictStack.get(sym.name)
-      if (ref) {
-        interpreter._stack.push(ref)
-      } else {
-        throw new types.Err(`Could not find ${sym.name} in the dictionary`, token)
-      }
+    const sym = popOperand(interpreter, { type: 'Sym' }, token)
+    const ref = interpreter._dictStack.get(sym.name)
+    if (ref) {
+      interpreter._stack.push(ref)
     } else {
-      throw new types.Err(`vref expected :Sym but got ${sym.getTypeName()}`, token)
+      throw new types.Err(`Could not find ${sym.name} in the dictionary`, token)
     }
   }
 }
