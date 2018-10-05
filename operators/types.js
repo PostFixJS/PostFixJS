@@ -17,49 +17,49 @@ module.exports.type = {
 module.exports.isArr = {
   name: 'arr?',
   execute (interpreter) {
-    interpreter._stack.push(new types.Bool(interpreter._stack.pop() instanceof types.Arr))
+    interpreter._stack.push(types.Bool.valueOf(interpreter._stack.pop() instanceof types.Arr))
   }
 }
 
 module.exports.isBool = {
   name: 'bool?',
   execute (interpreter) {
-    interpreter._stack.push(new types.Bool(interpreter._stack.pop() instanceof types.Bool))
+    interpreter._stack.push(types.Bool.valueOf(interpreter._stack.pop() instanceof types.Bool))
   }
 }
 
 module.exports.isExeArr = {
   name: 'exearr?',
   execute (interpreter) {
-    interpreter._stack.push(new types.Bool(interpreter._stack.pop() instanceof types.ExeArr))
+    interpreter._stack.push(types.Bool.valueOf(interpreter._stack.pop() instanceof types.ExeArr))
   }
 }
 
 module.exports.isFlt = {
   name: 'flt?',
   execute (interpreter) {
-    interpreter._stack.push(new types.Bool(interpreter._stack.pop() instanceof types.Flt))
+    interpreter._stack.push(types.Bool.valueOf(interpreter._stack.pop() instanceof types.Flt))
   }
 }
 
 module.exports.isInt = {
   name: 'int?',
   execute (interpreter) {
-    interpreter._stack.push(new types.Bool(interpreter._stack.pop() instanceof types.Int))
+    interpreter._stack.push(types.Bool.valueOf(interpreter._stack.pop() instanceof types.Int))
   }
 }
 
 module.exports.isNil = {
   name: 'nil?',
   execute (interpreter) {
-    interpreter._stack.push(new types.Bool(interpreter._stack.pop() instanceof types.Nil))
+    interpreter._stack.push(types.Bool.valueOf(interpreter._stack.pop() instanceof types.Nil))
   }
 }
 
 module.exports.isNum = {
   name: 'num?',
   execute (interpreter) {
-    interpreter._stack.push(new types.Bool(interpreter._stack.pop() instanceof types.Num))
+    interpreter._stack.push(types.Bool.valueOf(interpreter._stack.pop() instanceof types.Num))
   }
 }
 
@@ -68,28 +68,28 @@ module.exports.isObj = {
   execute (interpreter) {
     const value = interpreter._stack.pop()
     // although Nil inherits from Obj, it is not an Obj in PostFix
-    interpreter._stack.push(new types.Bool(!(value instanceof types.Nil) && value instanceof types.Obj))
+    interpreter._stack.push(types.Bool.valueOf(!(value instanceof types.Nil) && value instanceof types.Obj))
   }
 }
 
 module.exports.isParams = {
   name: 'params?',
   execute (interpreter) {
-    interpreter._stack.push(new types.Bool(interpreter._stack.pop() instanceof types.Params))
+    interpreter._stack.push(types.Bool.valueOf(interpreter._stack.pop() instanceof types.Params))
   }
 }
 
 module.exports.isStr = {
   name: 'str?',
   execute (interpreter) {
-    interpreter._stack.push(new types.Bool(interpreter._stack.pop() instanceof types.Str))
+    interpreter._stack.push(types.Bool.valueOf(interpreter._stack.pop() instanceof types.Str))
   }
 }
 
 module.exports.isSym = {
   name: 'sym?',
   execute (interpreter) {
-    interpreter._stack.push(new types.Bool(interpreter._stack.pop() instanceof types.Sym))
+    interpreter._stack.push(types.Bool.valueOf(interpreter._stack.pop() instanceof types.Sym))
   }
 }
 
@@ -113,10 +113,10 @@ module.exports.toFlt = {
       if (!isNaN(fltValue)) {
         interpreter._stack.push(new types.Flt(fltValue))
       } else {
-        interpreter._stack.push(new types.Nil())
+        interpreter._stack.push(types.Nil.nil)
       }
     } else {
-      interpreter._stack.push(new types.Nil())
+      interpreter._stack.push(types.Nil.nil)
     }
   }
 }
@@ -134,10 +134,10 @@ module.exports.toInt = {
       if (!isNaN(intValue)) {
         interpreter._stack.push(new types.Int(intValue))
       } else {
-        interpreter._stack.push(new types.Nil())
+        interpreter._stack.push(types.Nil.nil)
       }
     } else {
-      interpreter._stack.push(new types.Nil())
+      interpreter._stack.push(types.Nil.nil)
     }
   }
 }

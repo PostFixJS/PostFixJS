@@ -352,10 +352,10 @@ module.exports.find = {
 
     if (arrOrStr instanceof types.Arr) {
       const index = arrOrStr.items.findIndex((obj) => isEqual(obj, value))
-      interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
+      interpreter._stack.push(index >= 0 ? new types.Int(index) : types.Nil.nil)
     } else if (arrOrStr instanceof types.Str) {
       const index = arrOrStr.value.indexOf(value instanceof types.Str ? value.value : value.toString())
-      interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
+      interpreter._stack.push(index >= 0 ? new types.Int(index) : types.Nil.nil)
     }
   }
 }
@@ -371,10 +371,10 @@ module.exports.findFrom = {
 
     if (arrOrStr instanceof types.Arr) {
       const index = arrOrStr.items.findIndex((obj, i) => i >= startIndex.value && isEqual(obj, value))
-      interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
+      interpreter._stack.push(index >= 0 ? new types.Int(index) : types.Nil.nil)
     } else if (arrOrStr instanceof types.Str) {
       const index = arrOrStr.value.indexOf(value instanceof types.Str ? value.value : value.toString(), startIndex.value)
-      interpreter._stack.push(index >= 0 ? new types.Int(index) : new types.Nil())
+      interpreter._stack.push(index >= 0 ? new types.Int(index) : types.Nil.nil)
     }
   }
 }
@@ -388,9 +388,9 @@ module.exports.contains = {
     ], token)
 
     if (arrOrStr instanceof types.Arr) {
-      interpreter._stack.push(new types.Bool(arrOrStr.items.some((obj) => isEqual(obj, value))))
+      interpreter._stack.push(types.Bool.valueOf(arrOrStr.items.some((obj) => isEqual(obj, value))))
     } else if (arrOrStr instanceof types.Str) {
-      interpreter._stack.push(new types.Bool(arrOrStr.value.includes(value instanceof types.Str ? value.value : value.toString())))
+      interpreter._stack.push(types.Bool.valueOf(arrOrStr.value.includes(value instanceof types.Str ? value.value : value.toString())))
     }
   }
 }

@@ -101,11 +101,11 @@ module.exports.isEmpty = {
   execute (interpreter) {
     const obj = interpreter._stack.pop()
     if (obj instanceof types.Arr) {
-      interpreter._stack.push(new types.Bool(obj.items.length === 0))
+      interpreter._stack.push(types.Bool.valueOf(obj.items.length === 0))
     } else if (obj instanceof types.Nil) {
-      interpreter._stack.push(new types.Bool(true))
+      interpreter._stack.push(types.Bool.true)
     } else {
-      interpreter._stack.push(new types.Bool(false))
+      interpreter._stack.push(types.Bool.false)
     }
   }
 }

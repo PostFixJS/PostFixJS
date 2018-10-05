@@ -11,28 +11,28 @@ function compareTop (interpreter, token) {
 module.exports.lessThan = {
   name: '<',
   execute (interpreter, token) {
-    interpreter._stack.push(new types.Bool(compareTop(interpreter, token) < 0))
+    interpreter._stack.push(types.Bool.valueOf(compareTop(interpreter, token) < 0))
   }
 }
 
 module.exports.lessThanOrEqual = {
   name: '<=',
   execute (interpreter, token) {
-    interpreter._stack.push(new types.Bool(compareTop(interpreter, token) <= 0))
+    interpreter._stack.push(types.Bool.valueOf(compareTop(interpreter, token) <= 0))
   }
 }
 
 module.exports.greaterThan = {
   name: '>',
   execute (interpreter, token) {
-    interpreter._stack.push(new types.Bool(compareTop(interpreter, token) > 0))
+    interpreter._stack.push(types.Bool.valueOf(compareTop(interpreter, token) > 0))
   }
 }
 
 module.exports.greaterThanOrEqual = {
   name: '>=',
   execute (interpreter, token) {
-    interpreter._stack.push(new types.Bool(compareTop(interpreter, token) >= 0))
+    interpreter._stack.push(types.Bool.valueOf(compareTop(interpreter, token) >= 0))
   }
 }
 
@@ -41,7 +41,7 @@ module.exports.equal = {
   execute (interpreter) {
     const a = interpreter._stack.pop()
     const b = interpreter._stack.pop()
-    interpreter._stack.push(new types.Bool(isEqual(a, b)))
+    interpreter._stack.push(types.Bool.valueOf(isEqual(a, b)))
   }
 }
 
@@ -50,7 +50,7 @@ module.exports.notEqual = {
   execute (interpreter) {
     const a = interpreter._stack.pop()
     const b = interpreter._stack.pop()
-    interpreter._stack.push(new types.Bool(!isEqual(a, b)))
+    interpreter._stack.push(types.Bool.valueOf(!isEqual(a, b)))
   }
 }
 
@@ -62,7 +62,7 @@ module.exports.approxEqual = {
       { name: 'b' },
       { name: 'tolerance', type: 'Num' }
     ], token)
-    interpreter._stack.push(new types.Bool(isApproxEqual(a, b, tolerance.value)))
+    interpreter._stack.push(types.Bool.valueOf(isApproxEqual(a, b, tolerance.value)))
   }
 }
 
@@ -74,6 +74,6 @@ module.exports.notApproxEqual = {
       { name: 'b' },
       { name: 'tolerance', type: 'Num' }
     ], token)
-    interpreter._stack.push(new types.Bool(!isApproxEqual(a, b, tolerance.value)))
+    interpreter._stack.push(types.Bool.valueOf(!isApproxEqual(a, b, tolerance.value)))
   }
 }
