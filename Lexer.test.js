@@ -7,7 +7,9 @@ test('The lexer Lexer.parses PostFix code', t => {
     token: '2',
     tokenType: 'INTEGER',
     line: 0,
-    col: 0
+    col: 0,
+    endLine: 0,
+    endCol: 1
   })
 })
 
@@ -20,7 +22,9 @@ test('The lexer handles comments', t => {
     token: '42',
     tokenType: 'INTEGER',
     line: 0,
-    col: 0
+    col: 0,
+    endLine: 0,
+    endCol: 2
   }])
 })
 
@@ -34,7 +38,9 @@ test`)
     token: 'test',
     tokenType: 'REFERENCE',
     line: 4,
-    col: 0
+    col: 0,
+    endLine: 4,
+    endCol: 4
   }])
 })
 
@@ -49,7 +55,9 @@ test('The lexer handles nested multiline comments correctly', t => {
     token: 'test',
     tokenType: 'REFERENCE',
     line: 5,
-    col: 5
+    col: 5,
+    endLine: 5,
+    endCol: 9
   }])
 })
 
@@ -59,17 +67,23 @@ test('The lexer inserts a get token when using the . operator', t => {
     token: 'object',
     tokenType: 'REFERENCE',
     line: 0,
-    col: 0
+    col: 0,
+    endLine: 0,
+    endCol: 6
   }, {
     token: 'property',
     tokenType: 'REFERENCE',
     line: 0,
-    col: 8
+    col: 8,
+    endLine: 0,
+    endCol: 16
   }, {
     token: 'get',
     tokenType: 'REFERENCE',
     line: 0,
     col: 7,
+    endLine: 0,
+    endCol: 8,
     generated: true,
     generatedReason: 'DOT_SUGAR'
   }])
@@ -81,7 +95,9 @@ test('The lexer handles escaped quotes properly', t => {
     token: '"hello \\"world\\""',
     tokenType: 'STRING',
     col: 0,
-    line: 0
+    line: 0,
+    endCol: 17,
+    endLine: 0
   }])
 })
 
@@ -90,51 +106,69 @@ test('Brackets are self-delimiting tokens', t => {
     token: '[',
     tokenType: 'ARR_START',
     col: 0,
-    line: 0
+    line: 0,
+    endCol: 1,
+    endLine: 0
   }, {
     token: '42',
     tokenType: 'INTEGER',
     col: 1,
-    line: 0
+    line: 0,
+    endCol: 3,
+    endLine: 0
   }, {
     token: ']',
     tokenType: 'ARR_END',
     col: 3,
-    line: 0
+    line: 0,
+    endCol: 4,
+    endLine: 0
   }])
 
   t.deepEqual(Lexer.parse('( 42)'), [{
     token: '(',
     tokenType: 'PARAM_LIST_START',
     col: 0,
-    line: 0
+    line: 0,
+    endCol: 1,
+    endLine: 0
   }, {
     token: '42',
     tokenType: 'INTEGER',
     col: 2,
-    line: 0
+    line: 0,
+    endCol: 4,
+    endLine: 0
   }, {
     token: ')',
     tokenType: 'PARAM_LIST_END',
     col: 4,
-    line: 0
+    line: 0,
+    endCol: 5,
+    endLine: 0
   }])
 
   t.deepEqual(Lexer.parse('{42 }'), [{
     token: '{',
     tokenType: 'EXEARR_START',
     col: 0,
-    line: 0
+    line: 0,
+    endCol: 1,
+    endLine: 0
   }, {
     token: '42',
     tokenType: 'INTEGER',
     col: 1,
-    line: 0
+    line: 0,
+    endCol: 3,
+    endLine: 0
   }, {
     token: '}',
     tokenType: 'EXEARR_END',
     col: 4,
-    line: 0
+    line: 0,
+    endCol: 5,
+    endLine: 0
   }])
 })
 
@@ -143,21 +177,27 @@ test('The lexer parses scientific notation', async (t) => {
     token: '7e-8',
     tokenType: 'FLOAT',
     col: 0,
-    line: 0
+    line: 0,
+    endCol: 4,
+    endLine: 0
   }])
 
   t.deepEqual(Lexer.parse('7e+8'), [{
     token: '7e+8',
     tokenType: 'INTEGER',
     col: 0,
-    line: 0
+    line: 0,
+    endCol: 4,
+    endLine: 0
   }])
 
   t.deepEqual(Lexer.parse('7e8'), [{
     token: '7e8',
     tokenType: 'INTEGER',
     col: 0,
-    line: 0
+    line: 0,
+    endCol: 3,
+    endLine: 0
   }])
 })
 
@@ -166,12 +206,16 @@ test('The lexer emits tokens for line comments when emitComments is true', async
     token: '42',
     tokenType: 'INTEGER',
     col: 0,
-    line: 0
+    line: 0,
+    endCol: 2,
+    endLine: 0
   }, {
     token: '# answer to all questions',
     tokenType: 'LINE_COMMENT',
     col: 3,
-    line: 0
+    line: 0,
+    endCol: 28,
+    endLine: 0
   }])
 })
 
@@ -180,12 +224,16 @@ test('The lexer emits tokens for block comments when emitComments is true', asyn
     token: '42',
     tokenType: 'INTEGER',
     col: 0,
-    line: 0
+    line: 0,
+    endCol: 2,
+    endLine: 0
   }, {
     token: '#< this is a\nmulti-line\n#< nested >#\nblock comment >#',
     tokenType: 'BLOCK_COMMENT',
     col: 3,
-    line: 0
+    line: 0,
+    endCol: 16,
+    endLine: 3
   }])
 })
 
@@ -194,7 +242,9 @@ test('The lexer emitted block comment tokens end where the comment ends', async 
     token: '#< test >#',
     tokenType: 'BLOCK_COMMENT',
     col: 1,
-    line: 1
+    line: 1,
+    endCol: 11,
+    endLine: 1
   })
 })
 
@@ -203,6 +253,8 @@ test('The lexer parses nil properly', async (t) => {
     token: 'nil',
     tokenType: 'NIL',
     col: 0,
-    line: 0
+    line: 0,
+    endCol: 3,
+    endLine: 0
   })
 })

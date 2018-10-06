@@ -60,9 +60,13 @@ class Lexer {
             token += this.peek
             if (this.peek === '<') {
               // block comment
+              let tokenEndLine
+              let tokenEndCol
               let prev = this.peek
               let levels = 1
               while (this._readch()) {
+                tokenEndCol = this.col
+                tokenEndLine = this.row
                 token += this.peek
                 if (prev === '>' && this.peek === '#') {
                   levels--
@@ -85,7 +89,9 @@ class Lexer {
                 token,
                 tokenType: 'BLOCK_COMMENT',
                 col: tokenCol,
-                line: tokenLine
+                line: tokenLine,
+                endCol: tokenEndCol,
+                endLine: tokenEndLine
               }
             } else {
               // line comment
@@ -99,7 +105,9 @@ class Lexer {
                 token,
                 tokenType: 'LINE_COMMENT',
                 col: tokenCol,
-                line: tokenLine
+                line: tokenLine,
+                endCol: this.col,
+                endLine: tokenLine
               }
             }
           } else {
@@ -143,15 +151,16 @@ class Lexer {
 
       let insideString = false
       let maskNext = false
-      let oldPeek = this.peek
       let token = ''
 
       if ('{[()]}'.includes(this.peek)) {
         yield {
-          token: oldPeek,
-          tokenType: this.getTokenType(oldPeek),
+          token: this.peek,
+          tokenType: this.getTokenType(this.peek),
           col: tokenCol - 1,
-          line: tokenLine
+          line: tokenLine,
+          endCol: tokenCol,
+          endLine: tokenLine
         }
         continue
       } else if (this.peek === '"') {
@@ -164,6 +173,8 @@ class Lexer {
           tokenType: this.getTokenType('get'),
           col: this.col - 1,
           line: this.row,
+          endCol: this.col,
+          endLine: this.row,
           generated: true,
           generatedReason: 'DOT_SUGAR'
         }
@@ -206,7 +217,9 @@ class Lexer {
           token,
           tokenType: this.getTokenType(token),
           col: tokenCol - 1,
-          line: tokenLine
+          line: tokenLine,
+          endCol: tokenCol + token.length - 1,
+          endLine: tokenLine
         }
 
         // emit the deferred token here, otherwise it would get lost if the input is empty now
@@ -222,7 +235,9 @@ class Lexer {
             token: this.peek,
             tokenType: this.getTokenType(this.peek),
             col: this.col - 1,
-            line: this.row
+            line: this.row,
+            endCol: this.col,
+            endLine: this.row
           }
         }
       }
