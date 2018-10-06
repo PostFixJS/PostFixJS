@@ -78,6 +78,38 @@ class DocParser {
 
     return datadefs
   }
+
+  /**
+   * Get all symbols and related documentation from the given code. Only the first occurence of a symbol is used.
+   * @param {string} code PostFix code
+   * @return {object[]} Symbols with descriptions
+   */
+  static getSymbols (code) {
+    const foundSymbols = new Set()
+    const symbols = []
+    const tokens = Lexer.parse(code, { emitComments: true })
+
+    for (let i = 0; i < tokens.length; i++) {
+      if (tokens[i].tokenType === 'SYMBOL') {
+        const token = tokens[i]
+        const symbolName = normalizeSymbol(token.token)
+        if (!foundSymbols.has(symbolName)) {
+          foundSymbols.add(symbolName)
+          const docToken = tokens[i - 1]
+
+          foundSymbols.add(token.token)
+          symbols.push({
+            name: `:${symbolName}`,
+            description: docToken != null && docToken.tokenType === 'BLOCK_COMMENT' && docToken.endLine === token.line - 1
+              ? parseDocComment(docToken.token).description
+              : undefined
+          })
+        }
+      }
+    }
+
+    return symbols
+  }
 }
 
 function getFunctionAt (tokens, i) {

@@ -518,3 +518,26 @@ test('DocParser does not use block comments that are not in the line above the t
     }]
   }])
 })
+
+test('DocParser finds symbols', (t) => {
+  t.deepEqual(DocParser.getSymbols(`
+    :foo
+    foo:
+
+    #< Bar >#
+    bar:
+
+    #< unrelated comment >#
+
+    :buzz
+  `), [{
+    name: ':foo',
+    description: undefined
+  }, {
+    name: ':bar',
+    description: 'Bar'
+  }, {
+    name: ':buzz',
+    description: undefined
+  }])
+})
