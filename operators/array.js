@@ -491,7 +491,7 @@ module.exports.array = {
 module.exports.sort = {
   name: 'sort',
   execute (interpreter, token) {
-    const array = popOperand(interpreter, { type: 'Arr' }, token).copy()
+    const array = popOperand(interpreter, { type: 'Arr' }, token)
     const sortedArray = array.copy()
     sortedArray.items.sort((a, b) => compare(a, b, token))
     interpreter._stack.push(sortedArray)
