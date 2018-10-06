@@ -83,7 +83,9 @@ class DocParser {
 function getFunctionAt (tokens, i) {
   const fn = {}
   let doc
+  let docToken
   if (tokens[i] && tokens[i].tokenType === 'BLOCK_COMMENT') {
+    docToken = tokens[i]
     doc = parseDocComment(tokens[i].token)
     fn.description = doc.description
     i++
@@ -93,8 +95,14 @@ function getFunctionAt (tokens, i) {
   }
 
   if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
-    const token = tokens[i].token
-    fn.name = normalizeSymbol(token)
+    const token = tokens[i]
+    fn.name = normalizeSymbol(token.token)
+
+    if (docToken != null && docToken.endLine !== token.line - 1) {
+      // ignore doc comments that are not in the line over the function symbol
+      fn.description = undefined
+      doc = { params: {}, returns: [] }
+    }
   }
   i++
   const params = readParamsList(tokens, i)
@@ -123,21 +131,25 @@ function getFunctionAt (tokens, i) {
 
 function getVariableAt (tokens, i) {
   const variable = {}
-  let doc
+  let docToken
   if (tokens[i] && tokens[i].tokenType === 'BLOCK_COMMENT') {
-    doc = parseDocComment(tokens[i].token)
-    variable.description = doc.description
+    docToken = tokens[i]
+    variable.description = parseDocComment(tokens[i].token).description
     i++
   } else {
-    doc = { params: {}, returns: [] }
     variable.description = undefined
   }
 
   if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
     // :variableName value !
-    const token = tokens[i].token
-    variable.name = normalizeSymbol(token)
+    const token = tokens[i]
+    variable.name = normalizeSymbol(token.token)
     i++
+
+    if (docToken != null && docToken.endLine !== token.line - 1) {
+      // ignore doc comments that are not in the line over the function symbol
+      variable.description = undefined
+    }
 
     if (i < tokens.length && tokens[i].tokenType === 'DEFINITION') {
       // maybe the value is a symbol, e.g. :foo bar!
@@ -153,6 +165,10 @@ function getVariableAt (tokens, i) {
   }
 
   // value variableName!
+  if (docToken != null && docToken.endLine !== tokens[i].line - 1) {
+    // ignore doc comments that are not in the line over the function symbol
+    variable.description = undefined
+  }
   i = skipElement(tokens, i)
   if (i === false) return false
   if (tokens[i].tokenType === 'DEFINITION') {
@@ -165,17 +181,21 @@ function getVariableAt (tokens, i) {
 
 function getDatadefAt (tokens, i) {
   const datadef = {}
-  let doc
+  let docToken
   if (tokens[i] && tokens[i].tokenType === 'BLOCK_COMMENT') {
-    doc = parseDocComment(tokens[i].token)
-    datadef.description = doc.description
+    docToken = tokens[i]
+    datadef.description = parseDocComment(tokens[i].token).description
     i++
   } else {
-    doc = { fields: [] }
     datadef.description = undefined
   }
 
   if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
+    if (docToken != null && docToken.endLine !== tokens[i].line - 1) {
+      // ignore doc comments that are not in the line over the function symbol
+      datadef.description = undefined
+    }
+
     const token = tokens[i].token
     datadef.name = normalizeSymbol(token, true)
     i++
@@ -207,8 +227,10 @@ function getDatadefAt (tokens, i) {
           datadef.types = []
 
           let next = { description: undefined }
+          let nextDescriptionToken
           for (let i = union.firstToken + 1; i < union.lastToken; i++) {
             if (tokens[i].tokenType === 'BLOCK_COMMENT') {
+              nextDescriptionToken = tokens[i]
               next.description = parseDocComment(tokens[i].token).description
             } else if (tokens[i].tokenType === 'SYMBOL') {
               next.name = normalizeSymbol(tokens[i].token, true)
@@ -223,6 +245,11 @@ function getDatadefAt (tokens, i) {
                   type: param.type,
                   description: param.doc ? parseDocComment(param.doc).description : undefined
                 }))
+
+                if (nextDescriptionToken != null && nextDescriptionToken.endLine !== tokens[i].line - 1) {
+                  // ignore doc comments that are not in the line over the function symbol
+                  next.description = undefined
+                }
 
                 datadef.types.push(next)
                 next = { description: undefined }

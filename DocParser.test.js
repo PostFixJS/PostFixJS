@@ -435,3 +435,86 @@ test('DocParser does not crash on invalid input', (t) => {
   // not a variable declaration, but could be one
   t.deepEqual(DocParser.getVariables(':Test'), [])
 })
+
+test('DocParser does not use block comments that are not in the line above the token that is documented', (t) => {
+  t.deepEqual(DocParser.getVariables(`
+    #<
+    Unrelated documentation
+    >#
+
+    42 foo!
+  `), [{
+    name: 'foo',
+    description: undefined
+  }])
+
+  t.deepEqual(DocParser.getFunctions(`
+    #<
+    Unrelated documentation
+    >#
+
+    test: (x) {} fun
+  `), [{
+    name: 'test',
+    description: undefined,
+    params: [{ name: 'x', type: undefined, description: undefined }],
+    returns: []
+  }])
+
+  t.deepEqual(DocParser.getDatadefs(`
+    #<
+    Unrelated documentation
+    >#
+
+    Point: (
+      #< not the documentation for x >#
+    
+      x :Int,
+      y :Int
+    ) datadef
+  `), [{
+    name: ':Point',
+    description: undefined,
+    type: 'struct',
+    fields: [{
+      name: 'x',
+      type: ':Int',
+      description: undefined
+    }, {
+      name: 'y',
+      type: ':Int',
+      description: undefined
+    }]
+  }])
+
+  t.deepEqual(DocParser.getDatadefs(`
+  #< ignore this >#
+
+  Point: [
+    #< unrelated >#
+
+    Euclid: (
+      x :Num,
+      y :Num
+    )
+  ] datadef
+    `), [{
+    name: ':Point',
+    description: undefined,
+    type: 'union',
+    types: [':Euclid']
+  }, {
+    name: ':Euclid',
+    description: undefined,
+    type: 'struct',
+    fields: [{
+      name: 'x',
+      type: ':Num',
+      description: undefined
+    }, {
+      name: 'y',
+      type: ':Num',
+      description: undefined
+    }]
+  }])
+})

@@ -41,11 +41,15 @@ function parseParamsList (paramsList) {
     } else if (isCommentToken(paramsList[i])) {
       // this is a comment
       if (paramsList[i].tokenType === 'BLOCK_COMMENT') {
-        lastComment = paramsList[i].token
+        lastComment = paramsList[i]
       }
     } else {
       // this is a parameter name
-      params.push({ name: value, type: undefined, doc: lastComment })
+      params.push({
+        name: value,
+        type: undefined,
+        doc: lastComment != null && lastComment.endLine === paramsList[i].line - 1 ? lastComment.token : undefined
+      })
       lastComment = undefined
     }
   }
