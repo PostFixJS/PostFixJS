@@ -52,3 +52,14 @@ test('Reference counting should copy objects from the dict', async (t) => {
   const { stack } = await execute('[0] x! x 1 append x !=')
   t.is(stack.pop().value, true)
 })
+
+test('The interpreter handles escape sequences properly', async (t) => {
+  const { stack } = await execute(`[
+    "\\""  length 1 =
+    "\\\\" length 1 =
+    "\\n"  length 1 =
+    "\\r"  length 1 =
+    "\\t"  length 1 =
+  ]`)
+  t.true(stack.pop().items.every((x) => x.value === true))
+})

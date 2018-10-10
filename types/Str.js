@@ -22,6 +22,9 @@ class Str extends Obj {
     const str = new Str(
       token.token.substr(1, token.token.length - 2)
         .replace(/\\"/g, '"')
+        .replace(/\\n/g, '\n')
+        .replace(/\\r/g, '\r')
+        .replace(/\\t/g, '\t')
         .replace(/\\\\/g, '\\')
     )
     str.origin = token
