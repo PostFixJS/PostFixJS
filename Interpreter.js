@@ -252,13 +252,15 @@ class Interpreter {
       rejectRun = reject
     })
     const step = async () => {
+      let promiseResult
       while (true) {
         try {
-          const { done, value } = stepper.next()
+          const { done, value } = stepper.next(promiseResult)
+          promiseResult = undefined
           if (value && value.promise) {
             cancelPromise.cancel = value.cancel
             try {
-              await value.promise
+              promiseResult = await value.promise
               cancelPromise.cancel = null
               if (token.cancelled) {
                 rejectRun(new Error('Cancelled'))
@@ -331,12 +333,14 @@ class Interpreter {
         token.onCancel(() => reject(new Error('cancelled')))
         const continueExecution = async () => {
           let isDone = false
+          let promiseResult
           while (!isDone) {
             try {
-              const { done, value } = stepper.next()
+              const { done, value } = stepper.next(promiseResult)
+              promiseResult = undefined
               if (value && value.promise) {
                 cancelPromise.cancel = value.cancel
-                await value.promise
+                promiseResult = await value.promise
                 cancelPromise.cancel = null
                 if (token.cancelled) {
                   reject(new Error('Cancelled'))
