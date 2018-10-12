@@ -32,9 +32,28 @@ test('Trying to access the foreign stack in a function with a parameter list sho
   }, (e) => e instanceof types.Err && e.message === 'Stack underflow in function or lambda expression')
 })
 
-test('The interpreter handles excaped quotes properly', async (t) => {
-  const { stack } = await execute('"\\""')
-  t.is(stack.pop().value, '"')
+test('Variables defined while executing a function do not affect the lambda dict', async (t) => {
+  const { stack } = await execute(`
+    1 a!
+    :foo { 2 x! } fun
+    foo
+    :foo vref
+  `)
+  const foo = stack.pop()
+  t.true(foo instanceof types.Lam)
+  t.truthy(foo.dict.a, 'a should be in the lambda dict')
+  t.falsy(foo.dict.x, 'x should not be in the lambda dict')
+})
+
+test('The interpreter handles escape sequences properly', async (t) => {
+  const { stack } = await execute(`[
+    "\\""  length 1 =
+    "\\\\" length 1 =
+    "\\n"  length 1 =
+    "\\r"  length 1 =
+    "\\t"  length 1 =
+  ]`)
+  t.true(stack.pop().items.every((x) => x.value === true))
 })
 
 test('Reference counting should copy arrays before modification', async (t) => {
@@ -53,18 +72,32 @@ test('Reference counting should copy objects from the dict', async (t) => {
   t.is(stack.pop().value, true)
 })
 
-test('The interpreter handles escape sequences properly', async (t) => {
-  const { stack } = await execute(`[
-    "\\""  length 1 =
-    "\\\\" length 1 =
-    "\\n"  length 1 =
-    "\\r"  length 1 =
-    "\\t"  length 1 =
-  ]`)
-  t.true(stack.pop().items.every((x) => x.value === true))
-})
-
 test('It should not be possible to use a number as variable name', async (t) => {
   await throwsErrorMessage(t, () => execute(`"hello" 1!`), checkErrorMessage('Invalid variable name "1"'))
   await throwsErrorMessage(t, () => execute(`42 "hello" !`), checkErrorMessage('Expected operand 1 to be :Sym but got :Int instead'))
+})
+
+test('BinTree example', async (t) => {
+  await execute(`
+    BinTree: {
+      Leaf: ()
+      Node: (value :Num, left :BinTree, right :BinTree)
+    } datadef
+
+    tree-sum: (t :BinTree -> :Num) {
+        { t leaf? } { 0 }
+        { t node? } { 
+            t node-value 
+            t node-left tree-sum + 
+            t node-right tree-sum +
+        }
+    } cond-fun
+    
+    1 leaf leaf node node1!
+    4 leaf leaf node node4!
+    3 leaf node4 node node3!
+    5 node1 node3 node node5!
+
+    node5 tree-sum 13 test=
+  `, t)
 })

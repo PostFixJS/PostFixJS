@@ -27,7 +27,7 @@ class Lam extends ExeArr {
   }
 
   * execute (interpreter) {
-    interpreter._dictStack.pushDict(this.dict)
+    interpreter._dictStack.pushDict(Object.assign({}, this.dict))
     let stackHeight
     if (this.params != null) {
       yield * this.params.bind(interpreter)
