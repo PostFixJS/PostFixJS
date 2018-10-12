@@ -1,5 +1,5 @@
 import test from 'ava'
-const { execute, throwsErrorMessage } = require('./test/helpers/util')
+const { execute, throwsErrorMessage, checkErrorMessage } = require('./test/helpers/util')
 const types = require('./types')
 
 test('Param list in ExeArrs should work as expected', async (t) => {
@@ -62,4 +62,9 @@ test('The interpreter handles escape sequences properly', async (t) => {
     "\\t"  length 1 =
   ]`)
   t.true(stack.pop().items.every((x) => x.value === true))
+})
+
+test('It should not be possible to use a number as variable name', async (t) => {
+  await throwsErrorMessage(t, () => execute(`"hello" 1!`), checkErrorMessage('Invalid variable name "1"'))
+  await throwsErrorMessage(t, () => execute(`42 "hello" !`), checkErrorMessage('Expected operand 1 to be :Sym but got :Int instead'))
 })

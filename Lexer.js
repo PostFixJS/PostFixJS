@@ -156,7 +156,7 @@ class Lexer {
       if ('{[()]}'.includes(this.peek)) {
         yield {
           token: this.peek,
-          tokenType: this.getTokenType(this.peek),
+          tokenType: Lexer.getTokenType(this.peek),
           col: tokenCol - 1,
           line: tokenLine,
           endCol: tokenCol,
@@ -170,7 +170,7 @@ class Lexer {
       } else if (this.peek === '.') {
         this.deferredToken = {
           token: 'get',
-          tokenType: this.getTokenType('get'),
+          tokenType: Lexer.getTokenType('get'),
           col: this.col - 1,
           line: this.row,
           endCol: this.col,
@@ -215,7 +215,7 @@ class Lexer {
       if (token !== '') {
         yield {
           token,
-          tokenType: this.getTokenType(token),
+          tokenType: Lexer.getTokenType(token),
           col: tokenCol - 1,
           line: tokenLine,
           endCol: tokenCol + token.length - 1,
@@ -233,7 +233,7 @@ class Lexer {
         if ('{[()]}'.includes(this.peek)) {
           yield {
             token: this.peek,
-            tokenType: this.getTokenType(this.peek),
+            tokenType: Lexer.getTokenType(this.peek),
             col: this.col - 1,
             line: this.row,
             endCol: this.col,
@@ -244,7 +244,7 @@ class Lexer {
     }
   }
 
-  getTokenType (token) {
+  static getTokenType (token) {
     switch (token) {
       case '(':
         return 'PARAM_LIST_START'

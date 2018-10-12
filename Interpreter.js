@@ -4,6 +4,8 @@ const BreakError = require('./BreakError')
 const Stack = require('./Stack')
 const DictStack = require('./DictStack')
 const createCancellationToken = require('./util/cancellationToken')
+const Lexer = require('./Lexer')
+const { popOperand } = require('./typeCheck')
 
 class Interpreter {
   constructor () {
@@ -17,10 +19,17 @@ class Interpreter {
       name: '!',
       execute (interpreter, token) {
         const obj = interpreter._stack.pop()
-        const sym = token.tokenType === 'DEFINITION'
-          ? token.token.substr(0, token.token.length - 1)
-          : interpreter._stack.pop().name
-        interpreter._dictStack.put(sym, obj)
+
+        if (token.tokenType === 'DEFINITION') {
+          const name = token.token.substr(0, token.token.length - 1)
+          if (Lexer.getTokenType(name) !== 'REFERENCE') {
+            throw new types.Err(`Invalid variable name "${name}"`, token)
+          }
+          interpreter._dictStack.put(name, obj)
+        } else {
+          const sym = popOperand(interpreter, { type: 'Sym', index: 1 }, token)
+          interpreter._dictStack.put(sym.name, obj)
+        }
       }
     })
 
