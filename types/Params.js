@@ -66,7 +66,7 @@ class Params extends Obj {
             throw new Err(`Expected ${type.toString()} but got incompatible type ${value.getTypeName()} for parameter ${ref.name}`, ref.origin)
           }
         } else {
-          throw new Err(`Expected ${type.toString()} but got incompatible type ${value.getTypeName()} for parameter ${ref.name}`, ref.origin)
+          throw new Err(`Unknown type ${type.toString()} for parameter ${ref.name}`, ref.origin)
         }
       }
       interpreter._dictStack.put(ref.name, value)
