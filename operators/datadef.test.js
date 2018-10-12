@@ -140,3 +140,48 @@ test('types defined by datadef can be used for params and are checked', async (t
     42 test
   `), checkErrorMessage('Expected :Point but got incompatible type :Int for parameter x'))
 })
+
+test('datadef type declarations are optional and default to :Obj', async (t) => {
+  await execute(`
+    Point: (x y) datadef
+    1 2 point p!
+    p point-y 2 test=
+
+    p 5 point-y-set p!
+    p point-y 5 test=
+  `, t)
+})
+
+test('It should be possible to use datadefs as type argument', async (t) => {
+  await execute(`
+    Point: (x y) datadef
+    euclidian: (p :Point -> :Flt) {
+      p point-x 2 pow p point-y 2 pow + sqrt
+    } fun
+    3 4 point euclidian 5 test=
+  `, t)
+})
+
+test('Recursive types should work', async (t) => {
+  // recursive type (child uses parent union)
+  await execute(`
+    List: {
+      Null: ()
+      Cons: (value :Obj, next :List)
+    } datadef
+
+    null list? true test=
+    42 null cons list? true test=
+  `, t)
+
+  // recursive type (child uses other child)
+  await execute(`
+    A: {
+      Null: ()
+      B: (a :C)
+      C: (x :Int)
+    } datadef
+
+    42 c b a? true test=
+  `, t)
+})

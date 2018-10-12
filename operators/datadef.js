@@ -33,6 +33,7 @@ module.exports.datadef = {
       }
 
       const variants = []
+      const defs = {}
       for (let i = 0; i < definition.items.length - 1; i += 2) {
         const name = definition.items[i]
         const variantDefinition = definition.items[i + 1]
@@ -45,10 +46,22 @@ module.exports.datadef = {
         if (!(variantDefinition instanceof types.Params)) {
           throw new types.Err(`datadef variants need a parameter list (:Params) but got ${variantDefinition.getTypeName()} instead`, variantDefinition.origin || token)
         }
-        defineStruct(interpreter, variantDefinition, name)
         variants.push(name)
+        Object.assign(defs, defineStruct(interpreter, variantDefinition, name))
       }
-      defineUnionTest(interpreter, variants, name)
+      const typeChecker = defineUnionTest(interpreter, variants, name)
+      
+      // recursive type support, make the sub type functions aware of each other and the union type (only the type check is required)
+      for (const defName of Object.keys(defs)) {
+        if (defs[defName].dict) {
+          defs[defName].dict[`${name.name.toLowerCase()}?`] = typeChecker
+        }
+        for (const variant of variants) {
+          if (defs[defName].dict) {
+            defs[defName].dict[`${variant.name.toLowerCase()}?`] = typeChecker
+          }
+        }
+      }
     } else {
       throw new types.Err(`datadef expects a struct declaration (:Params) or a union type definition (:Arr) but got ${definition.getTypeName()} instead`, token)
     }
@@ -77,6 +90,7 @@ function defineStruct (interpreter, definition, name) {
     ),
     interpreter._dictStack.copyDict()
   )
+  defs[structName] = constructor
 
   const typeChecker = new types.Op({
     name: `${structName}?`,
@@ -84,6 +98,7 @@ function defineStruct (interpreter, definition, name) {
       interpreter._stack.push(types.Bool.valueOf(getDatadefType(interpreter._stack.pop()) === name.name))
     }
   })
+  defs[`${structName}?`] = typeChecker
 
   interpreter._dictStack.put(structName, constructor)
   interpreter._dictStack.put(`${structName}?`, typeChecker)
@@ -103,7 +118,7 @@ function defineStruct (interpreter, definition, name) {
       ],
       new types.Params(
         [{ ref: oParamRef, type: name }],
-        [param.type]
+        [param.type || new types.Sym('Obj')]
       ),
       interpreter._dictStack.copyDict()
     )
@@ -117,7 +132,7 @@ function defineStruct (interpreter, definition, name) {
         op('set')
       ],
       new types.Params(
-        [{ ref: oParamRef, type: name }, { ref: xParamRef, type: param.type }],
+        [{ ref: oParamRef, type: name }, { ref: xParamRef, type: param.type || new types.Sym('Obj') }],
         [name]
       ),
       interpreter._dictStack.copyDict()
@@ -140,18 +155,20 @@ function defineStruct (interpreter, definition, name) {
       ),
       interpreter._dictStack.copyDict()
     )
-
-    for (const name of Object.keys(defs)) {
-      interpreter._dictStack.put(name, defs[name])
-    }
   }
+
+  for (const name of Object.keys(defs)) {
+    interpreter._dictStack.put(name, defs[name])
+  }
+
+  return defs
 }
 
 function defineUnionTest (interpreter, variants, name) {
   // [ { o <t1>? } { o <t2>? } ... ] or
   const unionName = name.name.toLowerCase()
   const oParamRef = new types.Ref('o')
-  interpreter._dictStack.put(`${unionName}?`, new types.Lam(
+  const test = new types.Lam(
     [
       new types.Arr(variants.map((variant) =>
         new types.ExeArr([ oParamRef, new types.Ref(`${variant.name.toLowerCase()}?`) ])
@@ -163,7 +180,10 @@ function defineUnionTest (interpreter, variants, name) {
       [new types.Sym('Bool')]
     ),
     interpreter._dictStack.copyDict()
-  ))
+  )
+  interpreter._dictStack.put(`${unionName}?`, test)
+
+  return test
 }
 
 /**
