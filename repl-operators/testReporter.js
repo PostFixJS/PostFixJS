@@ -59,8 +59,6 @@ function reset () {
 }
 
 module.exports = {
-  reportPassed,
-  reportFailed,
   report,
   showStats,
   reset
