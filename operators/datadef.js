@@ -50,7 +50,7 @@ module.exports.datadef = {
         Object.assign(defs, defineStruct(interpreter, variantDefinition, name))
       }
       const typeChecker = defineUnionTest(interpreter, variants, name)
-      
+
       // recursive type support, make the sub type functions aware of each other and the union type (only the type check is required)
       for (const defName of Object.keys(defs)) {
         if (defs[defName].dict) {
