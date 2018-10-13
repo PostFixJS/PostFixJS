@@ -122,7 +122,7 @@ class DocParser {
  * @param {bool} options.withRanges True to include body ranges of the functions
  * @returns {object} Function and index of the first token after the function, or false if no function was found
  */
-function getFunctionAt (tokens, i, options = {}) {
+function getFunctionAt (tokens, i, options = { withRanges: true }) {
   const fn = {}
   let doc
   let docToken

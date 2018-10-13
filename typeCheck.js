@@ -7,10 +7,15 @@ function popOperand (interpreter, operand, token) {
 }
 
 function popOperands (interpreter, operands, token) {
+  if (interpreter._stack.accessibleCount < operands.length) {
+    throw new types.Err(`Expected ${operands.length} operands but only got ${interpreter._stack.accessibleCount}`, token)
+  }
+
   const values = []
   let i
   for (i = operands.length - 1; i >= 0; i--) {
-    values.push(Object.assign({ value: interpreter._stack.pop() }, operands[i]))
+    const operand = operands[i]
+    values.push(Object.assign({ value: interpreter._stack.pop() }, operand))
   }
   values.reverse()
   checkOperands(values, token)
