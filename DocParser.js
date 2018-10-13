@@ -154,8 +154,12 @@ function getFunctionAt (tokens, i) {
     fn.params = []
     fn.returns = []
   }
-  i = skipElements(tokens, i, 'EXEARR_START', 'EXEARR_END')
-  if (i !== false && tokens[i].tokenType === 'REFERENCE' && (tokens[i].token === 'fun' || tokens[i].token === 'cond-fun')) {
+  if (i !== false && i < tokens.length) {
+    fn.body = { start: { line: tokens[i].line, col: tokens[i].col } }
+    i = skipElements(tokens, i, 'EXEARR_START', 'EXEARR_END')
+  }
+  if (i !== false && i < tokens.length && tokens[i].tokenType === 'REFERENCE' && (tokens[i].token === 'fun' || tokens[i].token === 'cond-fun')) {
+    fn.body.end = { line: tokens[i - 1].line, col: tokens[i - 1].col }
     return { fn, i }
   }
   return false
