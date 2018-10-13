@@ -215,7 +215,7 @@ function getVariableAt (tokens, i) {
   }
 
   // value variableName!
-  if (docToken != null && docToken.endLine !== tokens[i].line - 1) {
+  if (docToken != null && tokens[i] && docToken.endLine !== tokens[i].line - 1) {
     // ignore doc comments that are not in the line over the function symbol
     variable.description = undefined
   }
@@ -318,6 +318,9 @@ function getDatadefAt (tokens, i) {
 }
 
 function skipElements (tokens, i, openToken, closeToken) {
+  if (i >= tokens.length) {
+    return false
+  }
   let depth = 1
   i++
   for (; i < tokens.length; i++) {

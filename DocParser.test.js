@@ -243,8 +243,12 @@ test
 Calculate the factorial of a number.
 @param
 >#
-    `, 'should not throw on invalid @param tags')
-  })
+    `)
+  }, 'should not throw on invalid @param tags')
+
+  t.notThrows(() => DocParser.getVariables('#< >#'),
+    'should not throw on comments that are not followed by a token'
+  )
 })
 
 test('DocParser finds cond-fun declarations', async (t) => {
