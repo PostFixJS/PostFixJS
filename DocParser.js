@@ -12,7 +12,7 @@ class DocParser {
    * @param {bool} options.withRanges True to include body ranges of the functions
    * @return {object[]} Function signatures with descriptions
    */
-  static getFunctions (code, options = { withRanges: true }) {
+  static getFunctions (code, options = { withRanges: false }) {
     const functions = []
     const tokens = Lexer.parse(code, { emitComments: true })
 
@@ -122,8 +122,12 @@ class DocParser {
  * @param {bool} options.withRanges True to include body ranges of the functions
  * @returns {object} Function and index of the first token after the function, or false if no function was found
  */
-function getFunctionAt (tokens, i, options = { withRanges: true }) {
+function getFunctionAt (tokens, i, options = { withRanges: false }) {
   const fn = {}
+  if (options.withRanges) {
+    fn.source = {}
+  }
+
   let doc
   let docToken
   if (tokens[i] && tokens[i].tokenType === 'BLOCK_COMMENT') {
@@ -160,19 +164,28 @@ function getFunctionAt (tokens, i, options = { withRanges: true }) {
       type,
       description: doc.returns.length > i ? doc.returns[i].description : undefined
     }))
+    if (options.withRanges) {
+      fn.source.params = {
+        start: { line: tokens[params.firstToken].line, col: tokens[params.firstToken].col },
+        end: { line: tokens[params.lastToken].line, col: tokens[params.lastToken].col }
+      }
+    }
   } else {
     fn.params = []
     fn.returns = []
+    if (options.withRanges) {
+      fn.source.params = undefined
+    }
   }
   if (i !== false && i < tokens.length) {
     if (options.withRanges) {
-      fn.body = { start: { line: tokens[i].line, col: tokens[i].col } }
+      fn.source.body = { start: { line: tokens[i].line, col: tokens[i].col } }
     }
     i = skipElements(tokens, i, 'EXEARR_START', 'EXEARR_END')
   }
   if (i !== false && i < tokens.length && tokens[i].tokenType === 'REFERENCE' && (tokens[i].token === 'fun' || tokens[i].token === 'cond-fun')) {
     if (options.withRanges) {
-      fn.body.end = { line: tokens[i - 1].line, col: tokens[i - 1].col }
+      fn.source.body.end = { line: tokens[i - 1].line, col: tokens[i - 1].col }
     }
     return { fn, i }
   }

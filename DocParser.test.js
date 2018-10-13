@@ -21,11 +21,7 @@ fac: (n :Int -> :Int) {
     ],
     returns: [
       { type: ':Int', description: 'Factorial of n' }
-    ],
-    body: {
-      start: { line: 6, col: 22 }, // opening {
-      end: { line: 8, col: 0 } // closing }
-    }
+    ]
   }])
 })
 
@@ -44,11 +40,7 @@ fac: (n :Int -> :Int) {
     ],
     returns: [
       { type: ':Int', description: undefined }
-    ],
-    body: {
-      start: { line: 1, col: 22 },
-      end: { line: 3, col: 0 }
-    }
+    ]
   }])
 })
 
@@ -68,11 +60,7 @@ foo: (n :Int -> :Str) {} fun
     ],
     returns: [
       { type: ':Str', description: undefined }
-    ],
-    body: {
-      start: { line: 4, col: 22 },
-      end: { line: 4, col: 23 }
-    }
+    ]
   }])
 })
 
@@ -93,11 +81,7 @@ foo: (n :Int -> :Str) {} fun
     ],
     returns: [
       { type: ':Str', description: 'The resulting string' }
-    ],
-    body: {
-      start: { line: 5, col: 22 },
-      end: { line: 5, col: 23 }
-    }
+    ]
   }])
 })
 
@@ -121,11 +105,7 @@ foo: (a b -> :Str) {} fun
     ],
     returns: [
       { type: ':Str', description: 'The resulting string' }
-    ],
-    body: {
-      start: { line: 7, col: 19 },
-      end: { line: 7, col: 20 }
-    }
+    ]
   }])
 })
 
@@ -143,11 +123,7 @@ foo: (-> :Str) {} fun
     params: [],
     returns: [
       { type: ':Str', description: undefined }
-    ],
-    body: {
-      start: { line: 4, col: 15 },
-      end: { line: 4, col: 16 }
-    }
+    ]
   }])
 })
 
@@ -156,22 +132,14 @@ test('DocParser supports functions that return nothing', async (t) => {
     name: 'noop',
     description: undefined,
     params: [],
-    returns: [],
-    body: {
-      start: { line: 0, col: 11 },
-      end: { line: 0, col: 12 }
-    }
+    returns: []
   }])
 
   t.deepEqual(DocParser.getFunctions('noop: () {} fun'), [{
     name: 'noop',
     description: undefined,
     params: [],
-    returns: [],
-    body: {
-      start: { line: 0, col: 9 },
-      end: { line: 0, col: 10 }
-    }
+    returns: []
   }])
 
   t.deepEqual(DocParser.getFunctions('pop: (top :Obj) {} fun'), [{
@@ -182,11 +150,7 @@ test('DocParser supports functions that return nothing', async (t) => {
       type: ':Obj',
       description: undefined
     }],
-    returns: [],
-    body: {
-      start: { line: 0, col: 16 },
-      end: { line: 0, col: 17 }
-    }
+    returns: []
   }])
 })
 
@@ -208,11 +172,7 @@ firstTwo: (arr :Arr -> :Obj :Obj) {} fun
     returns: [
       { type: ':Obj', description: 'First element' },
       { type: ':Obj', description: 'Second element' }
-    ],
-    body: {
-      start: { line: 7, col: 34 },
-      end: { line: 7, col: 35 }
-    }
+    ]
   }])
 })
 
@@ -221,11 +181,7 @@ test('DocParser supports functions without params', async (t) => {
     name: 'test',
     description: undefined,
     params: [],
-    returns: [],
-    body: {
-      start: { line: 0, col: 6 },
-      end: { line: 0, col: 7 }
-    }
+    returns: []
   }])
 })
 
@@ -267,11 +223,7 @@ condFun: (x :Int -> :Num) {} cond-fun
     ],
     returns: [
       { type: ':Num', description: 'Return value' }
-    ],
-    body: {
-      start: { line: 6, col: 26 },
-      end: { line: 6, col: 27 }
-    }
+    ]
   }])
 })
 
@@ -510,11 +462,7 @@ test('DocParser does not use block comments that are not in the line above the t
     name: 'test',
     description: undefined,
     params: [{ name: 'x', type: undefined, description: undefined }],
-    returns: [],
-    body: {
-      start: { line: 5, col: 14 },
-      end: { line: 5, col: 15 }
-    }
+    returns: []
   }])
 
   t.deepEqual(DocParser.getDatadefs(`
@@ -595,5 +543,67 @@ test('DocParser finds symbols', (t) => {
   }, {
     name: ':buzz',
     description: undefined
+  }])
+})
+
+test('DocParser can include the source ranges of a function', async (t) => {
+  const functions = DocParser.getFunctions(`
+fac: (n :Int -> :Int) {
+  { n n 1 - recur * } { 1 } n 1 > if
+} fun
+  `, { withRanges: true })
+
+  t.deepEqual(functions, [{
+    name: 'fac',
+    description: undefined,
+    params: [
+      { name: 'n', type: ':Int', description: undefined }
+    ],
+    returns: [
+      { type: ':Int', description: undefined }
+    ],
+    source: {
+      params: {
+        start: { line: 1, col: 5 }, // opening (
+        end: { line: 1, col: 20 } // closing )
+      },
+      body: {
+        start: { line: 1, col: 22 }, // opening {
+        end: { line: 3, col: 0 } // closing }
+      }
+    }
+  }])
+})
+
+test('DocParser can include the source ranges of a function without params or with empty params', async (t) => {
+  t.deepEqual(DocParser.getFunctions('test: {} fun', { withRanges: true }), [{
+    name: 'test',
+    description: undefined,
+    params: [],
+    returns: [],
+    source: {
+      params: undefined,
+      body: {
+        start: { line: 0, col: 6 }, // opening {
+        end: { line: 0, col: 7 } // closing }
+      }
+    }
+  }])
+
+  t.deepEqual(DocParser.getFunctions('test: () {} fun', { withRanges: true }), [{
+    name: 'test',
+    description: undefined,
+    params: [],
+    returns: [],
+    source: {
+      params: {
+        start: { line: 0, col: 6 }, // opening (
+        end: { line: 0, col: 7 } // closing )
+      },
+      body: {
+        start: { line: 0, col: 9 }, // opening {
+        end: { line: 0, col: 10 } // closing }
+      }
+    }
   }])
 })
