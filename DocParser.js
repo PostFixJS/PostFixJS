@@ -8,14 +8,16 @@ class DocParser {
   /**
    * Get all function signatures and related documentation from the given code.
    * @param {string} code PostFix code
+   * @param {object} options Options
+   * @param {bool} options.withRanges True to include body ranges of the functions
    * @return {object[]} Function signatures with descriptions
    */
-  static getFunctions (code) {
+  static getFunctions (code, options = { withRanges: true }) {
     const functions = []
     const tokens = Lexer.parse(code, { emitComments: true })
 
     for (let i = 0; i < tokens.length; i++) {
-      const fn = getFunctionAt(tokens, i)
+      const fn = getFunctionAt(tokens, i, options)
       if (fn !== false) {
         functions.push(fn.fn)
         i = fn.i
@@ -112,7 +114,15 @@ class DocParser {
   }
 }
 
-function getFunctionAt (tokens, i) {
+/**
+ * Get the function at the given token index.
+ * @param {objecŧ[]} tokens Tokens
+ * @param {number} i Starting index
+ * @param {object} options Options
+ * @param {bool} options.withRanges True to include body ranges of the functions
+ * @returns {object} Function and index of the first token after the function, or false if no function was found
+ */
+function getFunctionAt (tokens, i, options = {}) {
   const fn = {}
   let doc
   let docToken
@@ -155,11 +165,15 @@ function getFunctionAt (tokens, i) {
     fn.returns = []
   }
   if (i !== false && i < tokens.length) {
-    fn.body = { start: { line: tokens[i].line, col: tokens[i].col } }
+    if (options.withRanges) {
+      fn.body = { start: { line: tokens[i].line, col: tokens[i].col } }
+    }
     i = skipElements(tokens, i, 'EXEARR_START', 'EXEARR_END')
   }
   if (i !== false && i < tokens.length && tokens[i].tokenType === 'REFERENCE' && (tokens[i].token === 'fun' || tokens[i].token === 'cond-fun')) {
-    fn.body.end = { line: tokens[i - 1].line, col: tokens[i - 1].col }
+    if (options.withRanges) {
+      fn.body.end = { line: tokens[i - 1].line, col: tokens[i - 1].col }
+    }
     return { fn, i }
   }
   return false
