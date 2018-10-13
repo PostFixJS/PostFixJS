@@ -3,7 +3,7 @@ const createCancellationToken = require('../util/cancellationToken')
 const { popOperand } = require('../typeCheck')
 
 module.exports.time = {
-  name: 'time',
+  name: 'time-millis',
   execute (interpreter) {
     interpreter._stack.push(new types.Int(Date.now()))
   }
