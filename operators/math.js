@@ -115,9 +115,9 @@ module.exports.abs = {
   execute (interpreter, token) {
     const value = popOperand(interpreter, { type: ['Int', 'Flt'] }, token)
     if (value instanceof types.Int) {
-      interpreter._stack.push(new types.Int(-value.value))
+      interpreter._stack.push(new types.Int(Math.abs(value.value)))
     } else { // value instanceof types.Flt
-      interpreter._stack.push(new types.Flt(-value.value))
+      interpreter._stack.push(new types.Flt(Math.abs(value.value)))
     }
   }
 }

@@ -47,3 +47,10 @@ test('* should return a Flt if one of the operands is a Flt', async (t) => {
   t.true(result instanceof types.Flt)
   t.is(result.value, 4)
 })
+
+test('abs should return the absolute value of a number', async (t) => {
+  const { stack } = await execute('-3.141 abs 42 abs')
+  t.is(stack.count, 2)
+  t.is(stack.pop().value, 42)
+  t.is(stack.pop().value, 3.141)
+})
