@@ -1,5 +1,6 @@
 const types = require('../types')
 const { popOperand } = require('../typeCheck')
+const TailCallException = require('../TailCallException')
 
 module.exports.err = {
   name: 'err',
@@ -13,6 +14,13 @@ module.exports.exec = {
   name: 'exec',
   * execute (interpreter) {
     yield * interpreter.executeObj(interpreter._stack.pop())
+  }
+}
+
+module.exports.tailrec = {
+  name: 'tailcall',
+  execute (interpreter) {
+    throw new TailCallException(interpreter._stack.pop())
   }
 }
 

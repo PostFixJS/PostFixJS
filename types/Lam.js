@@ -2,6 +2,7 @@ const ExeArr = require('./ExeArr')
 const Err = require('./Err')
 const InvalidStackAccessError = require('../InvalidStackAccessError')
 const BreakError = require('../BreakError')
+const TailCallException = require('../TailCallException')
 
 class Lam extends ExeArr {
   /**
@@ -29,19 +30,34 @@ class Lam extends ExeArr {
   * execute (interpreter) {
     interpreter._dictStack.pushDict(Object.assign({}, this.dict))
     let stackHeight
-    if (this.params != null) {
-      yield * this.params.bind(interpreter)
-      stackHeight = interpreter._stack.forbidPop()
-    }
     let nextToken
+
     try {
-      for (const obj of this.items) {
-        yield obj.origin
-        nextToken = obj.origin
-        if (obj instanceof ExeArr) {
-          interpreter._stack.push(obj)
-        } else {
-          yield * interpreter.executeObj(obj, { handleErrors: false })
+      let tailcall = this
+      while (tailcall != null) {
+        if (tailcall.params != null) {
+          yield * tailcall.params.bind(interpreter)
+          if (stackHeight != null) interpreter._stack.allowPop(stackHeight)
+          stackHeight = interpreter._stack.forbidPop()
+        }
+
+        tailcall = null
+        try {
+          for (const obj of this.items) {
+            yield obj.origin
+            nextToken = obj.origin
+            if (obj instanceof ExeArr) {
+              interpreter._stack.push(obj)
+            } else {
+              yield * interpreter.executeObj(obj, { handleErrors: false })
+            }
+          }
+        } catch (e) {
+          if (e instanceof TailCallException) {
+            tailcall = e.call
+          } else {
+            throw e
+          }
         }
       }
     } catch (e) {
