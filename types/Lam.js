@@ -55,6 +55,10 @@ class Lam extends ExeArr {
         } catch (e) {
           if (e instanceof TailCallException) {
             tailcall = e.call
+            if (e.call !== this) { // if the tail call calls this function (recursion), the previous dict can be used again
+              interpreter._dictStack.popDict()
+              interpreter._dictStack.pushDict(Object.assign({}, tailcall.dict))
+            }
           } else {
             throw e
           }
