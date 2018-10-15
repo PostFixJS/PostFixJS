@@ -49,7 +49,7 @@ class Lam extends ExeArr {
             if (obj instanceof ExeArr) {
               interpreter._stack.push(obj)
             } else {
-              yield * interpreter.executeObj(obj, { handleErrors: false })
+              yield * interpreter.executeObj(obj, { handleErrors: false, isTail: obj === this.items[this.items.length - 1] })
             }
           }
         } catch (e) {

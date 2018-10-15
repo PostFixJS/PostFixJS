@@ -187,7 +187,8 @@ class Interpreter {
   }
 
   * executeObj (obj, {
-    handleErrors = true
+    handleErrors = true,
+    isTail = false
   } = {}) {
     if (this._openExeArrs > 0 && !(obj instanceof types.Marker && (obj.type === 'ExeArrOpen' || obj.type === 'ExeArrClose'))) {
       this._stack.push(obj)
@@ -195,7 +196,7 @@ class Interpreter {
       this._stack.push(obj)
     } else {
       try {
-        const result = obj.execute(this)
+        const result = obj.execute(this, { isTail })
         if (result != null && result[Symbol.iterator]) {
           yield * result
         }
