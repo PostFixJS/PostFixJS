@@ -70,6 +70,9 @@ module.exports.condFun = {
     if (!(name instanceof types.Sym)) {
       throw new types.Err(`cond-fun expects a function name (:Sym) as first argument but got ${name.getTypeName()}`, token)
     }
+    if (interpreter._builtIns[name.name]) {
+      throw new types.Err(`Cannot redefine built-in operator ${name.name}`, token)
+    }
 
     const lam = new types.Lam(
       [

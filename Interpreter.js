@@ -25,9 +25,15 @@ class Interpreter {
           if (Lexer.getTokenType(name) !== 'REFERENCE') {
             throw new types.Err(`Invalid variable name "${name}"`, token)
           }
+          if (interpreter._builtIns[name]) {
+            throw new types.Err(`Cannot redefine built-in operator ${name}`, token)
+          }
           interpreter._dictStack.put(name, obj)
         } else {
           const sym = popOperand(interpreter, { type: 'Sym', index: 1 }, token)
+          if (interpreter._builtIns[sym.name]) {
+            throw new types.Err(`Cannot redefine built-in operator ${sym.name}`, token)
+          }
           interpreter._dictStack.put(sym.name, obj)
         }
       }

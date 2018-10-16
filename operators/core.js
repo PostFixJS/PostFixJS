@@ -18,7 +18,7 @@ module.exports.exec = {
 
 module.exports.fun = {
   name: 'fun',
-  execute (interpreter) {
+  execute (interpreter, token) {
     // TODO parameter type check
     const body = interpreter._stack.pop()
     let params = null
@@ -26,6 +26,9 @@ module.exports.fun = {
       params = interpreter._stack.pop()
     }
     const name = interpreter._stack.pop()
+    if (interpreter._builtIns[name.name]) {
+      throw new types.Err(`Cannot redefine built-in operator ${name.name}`, token)
+    }
 
     const closure = new types.Lam(body.items, params, {})
     closure.setDict(Object.assign(interpreter._dictStack.copyDict(), {
