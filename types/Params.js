@@ -54,6 +54,9 @@ class Params extends Obj {
   }
 
   * bind (interpreter) {
+    if (interpreter._stack.accessibleCount < this.params.length) {
+      throw new Err(`Expected ${this.params.length} operands but only got ${interpreter._stack.accessibleCount}`, this.origin)
+    }
     for (let i = this.params.length - 1; i >= 0; i--) {
       const { ref, type } = this.params[i]
       const value = interpreter._stack.pop()
