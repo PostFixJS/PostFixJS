@@ -11,7 +11,7 @@ class Arr extends Obj {
   }
 
   toString () {
-    return `[ ${this.items.map((item) => item.toString()).join(', ')} ]`
+    return `[ ${this.items.map((item) => item.toString()).join(' ')} ]`
   }
 
   _copyImpl () {
