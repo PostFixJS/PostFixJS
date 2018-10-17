@@ -31,34 +31,39 @@ class Lam extends ExeArr {
     interpreter._dictStack.pushDict(Object.assign({}, this.dict))
     let stackHeight
     let nextToken
+    let running
 
     try {
       let tailcall = this
       while (tailcall != null) {
+        if (stackHeight != null) {
+          interpreter._stack.allowPop(stackHeight)
+        }
         if (tailcall.params != null) {
           yield * tailcall.params.bind(interpreter)
-          if (stackHeight != null) interpreter._stack.allowPop(stackHeight)
           stackHeight = interpreter._stack.forbidPop()
+        } else {
+          stackHeight = null
         }
 
+        running = tailcall
         tailcall = null
         try {
-          for (const obj of this.items) {
+          for (const obj of running.items) {
             yield obj.origin
             nextToken = obj.origin
             if (obj instanceof ExeArr) {
               interpreter._stack.push(obj)
             } else {
-              yield * interpreter.executeObj(obj, { handleErrors: false, isTail: obj === this.items[this.items.length - 1] })
+              yield * interpreter.executeObj(obj, { handleErrors: false, isTail: obj === running.items[running.items.length - 1] })
             }
           }
         } catch (e) {
           if (e instanceof TailCallException) {
             tailcall = e.call
-            if (e.call !== this) { // if the tail call calls this function (recursion), the previous dict can be used again
-              interpreter._dictStack.popDict()
-              interpreter._dictStack.pushDict(Object.assign({}, tailcall.dict))
-            }
+            // TODO in case of recursion, the dict doesn't need to be copied if no variables other than the parameters were set (they will be replaced anyway)
+            interpreter._dictStack.popDict()
+            interpreter._dictStack.pushDict(Object.assign({}, tailcall.dict))
           } else {
             throw e
           }
