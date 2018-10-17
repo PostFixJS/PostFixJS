@@ -19,8 +19,18 @@ module.exports.exec = {
 
 module.exports.tailrec = {
   name: 'tailcall',
-  execute (interpreter) {
-    throw new TailCallException(interpreter._stack.pop())
+  execute (interpreter, token) {
+    const sym = popOperand(interpreter, { type: 'Sym' }, token)
+    const ref = interpreter._dictStack.get(sym.name)
+    if (ref) {
+      if (ref instanceof types.Lam) {
+        throw new TailCallException(ref)
+      } else {
+        throw new types.Err(`Expected a function (:Lam) but got ${ref.getTypeName()}`, token)
+      }
+    } else {
+      throw new types.Err(`Could not find ${sym.name} in the dictionary`, token)
+    }
   }
 }
 
