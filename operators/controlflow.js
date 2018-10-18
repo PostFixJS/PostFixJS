@@ -22,7 +22,7 @@ module.exports.if = {
 
 module.exports.cond = {
   name: 'cond',
-  * execute (interpreter, token) {
+  * execute (interpreter, token, { isTail = false } = {}) {
     const pairs = interpreter._stack.pop()
     if (!(pairs instanceof types.Arr)) {
       throw new types.Err(`cond expects an array (:Arr) with conditions followed by actions but got ${pairs.getTypeName()}`, token)
@@ -45,7 +45,7 @@ module.exports.cond = {
       const result = interpreter._stack.pop()
       if (result instanceof types.Bool) {
         if (result.value) {
-          yield * interpreter.executeObj(action)
+          yield * interpreter.executeObj(action, { isTail })
           break // break at first matching condition
         }
       } else {
