@@ -1,6 +1,7 @@
 const types = require('./types')
 const InvalidStackAccessError = require('./InvalidStackAccessError')
 const BreakError = require('./BreakError')
+const TailCallException = require('./TailCallException')
 const Stack = require('./Stack')
 const DictStack = require('./DictStack')
 const createCancellationToken = require('./util/cancellationToken')
@@ -201,7 +202,7 @@ class Interpreter {
           yield * result
         }
       } catch (e) {
-        if (!(e instanceof BreakError) && handleErrors) {
+        if (!(e instanceof BreakError || e instanceof TailCallException) && handleErrors) {
           this._handleExecutionError(e, obj.origin)
         } else {
           throw e
@@ -245,6 +246,8 @@ class Interpreter {
       }
     } else if (e instanceof BreakError) {
       throw new types.Err(`${e.operator} can only be used in a loop`, token)
+    } else if (e instanceof TailCallException) {
+      throw new types.Err('tailcall can only be used in a function', token)
     } else {
       throw e
     }
