@@ -9,7 +9,7 @@ class Ref extends Obj {
     this.name = name
   }
 
-  * execute (interpreter, { isTail }) {
+  * execute (interpreter, { isTail = false } = {}) {
     const value = interpreter._dictStack.get(this.name)
     if (!value) {
       throw new Err(`Could not find ${this.name} in the dictionary`, this.origin)

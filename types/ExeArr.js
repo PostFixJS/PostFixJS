@@ -1,7 +1,7 @@
 const Arr = require('./Arr')
 
 class ExeArr extends Arr {
-  * execute (interpreter, { isTail }) {
+  * execute (interpreter, { isTail = false } = {}) {
     for (const obj of this.items) {
       yield obj.origin
       if (obj instanceof ExeArr) {

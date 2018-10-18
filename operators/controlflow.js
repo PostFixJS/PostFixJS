@@ -3,7 +3,7 @@ const BreakError = require('../BreakError')
 
 module.exports.if = {
   name: 'if',
-  * execute (interpreter, token, { isTail }) {
+  * execute (interpreter, token, { isTail = false } = {}) {
     let thenPart = interpreter._stack.pop()
     let elsePart = null
     if (interpreter._stack.peek() instanceof types.ExeArr) {
