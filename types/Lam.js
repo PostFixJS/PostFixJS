@@ -49,13 +49,14 @@ class Lam extends ExeArr {
         running = tailcall
         tailcall = null
         try {
+          const lastChild = running.items[running.items.length - 1]
           for (const obj of running.items) {
             yield obj.origin
             nextToken = obj.origin
             if (obj instanceof ExeArr) {
               interpreter._stack.push(obj)
             } else {
-              yield * interpreter.executeObj(obj, { handleErrors: false, isTail: obj === running.items[running.items.length - 1] })
+              yield * interpreter.executeObj(obj, { handleErrors: false, isTail: obj === lastChild })
             }
           }
         } catch (e) {
