@@ -129,7 +129,7 @@ test('sym?', async (t) => {
 
 test('str converts objects to strings', async (t) => {
   const { stack } = await execute('[1, 2 "test"] str')
-  t.is(stack.pop().value, '[ 1, 2, "test" ]')
+  t.is(stack.pop().value, '[ 1 2 "test" ]')
 })
 
 test('flt converts numbers and strings to floats', async (t) => {
