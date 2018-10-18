@@ -29,5 +29,8 @@ test('arrays should be comparable and have a well-defined order', async (t) => {
   t.is((await execute('[2, 3] [2] =')).stack.pop().value, false)
   t.is((await execute('[2, 3] [2, 3] =')).stack.pop().value, true)
 
+  t.is((await execute('[1 2] [1.2 1.7] 0.5 ~=')).stack.pop().value, true)
+  t.is((await execute('[1 2] [1.2 1.7] 0.1 ~=')).stack.pop().value, false)
+
   await throwsErrorMessage(t, () => execute('[1] ["2"] <'), checkErrorMessage('Cannot compare :Int and :Str at index 0'))
 })

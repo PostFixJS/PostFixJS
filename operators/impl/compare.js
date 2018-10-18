@@ -70,7 +70,7 @@ function isApproxEqual (a, b, tolerance) {
     }
     if (a.items.length === b.items.length) {
       for (let i = 0; i < a.items.length; i++) {
-        if (!isApproxEqual(a.items[i], b.items[i])) {
+        if (!isApproxEqual(a.items[i], b.items[i], tolerance)) {
           return false
         }
       }
