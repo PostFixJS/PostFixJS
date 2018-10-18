@@ -1,5 +1,5 @@
 import test from 'ava'
-const { execute, throwsErrorMessage, checkErrorMessage } = require('./test/helpers/util')
+const { execute, runPostFixTests, throwsErrorMessage, checkErrorMessage } = require('./test/helpers/util')
 const types = require('./types')
 
 test('Param list in ExeArrs should work as expected', async (t) => {
@@ -78,7 +78,7 @@ test('It should not be possible to use a number as variable name', async (t) => 
 })
 
 test('BinTree example', async (t) => {
-  await execute(`
+  await runPostFixTests(`
     BinTree: {
       Leaf: ()
       Node: (value :Num, left :BinTree, right :BinTree)

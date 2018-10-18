@@ -4,10 +4,45 @@ const Interpreter = require('../../Interpreter')
 /**
  * Execute the given code and return the resulting stack and dictionary stack.
  * @param {string} code Code to execute
- * @param {object} t Test object from ava, required to make PostFix tests work with ava
  * @returns {object} Object that contains the stack and dictStack
  */
-async function execute (code, t) {
+async function execute (code) {
+  const interpreter = new Interpreter()
+  await interpreter.run(Lexer.parse(code)).promise
+  return {
+    stack: interpreter._stack,
+    dictStack: interpreter._dictStack
+  }
+}
+
+/**
+ * Execute the given code and return the resulting stack and dictionary stack.
+ * This is useful to test things that may result in an infinite loop.
+ * @param {string} code Code to execute
+ * @param {number} timeout Execution timeout, in milliseconds
+ * @returns {object} Promise of an object that contains the stack and dictStack
+ */
+async function executeTimeout (code, timeout = 1000) {
+  const interpreter = new Interpreter()
+  const { cancel, step } = interpreter.startRun(Lexer.parse(code))
+  const timeoutId = setTimeout(cancel, timeout)
+  let done = false
+  while (!done) {
+    done = (await step()).done
+  }
+  clearTimeout(timeoutId)
+  return {
+    stack: interpreter._stack,
+    dictStack: interpreter._dictStack
+  }
+}
+
+/**
+ * Execute the given PostFix code and test with PostFix test operators.
+ * @param {string} code Code to execute
+ * @param {object} t Test object from AVA
+ */
+async function runPostFixTests (code, t) {
   const interpreter = new Interpreter()
   let failed = false
   if (t) {
@@ -37,32 +72,6 @@ async function execute (code, t) {
   await interpreter.run(Lexer.parse(code)).promise
   if (t && !failed) {
     t.pass()
-  }
-  return {
-    stack: interpreter._stack,
-    dictStack: interpreter._dictStack
-  }
-}
-
-/**
- * Execute the given code and return the resulting stack and dictionary stack.
- * This is useful to test things that may result in an infinite loop.
- * @param {string} code Code to execute
- * @param {number} timeout Execution timeout, in milliseconds
- * @returns {object} Promise of an object that contains the stack and dictStack
- */
-async function executeTimeout (code, timeout = 1000) {
-  const interpreter = new Interpreter()
-  const { cancel, step } = interpreter.startRun(Lexer.parse(code))
-  const timeoutId = setTimeout(cancel, timeout)
-  let done = false
-  while (!done) {
-    done = (await step()).done
-  }
-  clearTimeout(timeoutId)
-  return {
-    stack: interpreter._stack,
-    dictStack: interpreter._dictStack
   }
 }
 
@@ -96,5 +105,6 @@ module.exports = {
   checkErrorMessage,
   execute,
   executeTimeout,
+  runPostFixTests,
   throwsErrorMessage
 }
