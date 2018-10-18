@@ -111,6 +111,32 @@ test('exec should execute nested ExeArrs', async (t) => {
   t.is(stack.pop().value, 'pass')
 })
 
+test('tailcall should call a function without returning and should not push a dictionary', async (t) => {
+  const { stack } = await execute(`
+    g: { :g-was-called } fun
+    f: { :f-was-called :g tailcall :never-reached } fun
+    f
+  `, { maximumDictStackHeight: 2 })
+  t.is(stack.count, 2)
+  t.is(stack.pop().name, 'g-was-called')
+  t.is(stack.pop().name, 'f-was-called')
+})
+
+test('tailcall should throw an error if the operand is not a lambda function', async (t) => {
+  await throwsErrorMessage(t, () => execute(`
+    1 g!
+    f: { :g tailcall } fun
+    f 
+  `), checkErrorMessage('Expected a function (:Lam) but got :Int'))
+})
+
+test('tailcall should throw an error if it is used outside of a function', async (t) => {
+  await throwsErrorMessage(t, () => execute(`
+    f: { dup * } fun
+    :f tailcall
+  `), checkErrorMessage('tailcall can only be used in a function'))
+})
+
 test('empty? returns true for empty arrays and nil', async (t) => {
   const { stack } = await execute('{} empty? [] empty? nil empty?')
   t.is(stack.count, 3)

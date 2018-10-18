@@ -4,11 +4,21 @@ const Interpreter = require('../../Interpreter')
 /**
  * Execute the given code and return the resulting stack and dictionary stack.
  * @param {string} code Code to execute
+ * @param {object} options Options
+ * @param {number} options.maximumDictStackHeight Maximum dict stack height during execution
  * @returns {object} Object that contains the stack and dictStack
  */
-async function execute (code) {
+async function execute (code, options = {}) {
   const interpreter = new Interpreter()
-  await interpreter.run(Lexer.parse(code)).promise
+  const { step, promise } = interpreter.startRun(Lexer.parse(code))
+  let done = false
+  while (!done) {
+    done = (await step()).done
+    if (options.maximumDictStackHeight && options.maximumDictStackHeight < interpreter._dictStack.count) {
+      throw new Error(`Exceeded the expected maximum dict stack height of ${options.maximumDictStackHeight}`)
+    }
+  }
+  await promise // await the promise so that errors get thrown, if there are any
   return {
     stack: interpreter._stack,
     dictStack: interpreter._dictStack
