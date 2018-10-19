@@ -258,3 +258,35 @@ test('The lexer parses nil properly', async (t) => {
     endLine: 0
   })
 })
+
+test('The lexer trims Windows line breaks', async (t) => {
+  t.deepEqual(Lexer.parse('1 2 +\r\ntest'), [{
+    token: '1',
+    tokenType: 'INTEGER',
+    col: 0,
+    line: 0,
+    endCol: 1,
+    endLine: 0
+  }, {
+    token: '2',
+    tokenType: 'INTEGER',
+    col: 2,
+    line: 0,
+    endCol: 3,
+    endLine: 0
+  }, {
+    token: '+',
+    tokenType: 'REFERENCE',
+    col: 4,
+    line: 0,
+    endCol: 5,
+    endLine: 0
+  }, {
+    token: 'test',
+    tokenType: 'REFERENCE',
+    col: 0,
+    line: 1,
+    endCol: 4,
+    endLine: 1
+  }])
+})

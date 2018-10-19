@@ -27,6 +27,9 @@ class Lexer {
       if (this.peek === '\n') {
         this.row++
         this.col = 0
+      } else if (this.peek === '\r') {
+        // don't emit \r, so that \r is not included in the token before the line break on Windows
+        return this._readch()
       } else {
         this.col++
       }
