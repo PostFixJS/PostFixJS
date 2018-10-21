@@ -607,3 +607,30 @@ test('DocParser can include the source ranges of a function without params or wi
     }
   }])
 })
+
+test('DocParser finds param lists with ranges', (t) => {
+  t.deepEqual(DocParser.getParamsLists('"test" (x :Int, y :Flt -> :Str)', { withRanges: true }), [{
+    params: [{
+      doc: undefined,
+      name: 'x',
+      type: ':Int'
+    }, {
+      doc: undefined,
+      name: 'y',
+      type: ':Flt'
+    }],
+    returns: [
+      ':Str'
+    ],
+    source: {
+      start: {
+        col: 7,
+        line: 0
+      },
+      end: {
+        col: 30,
+        line: 0
+      }
+    }
+  }])
+})

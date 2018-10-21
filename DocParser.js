@@ -112,6 +112,36 @@ class DocParser {
 
     return symbols
   }
+
+  /**
+   * Get all param lists from the given code.
+   * @param {string} code PostFix code
+   * @param {object} options Options
+   * @param {bool} options.withRanges True to include body ranges of the param lists
+   * @return {object[]} Param lists with descriptions
+   */
+  static getParamsLists (code, options = { withRanges: false }) {
+    const paramLists = []
+    const tokens = Lexer.parse(code)
+
+    for (let i = 0; i < tokens.length; i++) {
+      if (tokens[i].tokenType === 'PARAM_LIST_START') {
+        const range = readParamsList(tokens, i)
+        if (range) {
+          const paramsList = parseParamsList(tokens.slice(range.firstToken, range.lastToken + 1))
+          if (options.withRanges) {
+            paramsList.source = {
+              start: { col: tokens[range.firstToken].col, line: tokens[range.firstToken].line },
+              end: { col: tokens[range.lastToken].col, line: tokens[range.lastToken].line }
+            }
+          }
+          paramLists.push(paramsList)
+        }
+      }
+    }
+
+    return paramLists
+  }
 }
 
 /**
