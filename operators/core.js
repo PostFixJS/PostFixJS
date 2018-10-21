@@ -1,5 +1,6 @@
 const types = require('../types')
 const { popOperand } = require('../typeCheck')
+const TailCallException = require('../TailCallException')
 
 module.exports.err = {
   name: 'err',
@@ -13,6 +14,23 @@ module.exports.exec = {
   name: 'exec',
   * execute (interpreter) {
     yield * interpreter.executeObj(interpreter._stack.pop())
+  }
+}
+
+module.exports.tailrec = {
+  name: 'tailcall',
+  execute (interpreter, token) {
+    const sym = popOperand(interpreter, { type: 'Sym' }, token)
+    const ref = interpreter._dictStack.get(sym.name)
+    if (ref) {
+      if (ref instanceof types.Lam) {
+        throw new TailCallException(ref)
+      } else {
+        throw new types.Err(`Expected a function (:Lam) but got ${ref.getTypeName()}`, token)
+      }
+    } else {
+      throw new types.Err(`Could not find ${sym.name} in the dictionary`, token)
+    }
   }
 }
 

@@ -3,7 +3,7 @@ const BreakError = require('../BreakError')
 
 module.exports.if = {
   name: 'if',
-  * execute (interpreter) {
+  * execute (interpreter, token, { isTail = false } = {}) {
     let thenPart = interpreter._stack.pop()
     let elsePart = null
     if (interpreter._stack.peek() instanceof types.ExeArr) {
@@ -13,16 +13,16 @@ module.exports.if = {
     const condition = interpreter._stack.pop()
 
     if (condition.value) {
-      yield * interpreter.executeObj(thenPart)
+      yield * interpreter.executeObj(thenPart, { isTail })
     } else if (elsePart != null) {
-      yield * interpreter.executeObj(elsePart)
+      yield * interpreter.executeObj(elsePart, { isTail })
     }
   }
 }
 
 module.exports.cond = {
   name: 'cond',
-  * execute (interpreter, token) {
+  * execute (interpreter, token, { isTail = false } = {}) {
     const pairs = interpreter._stack.pop()
     if (!(pairs instanceof types.Arr)) {
       throw new types.Err(`cond expects an array (:Arr) with conditions followed by actions but got ${pairs.getTypeName()}`, token)
@@ -45,7 +45,7 @@ module.exports.cond = {
       const result = interpreter._stack.pop()
       if (result instanceof types.Bool) {
         if (result.value) {
-          yield * interpreter.executeObj(action)
+          yield * interpreter.executeObj(action, { isTail })
           break // break at first matching condition
         }
       } else {

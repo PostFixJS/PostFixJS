@@ -1,6 +1,6 @@
 import test from 'ava'
 const types = require('../types')
-const { execute, checkErrorMessage, throwsErrorMessage } = require('../test/helpers/util')
+const { execute, runPostFixTests, checkErrorMessage, throwsErrorMessage } = require('../test/helpers/util')
 
 test('datadef generates a constructor function', async (t) => {
   let { dictStack } = await execute('Point: (x :Num, y :Num) datadef')
@@ -142,7 +142,7 @@ test('types defined by datadef can be used for params and are checked', async (t
 })
 
 test('datadef type declarations are optional and default to :Obj', async (t) => {
-  await execute(`
+  await runPostFixTests(`
     Point: (x y) datadef
     1 2 point p!
     p point-y 2 test=
@@ -153,7 +153,7 @@ test('datadef type declarations are optional and default to :Obj', async (t) => 
 })
 
 test('It should be possible to use datadefs as type argument', async (t) => {
-  await execute(`
+  await runPostFixTests(`
     Point: (x y) datadef
     euclidian: (p :Point -> :Flt) {
       p point-x 2 pow p point-y 2 pow + sqrt
@@ -164,7 +164,7 @@ test('It should be possible to use datadefs as type argument', async (t) => {
 
 test('Recursive types should work', async (t) => {
   // recursive type (child uses parent union)
-  await execute(`
+  await runPostFixTests(`
     List: {
       Null: ()
       Cons: (value :Obj, next :List)
@@ -175,7 +175,7 @@ test('Recursive types should work', async (t) => {
   `, t)
 
   // recursive type (child uses other child)
-  await execute(`
+  await runPostFixTests(`
     A: {
       Null: ()
       B: (a :C)

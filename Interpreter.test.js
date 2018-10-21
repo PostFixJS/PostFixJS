@@ -1,5 +1,5 @@
 import test from 'ava'
-const { execute, throwsErrorMessage, checkErrorMessage } = require('./test/helpers/util')
+const { execute, runPostFixTests, throwsErrorMessage, checkErrorMessage } = require('./test/helpers/util')
 const types = require('./types')
 
 test('Param list in ExeArrs should work as expected', async (t) => {
@@ -78,7 +78,7 @@ test('It should not be possible to use a number as variable name', async (t) => 
 })
 
 test('BinTree example', async (t) => {
-  await execute(`
+  await runPostFixTests(`
     BinTree: {
       Leaf: ()
       Node: (value :Num, left :BinTree, right :BinTree)
@@ -100,4 +100,42 @@ test('BinTree example', async (t) => {
 
     node5 tree-sum 13 test=
   `, t)
+})
+
+test('The interpreter should support proper tail calls in if bodies', async (t) => {
+  const { stack } = await execute(`
+    factorial_tr: (acc :Int, n :Int) {
+      n 1 > { acc n * n 1 - recur } { acc } if
+    } fun
+    factorial: (n :Int) { 1 n factorial_tr } fun
+    6 factorial
+  `, { maximumDictStackHeight: 2 })
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 720)
+})
+
+test('The interpreter should support proper tail calls in cond bodies', async (t) => {
+  const { stack } = await execute(`
+    factorial_tr: (acc :Int, n :Int) {
+      { { n 1 > } { acc n * n 1 - recur }
+       { true } { acc } } cond
+    } fun
+    factorial: (n :Int) { 1 n factorial_tr } fun
+    6 factorial
+  `, { maximumDictStackHeight: 2 })
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 720)
+})
+
+test('The interpreter should support proper tail calls in conf-fun bodies', async (t) => {
+  const { stack } = await execute(`
+    factorial_tr: (acc :Int, n :Int) {
+      { n 1 > } { acc n * n 1 - recur }
+      { true } { acc }
+    } cond-fun
+    factorial: (n :Int) { 1 n factorial_tr } fun
+    6 factorial
+  `, { maximumDictStackHeight: 2 })
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 720)
 })

@@ -4,6 +4,13 @@ class DictStack {
     this._stack = [this._dict]
   }
 
+  /**
+   * Get the number of dictionaries on this dictionary stack.
+   */
+  get count () {
+    return this._stack.length
+  }
+
   put (key, value) {
     if (this._dict[key]) {
       this._dict[key].refs--

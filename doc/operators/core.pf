@@ -5,6 +5,12 @@ Raise an error. This stops the program immediately.
 err: (message :Str) {} fun
 
 #<
+Leave the current lambda function and call a function from the dictionary.
+@param fn Name of the function to call, must be in the dictionary
+>#
+tailcall: (fn :Sym) {} fun
+
+#<
 Execute an object.
 @param obj Object to execute
 >#

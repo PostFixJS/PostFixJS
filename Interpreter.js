@@ -1,6 +1,7 @@
 const types = require('./types')
 const InvalidStackAccessError = require('./InvalidStackAccessError')
 const BreakError = require('./BreakError')
+const TailCallException = require('./TailCallException')
 const Stack = require('./Stack')
 const DictStack = require('./DictStack')
 const createCancellationToken = require('./util/cancellationToken')
@@ -187,7 +188,8 @@ class Interpreter {
   }
 
   * executeObj (obj, {
-    handleErrors = true
+    handleErrors = true,
+    isTail = false
   } = {}) {
     if (this._openExeArrs > 0 && !(obj instanceof types.Marker && (obj.type === 'ExeArrOpen' || obj.type === 'ExeArrClose'))) {
       this._stack.push(obj)
@@ -195,12 +197,12 @@ class Interpreter {
       this._stack.push(obj)
     } else {
       try {
-        const result = obj.execute(this)
+        const result = obj.execute(this, { isTail })
         if (result != null && result[Symbol.iterator]) {
           yield * result
         }
       } catch (e) {
-        if (!(e instanceof BreakError) && handleErrors) {
+        if (!(e instanceof BreakError || e instanceof TailCallException) && handleErrors) {
           this._handleExecutionError(e, obj.origin)
         } else {
           throw e
@@ -244,6 +246,8 @@ class Interpreter {
       }
     } else if (e instanceof BreakError) {
       throw new types.Err(`${e.operator} can only be used in a loop`, token)
+    } else if (e instanceof TailCallException) {
+      throw new types.Err('tailcall can only be used in a function', token)
     } else {
       throw e
     }

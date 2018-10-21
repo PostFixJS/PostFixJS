@@ -2,6 +2,7 @@ const ExeArr = require('./ExeArr')
 const Err = require('./Err')
 const InvalidStackAccessError = require('../InvalidStackAccessError')
 const BreakError = require('../BreakError')
+const TailCallException = require('../TailCallException')
 
 class Lam extends ExeArr {
   /**
@@ -29,19 +30,44 @@ class Lam extends ExeArr {
   * execute (interpreter) {
     interpreter._dictStack.pushDict(Object.assign({}, this.dict))
     let stackHeight
-    if (this.params != null) {
-      yield * this.params.bind(interpreter)
-      stackHeight = interpreter._stack.forbidPop()
-    }
     let nextToken
+    let running
+
     try {
-      for (const obj of this.items) {
-        yield obj.origin
-        nextToken = obj.origin
-        if (obj instanceof ExeArr) {
-          interpreter._stack.push(obj)
+      let tailcall = this
+      while (tailcall != null) {
+        if (stackHeight != null) {
+          interpreter._stack.allowPop(stackHeight)
+        }
+        if (tailcall.params != null) {
+          yield * tailcall.params.bind(interpreter)
+          stackHeight = interpreter._stack.forbidPop()
         } else {
-          yield * interpreter.executeObj(obj, { handleErrors: false })
+          stackHeight = null
+        }
+
+        running = tailcall
+        tailcall = null
+        try {
+          const lastChild = running.items[running.items.length - 1]
+          for (const obj of running.items) {
+            yield obj.origin
+            nextToken = obj.origin
+            if (obj instanceof ExeArr) {
+              interpreter._stack.push(obj)
+            } else {
+              yield * interpreter.executeObj(obj, { handleErrors: false, isTail: obj === lastChild })
+            }
+          }
+        } catch (e) {
+          if (e instanceof TailCallException) {
+            tailcall = e.call
+            // TODO in case of recursion, the dict doesn't need to be copied if no variables other than the parameters were set (they will be replaced anyway)
+            interpreter._dictStack.popDict()
+            interpreter._dictStack.pushDict(Object.assign({}, tailcall.dict))
+          } else {
+            throw e
+          }
         }
       }
     } catch (e) {
