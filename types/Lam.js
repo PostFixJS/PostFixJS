@@ -34,55 +34,39 @@ class Lam extends ExeArr {
     let running
 
     try {
-      if (interpreter.options.enableProperTailCalls) {
-        let tailcall = this
-        while (tailcall != null) {
-          if (stackHeight != null) {
-            interpreter._stack.allowPop(stackHeight)
-          }
-          if (tailcall.params != null) {
-            yield * tailcall.params.bind(interpreter)
-            stackHeight = interpreter._stack.forbidPop()
-          } else {
-            stackHeight = null
-          }
-
-          running = tailcall
-          tailcall = null
-          try {
-            const lastChild = running.items[running.items.length - 1]
-            for (const obj of running.items) {
-              yield obj.origin
-              nextToken = obj.origin
-              if (obj instanceof ExeArr) {
-                interpreter._stack.push(obj)
-              } else {
-                yield * interpreter.executeObj(obj, { handleErrors: false, isTail: obj === lastChild })
-              }
-            }
-          } catch (e) {
-            if (e instanceof TailCallException) {
-              tailcall = e.call
-              // TODO in case of recursion, the dict doesn't need to be copied if no variables other than the parameters were set (they will be replaced anyway)
-              interpreter._dictStack.popDict()
-              interpreter._dictStack.pushDict(Object.assign({}, tailcall.dict))
-            } else {
-              throw e
-            }
-          }
+      let tailcall = this
+      while (tailcall != null) {
+        if (stackHeight != null) {
+          interpreter._stack.allowPop(stackHeight)
         }
-      } else {
-        if (this.params != null) {
-          yield * this.params.bind(interpreter)
+        if (tailcall.params != null) {
+          yield * tailcall.params.bind(interpreter)
           stackHeight = interpreter._stack.forbidPop()
+        } else {
+          stackHeight = null
         }
-        for (const obj of this.items) {
-          yield obj.origin
-          nextToken = obj.origin
-          if (obj instanceof ExeArr) {
-            interpreter._stack.push(obj)
+
+        running = tailcall
+        tailcall = null
+        try {
+          const lastChild = running.items[running.items.length - 1]
+          for (const obj of running.items) {
+            yield obj.origin
+            nextToken = obj.origin
+            if (obj instanceof ExeArr) {
+              interpreter._stack.push(obj)
+            } else {
+              yield * interpreter.executeObj(obj, { handleErrors: false, isTail: obj === lastChild })
+            }
+          }
+        } catch (e) {
+          if (e instanceof TailCallException) {
+            tailcall = e.call
+            // TODO in case of recursion, the dict doesn't need to be copied if no variables other than the parameters were set (they will be replaced anyway)
+            interpreter._dictStack.popDict()
+            interpreter._dictStack.pushDict(Object.assign({}, tailcall.dict))
           } else {
-            yield * interpreter.executeObj(obj, { handleErrors: false })
+            throw e
           }
         }
       }

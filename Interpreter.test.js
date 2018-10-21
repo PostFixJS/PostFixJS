@@ -154,3 +154,17 @@ test('Proper tail calls can be disabled', async (t) => {
   }),
   checkErrorMessage('Exceeded the expected maximum dict stack height of 2'))
 })
+
+test('Explicit tail calls should still work if proper tail calls are disabled', async (t) => {
+  await t.notThrowsAsync(() => execute(`
+    factorial_tr: (acc :Int, n :Int) {
+      { n 1 > } { acc n * n 1 - :recur tailcall }
+      { true } { acc }
+    } cond-fun
+    factorial: (n :Int) { 1 n :factorial_tr tailcall } fun
+    6 factorial
+  `, {
+    maximumDictStackHeight: 2,
+    interpreterOptions: { enableProperTailCalls: false }
+  }))
+})

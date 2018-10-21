@@ -14,7 +14,7 @@ class Ref extends Obj {
     if (!value) {
       throw new Err(`Could not find ${this.name} in the dictionary`, this.origin)
     } else {
-      if (isTail && value instanceof Lam) {
+      if (interpreter.options.enableProperTailCalls && isTail && value instanceof Lam) {
         throw new TailCallException(value)
       }
       const result = value.execute(interpreter)
