@@ -6,10 +6,11 @@ const Interpreter = require('../../Interpreter')
  * @param {string} code Code to execute
  * @param {object} options Options
  * @param {number} options.maximumDictStackHeight Maximum dict stack height during execution
+ * @param {object} options.interpreterOptions Options for the interpreter
  * @returns {object} Object that contains the stack and dictStack
  */
 async function execute (code, options = {}) {
-  const interpreter = new Interpreter()
+  const interpreter = new Interpreter(options.interpreterOptions)
   const { step, promise } = interpreter.startRun(Lexer.parse(code))
   let done = false
   while (!done) {

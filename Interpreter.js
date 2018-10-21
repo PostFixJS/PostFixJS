@@ -9,7 +9,15 @@ const Lexer = require('./Lexer')
 const { popOperand } = require('./typeCheck')
 
 class Interpreter {
-  constructor () {
+  /**
+   * Create a new interpreter instance.
+   * @param {object} options Options
+   * @param {boolean} options.enableProperTailCalls Toggle tail call optimization (enabled by default)
+   */
+  constructor (options) {
+    this.options = Object.assign({
+      enableProperTailCalls: true
+    }, options)
     this._builtIns = {}
     this._stack = new Stack()
     this._dictStack = new DictStack()
@@ -412,11 +420,11 @@ class Interpreter {
   }
 
   /**
-   * Get a copy of this interpreter with the same state (dictionary stack, stack and built-ins).
+   * Get a copy of this interpreter with the same state (dictionary stack, stack and built-ins) and options.
    * @return {Interpreter} Copy of this interpreter
    */
   copy () {
-    const interpreter = new Interpreter()
+    const interpreter = new Interpreter(Object.assign({}, this.options))
     interpreter._builtIns = this._builtIns
     interpreter._testReporter = this._testReporter
     // TODO copy objects if needed (or add reference counting later)

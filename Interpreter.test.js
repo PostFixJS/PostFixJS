@@ -139,3 +139,18 @@ test('The interpreter should support proper tail calls in conf-fun bodies', asyn
   t.is(stack.count, 1)
   t.is(stack.pop().value, 720)
 })
+
+test('Proper tail calls can be disabled', async (t) => {
+  await throwsErrorMessage(t, () => execute(`
+    factorial_tr: (acc :Int, n :Int) {
+      { n 1 > } { acc n * n 1 - recur }
+      { true } { acc }
+    } cond-fun
+    factorial: (n :Int) { 1 n factorial_tr } fun
+    6 factorial
+  `, {
+    maximumDictStackHeight: 2,
+    interpreterOptions: { enableProperTailCalls: false }
+  }),
+  checkErrorMessage('Exceeded the expected maximum dict stack height of 2'))
+})
