@@ -91,7 +91,7 @@ class Stack {
     const i = this._minStackHeight.lastIndexOf(height)
     if (i >= 0) {
       this._minStackHeight.splice(i, 1)
-      this._currentMinStackHeight = this._minStackHeight[this._minStackHeight.length - 1]
+      this._currentMinStackHeight = this._minStackHeight[this._minStackHeight.length - 1] || 0
     }
   }
 
