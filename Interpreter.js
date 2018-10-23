@@ -428,8 +428,7 @@ class Interpreter {
     interpreter._builtIns = this._builtIns
     interpreter._testReporter = this._testReporter
     // TODO copy objects if needed (or add reference counting later)
-    interpreter._stack._stack = this._stack._stack.slice()
-    interpreter._stack._minStackHeight = this._stack._minStackHeight.slice()
+    interpreter._stack = this._stack.copy()
     interpreter._dictStack._dict = this._dictStack.copyDict()
     interpreter._dictStack._stack = [interpreter._dictStack._dict]
     interpreter._openExeArrs = this._openExeArrs

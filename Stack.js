@@ -4,6 +4,7 @@ class Stack {
   constructor () {
     this._stack = []
     this._minStackHeight = []
+    this._currentMinStackHeight = 0
   }
 
   push (obj) {
@@ -12,8 +13,7 @@ class Stack {
   }
 
   pop () {
-    const minStackHeight = this._minStackHeight[this._minStackHeight.length - 1] || 0
-    if (this._stack.length <= minStackHeight) {
+    if (this._stack.length <= this._currentMinStackHeight) {
       throw new InvalidStackAccessError()
     }
     const top = this._stack.pop()
@@ -37,7 +37,7 @@ class Stack {
   }
 
   peek (i = 0) {
-    const minStackHeight = this._minStackHeight[this._minStackHeight.length - 1] || 0
+    const minStackHeight = this._currentMinStackHeight
     if (this._stack.length - i <= minStackHeight) {
       throw new InvalidStackAccessError()
     }
@@ -50,6 +50,7 @@ class Stack {
     }
     this._stack = []
     this._minStackHeight = []
+    this._currentMinStackHeight = 0
   }
 
   get count () {
@@ -61,11 +62,7 @@ class Stack {
    * Inside of lambda functions, this may be smaller than the stack count.
    */
   get accessibleCount () {
-    if (this._minStackHeight.length === 0) {
-      return this.count
-    } else {
-      return this.count - this._minStackHeight[this._minStackHeight.length - 1]
-    }
+    return this.count - this._currentMinStackHeight
   }
 
   /**
@@ -82,6 +79,7 @@ class Stack {
    */
   forbidPop () {
     this._minStackHeight.push(this.count)
+    this._currentMinStackHeight = this.count
     return this.count
   }
 
@@ -93,7 +91,18 @@ class Stack {
     const i = this._minStackHeight.lastIndexOf(height)
     if (i >= 0) {
       this._minStackHeight.splice(i, 1)
+      this._currentMinStackHeight = this._minStackHeight[this._minStackHeight.length - 1]
     }
+  }
+
+  /**
+   * Create a copy of this stack.
+   */
+  copy () {
+    const copy = new Stack()
+    copy._stack = this._stack.slice()
+    copy._minStackHeight = this._minStackHeight.slice()
+    copy._currentMinStackHeight = this._currentMinStackHeight
   }
 }
 

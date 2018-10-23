@@ -11,15 +11,22 @@ function popOperands (interpreter, operands, token) {
     throw new types.Err(`Expected ${operands.length} operands but only got ${interpreter._stack.accessibleCount}`, token)
   }
 
-  const values = []
-  let i
-  for (i = operands.length - 1; i >= 0; i--) {
+  const values = new Array(operands.length)
+  for (let i = operands.length - 1; i >= 0; i--) {
     const operand = operands[i]
-    values.push(Object.assign({ value: interpreter._stack.pop() }, operand))
+    const value = interpreter._stack.pop()
+    if (operand.type != null && !checkType(value, operand.type)) {
+      const { name, type } = operand
+      if (name) {
+        throw new types.Err(`Expected operand ${i + 1} (${name}) to be ${typeToStr(type)} but got ${value.getTypeName()} instead`, token)
+      } else {
+        throw new types.Err(`Expected operand ${i + 1} to be ${typeToStr(type)} but got ${value.getTypeName()} instead`, token)
+      }
+    }
+    values[i] = value
   }
-  values.reverse()
-  checkOperands(values, token)
-  return values.map(({ value }) => value)
+
+  return values
 }
 
 function checkOperand (value, operand, token) {
