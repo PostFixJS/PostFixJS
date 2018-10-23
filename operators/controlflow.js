@@ -1,5 +1,6 @@
 const types = require('../types')
 const BreakError = require('../BreakError')
+const { popOperand } = require('../typeCheck')
 
 module.exports.if = {
   name: 'if',
@@ -10,7 +11,7 @@ module.exports.if = {
       elsePart = thenPart
       thenPart = interpreter._stack.pop()
     }
-    const condition = interpreter._stack.pop()
+    const condition = popOperand(interpreter, { name: 'condition', type: 'Bool' }, token)
 
     if (condition.value) {
       yield * interpreter.executeObj(thenPart, { isTail })
@@ -124,20 +125,22 @@ module.exports.for = {
     if (interpreter._stack.peek() instanceof types.Int) {
       const upper = interpreter._stack.pop()
       const lower = interpreter._stack.pop()
-      if (lower instanceof types.Int) {
-        try {
-          let i
-          for (i = lower.value; i < upper.value; i++) {
-            interpreter._stack.push(new types.Int(i))
-            yield * interpreter.executeObj(body)
-          }
-        } catch (e) {
-          if (!(e instanceof BreakError)) {
-            throw e
-          }
-        }
-      } else {
+      if (!(lower instanceof types.Int)) {
         throw new types.Err(`for expects lower bound to be an :Int but got ${lower.getTypeName()} instead`, token)
+      }
+      if (!(upper instanceof types.Int)) {
+        throw new types.Err(`for expects upper bound to be an :Int but got ${upper.getTypeName()} instead`, token)
+      }
+      try {
+        let i
+        for (i = lower.value; i < upper.value; i++) {
+          interpreter._stack.push(new types.Int(i))
+          yield * interpreter.executeObj(body)
+        }
+      } catch (e) {
+        if (!(e instanceof BreakError)) {
+          throw e
+        }
       }
     } else {
       const arr = interpreter._stack.pop()
@@ -221,13 +224,9 @@ module.exports.break = {
 module.exports.breakif = {
   name: 'breakif',
   execute (interpreter, token) {
-    const cond = interpreter._stack.pop()
-    if (cond instanceof types.Bool) {
-      if (cond.value) {
-        throw new BreakError('breakif')
-      }
-    } else {
-      throw new types.Err(`breakif expects a :Bool but got ${cond.getTypeName()}`, token)
+    const cond = popOperand(interpreter, { name: 'condition', type: 'Bool' }, token)
+    if (cond.value) {
+      throw new BreakError('breakif')
     }
   }
 }
