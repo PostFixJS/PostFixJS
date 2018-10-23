@@ -1,5 +1,5 @@
 const types = require('../types')
-const { popOperand } = require('../typeCheck')
+const { popOperand, checkOperands, checkOperand } = require('../typeCheck')
 const TailCallException = require('../TailCallException')
 
 module.exports.err = {
@@ -37,13 +37,26 @@ module.exports.tailrec = {
 module.exports.fun = {
   name: 'fun',
   execute (interpreter, token) {
-    // TODO parameter type check
     const body = interpreter._stack.pop()
     let params = null
     if (interpreter._stack.peek() instanceof types.Params) {
       params = interpreter._stack.pop()
     }
     const name = interpreter._stack.pop()
+
+    if (params != null) {
+      checkOperands([
+        { name: 'name', value: name, type: 'Sym' },
+        { name: 'params', value: params, type: 'Params' },
+        { name: 'body', value: body, type: 'ExeArr' }
+      ], token)
+    } else {
+      checkOperands([
+        { name: 'name', value: name, type: 'Sym' },
+        { name: 'body', value: body, type: 'ExeArr' }
+      ], token)
+    }
+
     if (interpreter._builtIns[name.name]) {
       throw new types.Err(`Cannot redefine built-in operator ${name.name}`, token)
     }
@@ -58,12 +71,20 @@ module.exports.fun = {
 
 module.exports.lam = {
   name: 'lam',
-  execute (interpreter) {
-    // TODO parameter type check
+  execute (interpreter, token) {
     const body = interpreter._stack.pop()
     let params = null
     if (interpreter._stack.accessibleCount > 0 && interpreter._stack.peek() instanceof types.Params) {
       params = interpreter._stack.pop()
+    }
+
+    if (params != null) {
+      checkOperands([
+        { name: 'params', value: params, type: 'Params' },
+        { name: 'body', value: body, type: 'ExeArr' }
+      ], token)
+    } else {
+      checkOperand(body, { name: 'body', type: 'ExeArr' }, token)
     }
 
     const closure = new types.Lam(body.items, params, interpreter._dictStack.copyDict())

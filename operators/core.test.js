@@ -48,6 +48,24 @@ test('fun can define functions with an arrow and return values in the param list
   `), checkErrorMessage('Expected fun to return 0 values but it returned 1 values'))
 })
 
+test('fun throws an error message when called with invalid operands', async (t) => {
+  await throwsErrorMessage(t, () => execute(`
+    "not a sym" {} fun
+  `), checkErrorMessage('Expected operand 1 (name) to be :Sym but got :Str instead'))
+  await throwsErrorMessage(t, () => execute(`
+    name: () "not a body" fun
+  `), checkErrorMessage('Expected operand 3 (body) to be :ExeArr but got :Str instead'))
+  await throwsErrorMessage(t, () => execute(`
+    name: "not a body" fun
+  `), checkErrorMessage('Expected operand 2 (body) to be :ExeArr but got :Str instead'))
+})
+
+test('fun throws an error message when trying to redefine a built-in operator', async (t) => {
+  await throwsErrorMessage(t, () => execute(`
+    +: (a b) { a b - } fun
+  `), checkErrorMessage('Cannot redefine built-in operator +'))
+})
+
 test('lam can define functions without a parameter list that do not check for underflows', async (t) => {
   const { dictStack, stack } = await execute(`
     { 2 + dup } lam test!
@@ -57,6 +75,12 @@ test('lam can define functions without a parameter list that do not check for un
   const fun = dictStack.get('test')
   t.true(fun instanceof types.Lam)
   t.is(fun.params, null)
+})
+
+test('lam throws an error message when called with invalid operands', async (t) => {
+  await throwsErrorMessage(t, () => execute(`
+    "not a body" lam
+  `), checkErrorMessage('Expected operand 1 (body) to be :ExeArr but got :Str instead'))
 })
 
 test('update-lam should update the dictionaries of the given functions', async (t) => {
