@@ -11,7 +11,9 @@ module.exports.length = {
     if (obj instanceof types.Arr) {
       interpreter._stack.push(new types.Int(obj.items.length))
     } else if (obj instanceof types.Str) {
-      interpreter._stack.push(new types.Int(obj.value.length))
+      // Using Array.from to get the character count if the string contains unicode characters
+      // See https://mathiasbynens.be/notes/javascript-unicode
+      interpreter._stack.push(new types.Int(Array.from(obj.value).length))
     }
   }
 }

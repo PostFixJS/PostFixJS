@@ -8,6 +8,12 @@ test('length should return length of strings', async (t) => {
   t.is(stack.pop().value, 11)
 })
 
+test('length should return the character count of strings when they contain unicode characters', async (t) => {
+  const { stack } = await execute('"Unicorn: 🦄" length')
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 10)
+})
+
 test('length should return length of arrays', async (t) => {
   const { stack } = await execute('["a" "b" "c"] length')
   t.is(stack.count, 1)
