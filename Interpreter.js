@@ -133,7 +133,7 @@ class Interpreter {
           const value = this._dictStack.get(token.token)
           if (value) {
             try {
-              const result = value.execute(this)
+              const result = value.execute(this, { callerToken: token })
               if (result != null && result[Symbol.iterator]) {
                 yield * result
               }

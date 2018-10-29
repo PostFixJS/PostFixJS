@@ -53,9 +53,15 @@ class Params extends Obj {
     return new Params(params, returns, origin)
   }
 
-  * bind (interpreter) {
+  /**
+   * Pop the function parameters from the stack, check their types and put them into the current dictionary.
+   * @param {Interpreter} interpreter Interpreter instance
+   * @param {object} options Options
+   * @param {object} options.callerToken Token that called the lambda function, used for precise error messages
+   */
+  * bind (interpreter, { callerToken } = {}) {
     if (interpreter._stack.accessibleCount < this.params.length) {
-      throw new Err(`Expected ${this.params.length} operands but only got ${interpreter._stack.accessibleCount}`, this.origin)
+      throw new Err(`Expected ${this.params.length} operands but only got ${interpreter._stack.accessibleCount}`, callerToken || this.origin)
     }
     for (let i = this.params.length - 1; i >= 0; i--) {
       const { ref, type } = this.params[i]
@@ -67,12 +73,12 @@ class Params extends Obj {
           yield * interpreter.executeObj(typeChecker)
           const typeMatches = interpreter._stack.pop()
           if (typeMatches.value !== true) {
-            throw new Err(`Expected ${type.toString()} but got incompatible type ${value.getTypeName()} for parameter ${ref.name}`, ref.origin)
+            throw new Err(`Expected ${type.toString()} but got incompatible type ${value.getTypeName()} for parameter ${ref.name}`, callerToken || ref.origin)
           }
         } else if (isBuiltInType(type)) {
-          throw new Err(`Expected ${type.toString()} but got incompatible type ${value.getTypeName()} for parameter ${ref.name}`, ref.origin)
+          throw new Err(`Expected ${type.toString()} but got incompatible type ${value.getTypeName()} for parameter ${ref.name}`, callerToken || ref.origin)
         } else {
-          throw new Err(`Unknown type ${type.toString()} for parameter ${ref.name}`, ref.origin)
+          throw new Err(`Unknown type ${type.toString()} for parameter ${ref.name}`, callerToken || ref.origin)
         }
       }
       interpreter._dictStack.put(ref.name, value)

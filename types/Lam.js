@@ -27,7 +27,7 @@ class Lam extends ExeArr {
     this.dict['recur'] = this
   }
 
-  * execute (interpreter) {
+  * execute (interpreter, { callerToken } = {}) {
     interpreter._dictStack.pushDict(Object.assign({}, this.dict))
     let stackHeight
     let nextToken
@@ -40,7 +40,7 @@ class Lam extends ExeArr {
           interpreter._stack.allowPop(stackHeight)
         }
         if (tailcall.params != null) {
-          yield * tailcall.params.bind(interpreter)
+          yield * tailcall.params.bind(interpreter, { callerToken })
           stackHeight = interpreter._stack.forbidPop()
         } else {
           stackHeight = null

@@ -17,7 +17,7 @@ class Ref extends Obj {
       if (interpreter.options.enableProperTailCalls && isTail && value instanceof Lam) {
         throw new TailCallException(value)
       }
-      const result = value.execute(interpreter)
+      const result = value.execute(interpreter, { callerToken: this.origin })
       if (result != null && result[Symbol.iterator]) {
         yield * result
       }

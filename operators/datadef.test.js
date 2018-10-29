@@ -23,6 +23,20 @@ test('the datadef constructor constructs a struct', async (t) => {
   t.is(point.items[3].value, 4)
 })
 
+test('the datadef constructor throws errors at its calling position if a parameter is missing', async (t) => {
+  await throwsErrorMessage(t, () => execute(`
+    Point: (x :Num, y :Num) datadef
+    3 point
+  `), checkErrorMessage('Expected 2 operands but only got 1', { line: 2, col: 6 }))
+})
+
+test('the datadef constructor throws errors at its calling position if a parameter is invalid', async (t) => {
+  await throwsErrorMessage(t, () => execute(`
+    Point: (x :Num, y :Num) datadef
+    3 "4" point
+  `), checkErrorMessage('Expected :Num but got incompatible type :Str for parameter y', { line: 2, col: 10 }))
+})
+
 test('the type checker checks the type', async (t) => {
   let { stack } = await execute(`
     Point: (x :Num, y :Num) datadef
