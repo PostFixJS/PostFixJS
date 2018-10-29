@@ -89,11 +89,19 @@ async function runPostFixTests (code, t) {
 /**
  * Create a function that checks if the message of a given error matches a string.
  * @param {string} expectedMessage Expected error message
+ * @param {object} expectedPosition Expected error position (optional)
+ * @param {number} expectedPosition.line Expected error line
+ * @param {number} expectedPosition.col Expected error column
  * @returns {function} Function that checks if the message of the error object matches the expected message
  */
-function checkErrorMessage (expectedMessage) {
+function checkErrorMessage (expectedMessage, expectedPosition = null) {
   return (err) => {
-    return err.message === expectedMessage
+    if (expectedPosition == null) {
+      return err.message === expectedMessage
+    } else if (err.origin != null) {
+      const { line, col } = err.origin
+      return col === expectedPosition.col && line === expectedPosition.line && err.message === expectedMessage
+    }
   }
 }
 
