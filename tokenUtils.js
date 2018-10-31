@@ -89,7 +89,7 @@ function readArray (tokens, i) {
 /**
  * Check if the given token is a comment.
  * @param {object} token Token
- * @return True if the token is a comment token, false otherwise
+ * @returns True if the token is a comment token, false otherwise
  */
 function isCommentToken (token) {
   return token.tokenType === 'BLOCK_COMMENT' || token.tokenType === 'LINE_COMMENT'
@@ -97,14 +97,15 @@ function isCommentToken (token) {
 
 /**
  * Normalize a symbol name.
- * @param {string} name Symbol name (with colons)
- * @param {*} withDots True to prefix the symbol with colons, false to omit them
+ * @param {string} name Symbol name (with or without colon)
+ * @param {boolean} withColon True to prefix the symbol with a colon, false to omit them
+ * @returns Normalized symbol (with or without leading colon)
  */
-function normalizeSymbol (name, withDots = false) {
+function normalizeSymbol (name, withColon = false) {
   const cleanName = name.indexOf(':') === 0
     ? name.substr(1)
     : name.substr(0, name.length - 1)
-  return withDots ? `:${cleanName}` : cleanName
+  return withColon ? `:${cleanName}` : cleanName
 }
 
 module.exports = {
