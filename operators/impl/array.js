@@ -15,6 +15,7 @@ function keySet (array, key, value) {
     if (isEqual(key, array.items[i])) {
       const newArr = array.copy()
       newArr.items[i + 1] = value
+      value.refs++
       return newArr
     }
   }
@@ -27,6 +28,7 @@ function arraySet (array, index, value, token) {
   if (index.value >= 0 && index.value < array.items.length) {
     const newArr = array.copy()
     newArr.items[index.value | 0] = value
+    value.refs++
     return newArr
   } else {
     throw new types.Err(`Index is out of range (index is ${index.value} but the :Arr has length ${array.items.length})`, token)

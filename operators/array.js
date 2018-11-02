@@ -297,6 +297,7 @@ module.exports.append = {
 
     const newArr = array.copy()
     newArr.items.push(value)
+    value.refs++
     interpreter._stack.push(newArr)
   }
 }
@@ -312,6 +313,7 @@ module.exports.remove = {
     const removeIndex = array.items.findIndex((obj) => isEqual(obj, value))
     if (removeIndex >= 0) {
       const newArray = array.copy()
+      newArray.items[removeIndex].refs--
       newArray.items.splice(removeIndex, 1)
       interpreter._stack.push(newArray)
     } else {
@@ -337,9 +339,10 @@ module.exports.removeAt = {
       if (index.value < 0 || index.value >= array.items.length) {
         throw new types.Err(`The index ${index.value} is not in the array (range 0 to ${array.items.length - 1})`, token)
       }
-      const newArrray = array.copy()
-      newArrray.items.splice(index.value, 1)
-      interpreter._stack.push(newArrray)
+      const newArray = array.copy()
+      newArray.items[index.value].refs--
+      newArray.items.splice(index.value, 1)
+      interpreter._stack.push(newArray)
     }
   }
 }
@@ -444,6 +447,7 @@ module.exports.insert = {
       if (index.value >= 0 && index.value <= arrOrStr.items.length) {
         const newArr = arrOrStr.copy()
         newArr.items.splice(index, 0, obj)
+        obj.refs++
         interpreter._stack.push(newArr)
       } else {
         throw new types.Err(`Index ${index.value} is out of range from 0 to ${arrOrStr.items.length}`, token)
