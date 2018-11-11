@@ -58,7 +58,7 @@ module.exports.datadef = {
         }
         for (const variant of variants) {
           if (defs[defName].dict) {
-            defs[defName].dict[`${variant.name.toLowerCase()}?`] = typeChecker
+            defs[defName].dict[`${variant.name.toLowerCase()}?`] = defs[`${variant.name.toLowerCase()}?`]
           }
         }
       }

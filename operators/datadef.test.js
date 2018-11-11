@@ -198,4 +198,12 @@ test('Recursive types should work', async (t) => {
 
     42 c b a? true test=
   `, t)
+
+  await throwsErrorMessage(t, () => execute(`
+    A: {
+      C: ()
+      B: (arg :Int)
+    } datadef
+    c b-arg
+  `), checkErrorMessage('Expected :B but got incompatible type :Arr for parameter o'))
 })
