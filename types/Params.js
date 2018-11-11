@@ -2,7 +2,7 @@ const Obj = require('./Obj')
 const Sym = require('./Sym')
 const Err = require('./Err')
 const Ref = require('./Ref')
-const { isBuiltInType } = require('./util')
+const { isBuiltInType, getTypeNameWithDatadef } = require('./util')
 
 class Params extends Obj {
   constructor (params, returns, origin) {
@@ -73,10 +73,10 @@ class Params extends Obj {
           yield * interpreter.executeObj(typeChecker)
           const typeMatches = interpreter._stack.pop()
           if (typeMatches.value !== true) {
-            throw new Err(`Expected ${type.toString()} but got incompatible type ${value.getTypeName()} for parameter ${ref.name}`, callerToken || ref.origin)
+            throw new Err(`Expected ${type.toString()} but got incompatible type ${getTypeNameWithDatadef(value)} for parameter ${ref.name}`, callerToken || ref.origin)
           }
         } else if (isBuiltInType(type)) {
-          throw new Err(`Expected ${type.toString()} but got incompatible type ${value.getTypeName()} for parameter ${ref.name}`, callerToken || ref.origin)
+          throw new Err(`Expected ${type.toString()} but got incompatible type ${getTypeNameWithDatadef(value)} for parameter ${ref.name}`, callerToken || ref.origin)
         } else {
           throw new Err(`Unknown type ${type.toString()} for parameter ${ref.name}`, callerToken || ref.origin)
         }
@@ -107,10 +107,10 @@ class Params extends Obj {
           yield * interpreter.executeObj(typeChecker)
           const typeMatches = interpreter._stack.pop()
           if (typeMatches.value !== true) {
-            throw new Err(`Expected return value ${i + 1} to be of type ${expectedType} but got incompatible type ${actual.getTypeName()}`, this.origin)
+            throw new Err(`Expected return value ${i + 1} to be of type ${expectedType} but got incompatible type ${getTypeNameWithDatadef(actual)}`, this.origin)
           }
         } else if (isBuiltInType(expectedType)) {
-          throw new Err(`Expected return value ${i + 1} to be of type ${expectedType} but got incompatible type ${actual.getTypeName()}`, this.origin)
+          throw new Err(`Expected return value ${i + 1} to be of type ${expectedType} but got incompatible type ${getTypeNameWithDatadef(actual)}`, this.origin)
         } else {
           throw new Err(`Unknown expected return type ${expectedType} for return value ${i + 1}`, this.returns[i].origin || this.origin)
         }

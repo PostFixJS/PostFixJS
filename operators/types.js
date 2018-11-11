@@ -1,5 +1,5 @@
 const types = require('../types')
-const { getDatadefType } = require('./datadef')
+const { getDatadefType } = require('../types/util')
 
 module.exports.type = {
   name: 'type',
