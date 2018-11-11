@@ -1,5 +1,5 @@
 const Lexer = require('./Lexer')
-const { parseParamsList, readParamsList, readArray, normalizeSymbol } = require('./tokenUtils')
+const { parseParamsList, readParamsList, readArray, readExecutableArray, normalizeSymbol } = require('./tokenUtils')
 
 /**
  * A parser for documentation.
@@ -310,9 +310,9 @@ function getDatadefAt (tokens, i) {
           return { datadef, i }
         }
       }
-    } else if (tokens[i].tokenType === 'ARR_START') {
+    } else if (tokens[i].tokenType === 'ARR_START' || tokens[i].tokenType === 'EXEARR_START') {
       // union
-      const union = readArray(tokens, i)
+      const union = tokens[i].tokenType === 'ARR_START' ? readArray(tokens, i) : readExecutableArray(tokens, i)
       if (union) {
         i = union.lastToken + 1
         if (tokens[i] && tokens[i].tokenType === 'REFERENCE' && tokens[i].token === 'datadef') {

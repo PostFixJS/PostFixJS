@@ -87,6 +87,34 @@ function readArray (tokens, i) {
 }
 
 /**
+ * Get the tokens of an executable array from an array of tokens.
+ * @param {object[]} tokens Array of tokens
+ * @param {number} i Index of a ARR_START token
+ * @returns {object|bool} Index of the first and last token (inclusive) of the array or false if no array is found
+ */
+function readExecutableArray (tokens, i) {
+  let depth = 0
+  if (tokens[i] && tokens[i].tokenType === 'EXEARR_START') {
+    const firstToken = i
+    while (i < tokens.length) {
+      if (tokens[i].tokenType === 'EXEARR_START') {
+        depth++
+      } else if (tokens[i].tokenType === 'EXEARR_END') {
+        depth--
+        if (depth === 0) {
+          return {
+            firstToken,
+            lastToken: i
+          }
+        }
+      }
+      i++
+    }
+  }
+  return false
+}
+
+/**
  * Check if the given token is a comment.
  * @param {object} token Token
  * @returns True if the token is a comment token, false otherwise
@@ -112,6 +140,7 @@ module.exports = {
   readParamsList,
   parseParamsList,
   readArray,
+  readExecutableArray,
   isCommentToken,
   normalizeSymbol
 }
