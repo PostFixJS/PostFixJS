@@ -96,7 +96,12 @@ module.exports.isSym = {
 module.exports.toStr = {
   name: 'str',
   execute (interpreter) {
-    interpreter._stack.push(new types.Str(interpreter._stack.pop().toString()))
+    const obj = interpreter._stack.pop()
+    if (obj instanceof types.Str) {
+      interpreter._stack.push(obj)
+    } else {
+      interpreter._stack.push(new types.Str(obj.toString()))
+    }
   }
 }
 

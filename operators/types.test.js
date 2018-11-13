@@ -132,6 +132,11 @@ test('str converts objects to strings', async (t) => {
   t.is(stack.pop().value, '[ 1 2 "test" ]')
 })
 
+test('str does not change strings', async (t) => {
+  const { stack } = await execute('"test" str')
+  t.is(stack.pop().value, 'test')
+})
+
 test('flt converts numbers and strings to floats', async (t) => {
   const { stack } = await execute('1 flt 1.5 flt "1.2" flt')
   t.is(stack.count, 3)
