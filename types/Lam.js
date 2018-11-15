@@ -36,14 +36,11 @@ class Lam extends ExeArr {
     try {
       let tailcall = this
       while (tailcall != null) {
-        if (stackHeight != null) {
-          interpreter._stack.allowPop(stackHeight)
-        }
         if (tailcall.params != null) {
           yield * tailcall.params.bind(interpreter, { callerToken })
-          stackHeight = interpreter._stack.forbidPop()
-        } else {
-          stackHeight = null
+          if (stackHeight == null) {
+            stackHeight = interpreter._stack.forbidPop()
+          }
         }
 
         running = tailcall
