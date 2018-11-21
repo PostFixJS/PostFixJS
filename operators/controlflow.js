@@ -135,7 +135,12 @@ module.exports.for = {
         let i
         for (i = lower.value; i < upper.value; i++) {
           interpreter._stack.push(new types.Int(i))
-          yield * interpreter.executeObj(body)
+          if (body.items.length === 0) {
+            // edge case to allow interrupting an empty loop
+            yield body.origin
+          } else {
+            yield * interpreter.executeObj(body)
+          }
         }
       } catch (e) {
         if (!(e instanceof BreakError)) {
@@ -148,7 +153,12 @@ module.exports.for = {
         try {
           for (const item of arr.items) {
             interpreter._stack.push(item)
-            yield * interpreter.executeObj(body)
+            if (body.items.length === 0) {
+              // edge case to allow interrupting an empty loop
+              yield body.origin
+            } else {
+              yield * interpreter.executeObj(body)
+            }
           }
         } catch (e) {
           if (!(e instanceof BreakError)) {
@@ -159,7 +169,12 @@ module.exports.for = {
         try {
           for (const char of arr.value.split('')) {
             interpreter._stack.push(new types.Str(char))
-            yield * interpreter.executeObj(body)
+            if (body.items.length === 0) {
+              // edge case to allow interrupting an empty loop
+              yield body.origin
+            } else {
+              yield * interpreter.executeObj(body)
+            }
           }
         } catch (e) {
           if (!(e instanceof BreakError)) {
@@ -187,7 +202,12 @@ module.exports.fori = {
         for (i = 0; i < arr.items.length; i++) {
           interpreter._stack.push(arr.items[i])
           interpreter._stack.push(new types.Int(i))
-          yield * interpreter.executeObj(body)
+          if (body.items.length === 0) {
+            // edge case to allow interrupting an empty loop
+            yield body.origin
+          } else {
+            yield * interpreter.executeObj(body)
+          }
         }
       } catch (e) {
         if (!(e instanceof BreakError)) {
@@ -201,7 +221,12 @@ module.exports.fori = {
         for (i = 0; i < chars.length; i++) {
           interpreter._stack.push(new types.Str(chars[i]))
           interpreter._stack.push(new types.Int(i))
-          yield * interpreter.executeObj(body)
+          if (body.items.length === 0) {
+            // edge case to allow interrupting an empty loop
+            yield body.origin
+          } else {
+            yield * interpreter.executeObj(body)
+          }
         }
       } catch (e) {
         if (!(e instanceof BreakError)) {
