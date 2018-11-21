@@ -1,6 +1,12 @@
 const types = require('../../types')
 const { isEqual } = require('./compare')
 
+/**
+ * Get a value by its key in a PostFix array.
+ * @param {Arr} array PostFix array
+ * @param {Obj} key Key
+ * @param {Obj} defaultValue Default value that is returned if the key is not found
+ */
 function keyGet (array, key, defaultValue) {
   for (let i = 0; i < array.items.length - 1; i++) {
     if (isEqual(key, array.items[i])) {
@@ -10,6 +16,12 @@ function keyGet (array, key, defaultValue) {
   return defaultValue
 }
 
+/**
+ * Insert a value for a key in a PostFix array. If the key already exists, the value is replaced.
+ * @param {Arr} array PostFix array
+ * @param {Obj} key Key
+ * @param {Obj} value Value
+ */
 function keySet (array, key, value) {
   for (let i = 0; i < array.items.length - 1; i++) {
     if (isEqual(key, array.items[i])) {
@@ -24,6 +36,13 @@ function keySet (array, key, value) {
   return newArr
 }
 
+/**
+ * Set a value in a PostFix array. Throws an error if the index is out of range.
+ * @param {Arr} array PostFix array
+ * @param {Num} index Index (rounded down if not an integer)
+ * @param {Obj} value Value
+ * @param {Token} token PostFix token used for error messages
+ */
 function arraySet (array, index, value, token) {
   if (index.value >= 0 && index.value < array.items.length) {
     const newArr = array.copy()
