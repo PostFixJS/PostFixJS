@@ -3,7 +3,7 @@ let random = seedrandom(`${Date.now()}`)
 
 /**
  * Return a random number between 0 (inclusive) and 1 (exclusive).
- * @returns Random double 0 <= i < 1
+ * @returns {number} Random double 0 <= i < 1
  */
 module.exports.nextDouble = () => random.double()
 

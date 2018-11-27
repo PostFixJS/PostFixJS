@@ -1,5 +1,11 @@
 const types = require('../../types')
 
+/**
+ * Check if two PostFix objects are equal.
+ * @param {Obj} a A PostFix object
+ * @param {Obj} b Another PostFix object
+ * @returns {boolean} True if the two values are equal, false otherwise
+ */
 function isEqual (a, b) {
   if (a === b) {
     return true
@@ -26,6 +32,14 @@ function isEqual (a, b) {
   return false
 }
 
+/**
+ * Compare two PostFix values.
+ * @param {Obj} a A PostFix object
+ * @param {Obj} b Another PostFix object
+ * @param {Token} token Token used for throwing error messages
+ * @returns {number} A positive number if a > b, a negative number if b < a or 0 if a == b
+ * @throws {Err} Throws an error if the objects cannot be compared
+ */
 function compare (a, b, token) {
   // This compare implementation is ported from the lt/gt methods
   // of the original PostFix implementation.
@@ -63,6 +77,13 @@ function compare (a, b, token) {
   }
 }
 
+/**
+ * Check if two PostFix objects are approximately equal. Two numbers are considered approximately equal iff the difference is less than or equal to the tolerance. All other types are checked for equality.
+ * @param {Obj} a A PostFix object
+ * @param {Obj} b Another PostFix object
+ * @param {number} tolerance Tolerance used when comparing numbers
+ * @returns {boolean} True if the two values are equal, false otherwise
+ */
 function isApproxEqual (a, b, tolerance) {
   if (a instanceof types.Arr && b instanceof types.Arr) {
     if (a === b) {

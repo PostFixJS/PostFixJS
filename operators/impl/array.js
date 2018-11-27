@@ -6,6 +6,7 @@ const { isEqual } = require('./compare')
  * @param {Arr} array PostFix array
  * @param {Obj} key Key
  * @param {Obj} defaultValue Default value that is returned if the key is not found
+ * @returns {Obj} Value of the key or the default value if the key is not found
  */
 function keyGet (array, key, defaultValue) {
   for (let i = 0; i < array.items.length - 1; i++) {
@@ -21,6 +22,7 @@ function keyGet (array, key, defaultValue) {
  * @param {Arr} array PostFix array
  * @param {Obj} key Key
  * @param {Obj} value Value
+ * @returns {Arr} A new array with the value set
  */
 function keySet (array, key, value) {
   for (let i = 0; i < array.items.length - 1; i++) {
@@ -37,11 +39,13 @@ function keySet (array, key, value) {
 }
 
 /**
- * Set a value in a PostFix array. Throws an error if the index is out of range.
+ * Set a value in a PostFix array.
  * @param {Arr} array PostFix array
  * @param {Num} index Index (rounded down if not an integer)
  * @param {Obj} value Value
  * @param {Token} token PostFix token used for error messages
+ * @returns {Arr} A new array with the value set
+ * @throws {Err} Throws an error if the index is out of range
  */
 function arraySet (array, index, value, token) {
   if (index.value >= 0 && index.value < array.items.length) {
