@@ -4,11 +4,14 @@ const InvalidStackAccessError = require('../InvalidStackAccessError')
 const BreakError = require('../BreakError')
 const TailCallException = require('../TailCallException')
 
+/**
+ * A lambda function, i.e. an executable array with its own dictionary and an optional parameter list.
+ */
 class Lam extends ExeArr {
   /**
    * Create a new lambda function (executable array with parameters and dictionary).
    * @param {Obj[]} items Function body
-   * @param {Params} params Parameters and return values
+   * @param {Params} params Parameters and return values (optional)
    * @param {object} dict Copy of the dictionary
    */
   constructor (items, params, dict) {
@@ -27,6 +30,12 @@ class Lam extends ExeArr {
     this.dict['recur'] = this
   }
 
+  /**
+   * Execute this lambda function.
+   * @param {Interpreter} interpreter PostFix Interpreter instance
+   * @param {object} options Options
+   * @param {Token} options.callerToken Token that called this function, used for throwing better errors
+   */
   * execute (interpreter, { callerToken } = {}) {
     interpreter._dictStack.pushDict(Object.assign({}, this.dict))
     let stackHeight

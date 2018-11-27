@@ -1,5 +1,9 @@
 const Obj = require('./Obj')
 
+/**
+ * PostFix array type.
+ * Arrays are zero-based collections of PostFix objects.
+ */
 class Arr extends Obj {
   /**
    * Create a new array and increase the reference counter of all children.

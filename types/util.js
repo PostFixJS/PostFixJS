@@ -4,6 +4,7 @@ const Sym = require('./Sym')
 /**
  * Check if the given type name is a built-in type.
  * @param {string|Sym} type Symbol or type name, e.g. :Int or :Square
+ * @returns {boolean} True if the type is built-in, false otherwise
  */
 function isBuiltInType (type) {
   if (type instanceof Sym) {
@@ -15,7 +16,7 @@ function isBuiltInType (type) {
 /**
  * Check if the given object is an instance of a datadef'ed type.
  * @param {Obj} obj Object
- * @return The name of the type or false if the object is not a datadef type instance
+ * @returns The name of the type or false if the object is not a datadef type instance
  */
 function getDatadefType (obj) {
   if (obj instanceof Arr &&
@@ -31,7 +32,7 @@ function getDatadefType (obj) {
 /**
  * Get the datadef type if the object is a datadef instance or the built-in type name otherwise.
  * @param {Obj} obj Object
- * @return Type name
+ * @returns Type name
  */
 function getTypeNameWithDatadef (obj) {
   const datadefType = getDatadefType(obj)

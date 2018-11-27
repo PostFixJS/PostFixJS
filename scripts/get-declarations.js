@@ -1,3 +1,7 @@
+/**
+ * @fileoverview This is a small script that gets all function and variable definitions in the code provided as stdin and prints the definitions as JSON on stdout. When called via a console (i.e. TTY), the output is pretty-printed.
+ */
+
 const getStdin = require('get-stdin')
 const DocParser = require('../DocParser')
 

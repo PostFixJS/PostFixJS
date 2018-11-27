@@ -16,6 +16,10 @@ class Marker extends Obj {
     this.type = type
   }
 
+  /**
+   * Execute this marker. If this marker is an opening marker, push it on the stack. If this is a closing marker, pop values from the stack until the corresponding opening marker is found and construct an array, executable array or parameter list from those elements and put it on the stack.
+   * @param {Interpreter} interpreter PostFix interpreter instance
+   */
   execute (interpreter) {
     if (this.type === 'ExeArrClose') {
       const items = interpreter._stack.popUntil((obj) => obj instanceof Marker && obj.type === 'ExeArrOpen')
@@ -70,6 +74,11 @@ class Marker extends Obj {
     return new Marker(this.type)
   }
 
+  /**
+   * Create a marker instance from the given token.
+   * @param {Token} token PostFix token
+   * @returns {Marker} Marker instance that corresponds to the token type
+   */
   static fromToken (token) {
     const marker = new Marker({
       'ARR_START': 'ArrOpen',

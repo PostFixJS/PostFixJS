@@ -3,6 +3,7 @@
  *
  * This is somewhat inspired by monaco's CancellationTokenSource and
  * TC39's Cancellation API proposal.
+ * @see https://github.com/tc39/proposal-cancellation
  */
 function createCancellationToken () {
   const onCancelListeners = []

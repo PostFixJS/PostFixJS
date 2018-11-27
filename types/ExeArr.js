@@ -1,6 +1,15 @@
 const Arr = require('./Arr')
 
+/**
+ * An executable array. This behaves like a normal array but its content is not executed immediately.
+ */
 class ExeArr extends Arr {
+  /**
+   * Execute this executable array.
+   * @param {Interpreter} interpreter PostFix interpreter instance
+   * @param {object} options Execution options
+   * @param {bool} options.isTail Whether or not this executable array is in a tail position; used for tail call optimization
+   */
   * execute (interpreter, { isTail = false } = {}) {
     const lastChild = this.items[this.items.length - 1]
     for (const obj of this.items) {

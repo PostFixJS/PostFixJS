@@ -10,6 +10,12 @@ class Op extends Obj {
     this.origin = origin
   }
 
+  /**
+   * Execute this operation.
+   * @param {Interpreter} interpreter PostFix interpreter instance
+   * @param {object} options Execution options
+   * @param {bool} options.isTail Whether or not this operation is in a tail position; used for tail call optimization
+   */
   * execute (interpreter, { isTail = false } = {}) {
     const result = this._impl.execute(interpreter, this.origin, { isTail })
     if (result != null && result[Symbol.iterator]) {
@@ -29,7 +35,7 @@ class Op extends Obj {
   }
 
   _copyImpl () {
-    // Ops are immutable
+    // Ops are immutable, no copy needed (unless there is origin information)
     if (this.origin) {
       return new Op(this._impl)
     } else {
