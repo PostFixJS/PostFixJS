@@ -168,3 +168,10 @@ test('Explicit tail calls should still work if proper tail calls are disabled', 
     interpreterOptions: { enableProperTailCalls: false }
   }))
 })
+
+test('Numbers support E-notation', async (t) => {
+  await runPostFixTests(`
+    2e5 200000 test=
+    2e-2 0.02 test=
+  `, t)
+})
