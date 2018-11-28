@@ -1,6 +1,13 @@
 const Obj = require('./Obj')
 
+/**
+ * A symbol, can be used to name things or like enums.
+ */
 class Sym extends Obj {
+  /**
+   * Create a new symbol.
+   * @param {string} name Name of the symbol
+   */
   constructor (name) {
     super()
     this.name = name
@@ -23,6 +30,11 @@ class Sym extends Obj {
     }
   }
 
+  /**
+   * Create a symbol from the given token.
+   * @param {Token} token PostFix symbol token
+   * @returns {Sym} Symbol instance with origin information
+   */
   static fromToken (token) {
     const name = token.token.indexOf(':') === 0
       ? token.token.substr(1)

@@ -4,7 +4,16 @@ const Err = require('./Err')
 const Ref = require('./Ref')
 const { isBuiltInType, getTypeNameWithDatadef } = require('./util')
 
+/**
+ * A parameter list. This is used for function arguments and for declaration of struct data types.
+ */
 class Params extends Obj {
+  /**
+   * 
+   * @param {object} params Parameters (objects with a ref (Ref) and type (Sym) attribute)
+   * @param {*} returns Return values (objects with a ref (Ref) and type (Sym) attribute)
+   * @param {Token} token PostFix token of the declaration of this param list
+   */
   constructor (params, returns, origin) {
     super()
     this.origin = origin
@@ -12,6 +21,13 @@ class Params extends Obj {
     this.returns = returns
   }
 
+  /**
+   * Create a parameter list instance from the given objects. These objects are typically pushed on the stack while evaluating a parameter list declaration.
+   * @param {Obj[]} rawParams Array of markers, refs and symbols that declare the parameter list
+   * @param {Token} origin PostFix token
+   * @returns {Params} Parameter list with origin information from the given token
+   * @throws {Err} Throws an error if the parameter list is invalid
+   */
   static fromParamList (rawParams, origin) {
     const Marker = require('./Marker') // Marker<>Params is a circular dependency; this wouldn't be required with es6 imports
 
@@ -85,6 +101,12 @@ class Params extends Obj {
     }
   }
 
+  /**
+   * Check if the topmost values on the stack match the return values of this parameter list.
+   * @param {Interpreter} interpreter PostFix interpreter instance
+   * @param {number} returnCount Number of elements that the function actually returned, used to check the return values
+   * @throws {Err} Throws an error if the return types or the number of return values don't match this parameter list
+   */
   * checkReturns (interpreter, returnCount) {
     if (this.returns == null) {
       return
