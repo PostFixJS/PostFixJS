@@ -79,9 +79,22 @@ test('the datadef updaters update fields of a struct', async (t) => {
     { 2 * } point-x-do point-x
   `)
   t.is(stack.count, 1)
-  const y = stack.pop()
-  t.true(y instanceof types.Int)
-  t.is(y.value, 6)
+  const x = stack.pop()
+  t.true(x instanceof types.Int)
+  t.is(x.value, 6)
+})
+
+test('the datadef updaters can access the outside dictionary', async (t) => {
+  let { stack } = await execute(`
+    Point: (x :Num, y :Num) datadef
+    2 two!
+    3 4 point
+    { two * } point-x-do point-x
+  `)
+  t.is(stack.count, 1)
+  const x = stack.pop()
+  t.true(x instanceof types.Int)
+  t.is(x.value, 6)
 })
 
 test('datadef can define union types with a union typecheck', async (t) => {

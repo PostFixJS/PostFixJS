@@ -154,7 +154,7 @@ function defineStruct (interpreter, definition, name) {
         [{ ref: oParamRef, type: name }, { ref: xParamRef, type: new types.Sym('ExeArr') }],
         [name]
       ),
-      interpreter._dictStack.copyDict()
+      null // no dictionary to allow accessing the current dictionary
     )
   }
 

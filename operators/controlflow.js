@@ -81,7 +81,7 @@ module.exports.condFun = {
         new types.Op(interpreter.getBuiltIn('cond'))
       ],
       params,
-      {}
+      null // set below
     )
     lam.setDict(Object.assign(interpreter._dictStack.copyDict(), {
       [name.name]: lam

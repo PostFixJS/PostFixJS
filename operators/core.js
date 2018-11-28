@@ -61,7 +61,7 @@ module.exports.fun = {
       throw new types.Err(`Cannot redefine built-in operator ${name.name}`, token)
     }
 
-    const closure = new types.Lam(body.items, params, {})
+    const closure = new types.Lam(body.items, params, null)
     closure.setDict(Object.assign(interpreter._dictStack.copyDict(), {
       [name.name]: closure
     }))
