@@ -15,7 +15,7 @@ function report (passed, type, params, token) {
   } else {
     failed++
     process.exitCode = -1
-  
+
     if (type === 'test=') {
       const [ actual, expected ] = params
       console.log(`Line ${token.line + 1}: Test failed, expected value to equal ${expected.toString()} but got ${actual.toString()}`)

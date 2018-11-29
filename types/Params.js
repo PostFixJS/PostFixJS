@@ -9,9 +9,9 @@ const { isBuiltInType, getTypeNameWithDatadef } = require('./util')
  */
 class Params extends Obj {
   /**
-   * 
-   * @param {object} params Parameters (objects with a ref (Ref) and type (Sym) attribute)
-   * @param {*} returns Return values (objects with a ref (Ref) and type (Sym) attribute)
+   * Create a new parameter list
+   * @param {object[]} params Parameters (objects with a ref (Ref) and type (Sym) attribute)
+   * @param {object[]} returns Return values (objects with a ref (Ref) and type (Sym) attribute)
    * @param {Token} token PostFix token of the declaration of this param list
    */
   constructor (params, returns, origin) {
