@@ -8,6 +8,9 @@ const createCancellationToken = require('./util/cancellationToken')
 const Lexer = require('./Lexer')
 const { popOperand } = require('./typeCheck')
 
+/**
+ * The PostFix interpreter. This is the heart of PostFixJS.
+ */
 class Interpreter {
   /**
    * Create a new interpreter instance.
@@ -63,6 +66,11 @@ class Interpreter {
     this.registerBuiltIns(require('./operators/types'))
   }
 
+  /**
+   * Register a built-in function, i.e. a PostFix operator.
+   * @param {object} builtIn Built-in function, has a name and execute attribute
+   * @example See the operator implementations for examples
+   */
   registerBuiltIn (builtIn) {
     if (this._builtIns[builtIn.name] != null) {
       console.warn(`Replacing already registered built-in ${builtIn.name}`)
@@ -70,6 +78,10 @@ class Interpreter {
     this._builtIns[builtIn.name] = builtIn
   }
 
+  /**
+   * Register multiple built-in functions.
+   * @param {object} builtIns Built-ins to register, if this is an object, the values are used
+   */
   registerBuiltIns (builtIns) {
     if (Array.isArray(builtIns)) {
       for (const builtIn of builtIns) {
@@ -83,14 +95,27 @@ class Interpreter {
     }
   }
 
+  /**
+   * Get a built-in by its name.
+   * @param {string} name Name of a built-in
+   */
   getBuiltIn (name) {
     return this._builtIns[name]
   }
 
+  /**
+   * Set the test reporter that this interpreter uses for test-related operations.
+   * @param {TestReporter} reporter Test reporter
+   * @example See the REPL test reporter (repl-operators/testReporter.js)
+   */
   setTestReporter (reporter) {
     this._testReporter = reporter
   }
 
+  /**
+   * The test reporter of this interpreter.
+   * @returns {TestReporter} The test reporter of this interpreter
+   */
   get testReporter () {
     return this._testReporter
   }
@@ -195,6 +220,13 @@ class Interpreter {
     }
   }
 
+  /**
+   * Execute the given PostFix object.
+   * @param {Obj} obj PostFix object to execute
+   * @param {object} options Options
+   * @param {boolean} options.handleErrors Whether to handle error (true) or throw them (false)
+   * @param {boolean} options.isTail Whether the object to be executed is in a tail position, used for tail call optimization
+   */
   * executeObj (obj, {
     handleErrors = true,
     isTail = false

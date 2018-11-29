@@ -1,3 +1,12 @@
+#!/usr/env/node
+
+/**
+ * @fileoverview This is a PostFix REPL that runs in NodeJS. It is interactive by default but also
+ * supports reading from stdin by specifying -- as first argument.
+ * If tests are used and a test fails, the exit code is set to -1 to enable simple integration with
+ * other CLI applications (e.g. build and testing scripts).
+ */
+
 const read = require('read')
 const Lexer = require('./Lexer')
 const Interpreter = require('./Interpreter')
@@ -22,6 +31,9 @@ if (process.argv[process.argv.length - 1] === '--') {
   repl()
 }
 
+/**
+ * The actual read-eval-print loop.
+ */
 async function repl () {
   while (true) {
     try {

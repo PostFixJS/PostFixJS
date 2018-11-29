@@ -146,7 +146,7 @@ class DocParser {
 
 /**
  * Get the function at the given token index.
- * @param {objecŧ[]} tokens Tokens
+ * @param {object[]} tokens Tokens
  * @param {number} i Starting index
  * @param {object} options Options
  * @param {bool} options.withRanges True to include body ranges of the functions
@@ -211,7 +211,7 @@ function getFunctionAt (tokens, i, options = { withRanges: false }) {
     if (options.withRanges) {
       fn.source.body = { start: { line: tokens[i].line, col: tokens[i].col } }
     }
-    i = skipElements(tokens, i, 'EXEARR_START', 'EXEARR_END')
+    i = skipElement(tokens, i) // skip the executable array
   }
   if (i !== false && i < tokens.length && tokens[i].tokenType === 'REFERENCE' && (tokens[i].token === 'fun' || tokens[i].token === 'cond-fun')) {
     if (options.withRanges) {
@@ -222,6 +222,12 @@ function getFunctionAt (tokens, i, options = { withRanges: false }) {
   return false
 }
 
+/**
+ * Get the variable definition at the given token index.
+ * @param {object[]} tokens Tokens
+ * @param {number} i Starting index
+ * @returns {object} Variable and index of the first token after the variable declaration, or false if no variable was found
+ */
 function getVariableAt (tokens, i) {
   const variable = {}
   let docToken
@@ -272,6 +278,12 @@ function getVariableAt (tokens, i) {
   return false
 }
 
+/**
+ * Get the data definition at the given token index.
+ * @param {object[]} tokens Tokens
+ * @param {number} i Starting index
+ * @returns {object} Function and index of the first token after the datadef, or false if no datadef was found
+ */
 function getDatadefAt (tokens, i) {
   const datadef = {}
   let docToken
@@ -360,10 +372,32 @@ function getDatadefAt (tokens, i) {
   return false
 }
 
-function skipElements (tokens, i, openToken, closeToken) {
+/**
+ * Skip the element at the given token index. If it is an array, executable array or param list, the entire array or list is skipped.
+ * @param {Token[]} tokens Tokens
+ * @param {number} i Starting index
+ * @returns {number} The index of the token after the skipped element or false if out of range
+ */
+function skipElement (tokens, i) {
   if (i >= tokens.length) {
     return false
   }
+  const openToken = tokens[i].tokenType
+  let closeToken
+  switch (tokens[i].tokenType) {
+    case 'PARAM_LIST_START':
+      closeToken = 'PARAM_LIST_END'
+      break
+    case 'ARR_START':
+      closeToken = 'ARR_END'
+      break
+    case 'EXEARR_START':
+      closeToken = 'EXEARR_END'
+      break
+    default:
+      return i < tokens.length - 1 ? i + 1 : false
+  }
+
   let depth = 1
   i++
   for (; i < tokens.length; i++) {
@@ -379,22 +413,11 @@ function skipElements (tokens, i, openToken, closeToken) {
   return false
 }
 
-function skipElement (tokens, i) {
-  if (i >= tokens.length) {
-    return false
-  }
-  switch (tokens[i].tokenType) {
-    case 'PARAM_LIST_START':
-      return skipElements(tokens, i, 'PARAM_LIST_START', 'PARAM_LIST_END')
-    case 'ARR_START':
-      return skipElements(tokens, i, 'ARR_START', 'ARR_END')
-    case 'EXEARR_START':
-      return skipElements(tokens, i, 'EXEARR_START', 'EXEARR_END')
-    default:
-      return i < tokens.length - 1 ? i + 1 : false
-  }
-}
-
+/**
+ * Parse a Javadoc-style documentation comment. It supports return and param tags.
+ * @param {string} comment Raw documentation comment, including <# and #>
+ * @returns {object} Parsed comment with params, returns and description
+ */
 function parseDocComment (comment) {
   const lines = comment.substring(2, comment.length - 2).trim().split('\n')
   const firstParam = lines.findIndex((line) => line.trim()[0] === '@')
