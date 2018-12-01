@@ -1,4 +1,4 @@
-#!/usr/env/node
+#!/usr/bin/env node
 
 /**
  * @fileoverview This is a PostFix REPL that runs in NodeJS. It is interactive by default but also
