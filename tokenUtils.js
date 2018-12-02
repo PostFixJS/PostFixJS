@@ -7,6 +7,7 @@
 function readParamsList (tokens, i) {
   if (tokens[i] && tokens[i].tokenType === 'PARAM_LIST_START') {
     const firstToken = i
+    i++
     while (i < tokens.length && tokens[i - 1].tokenType !== 'PARAM_LIST_END') {
       i++
     }

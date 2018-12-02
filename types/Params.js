@@ -75,13 +75,28 @@ class Params extends Obj {
    * @param {object} options Options
    * @param {object} options.callerToken Token that called the lambda function, used for precise error messages
    */
-  * bind (interpreter, { callerToken } = {}) {
+  * bind (interpreter, options) {
+    yield * this.checkParams(interpreter, options)
+    for (let i = this.params.length - 1; i >= 0; i--) {
+      interpreter._dictStack.put(this.params[i].ref.name, interpreter._stack.pop())
+    }
+  }
+
+  /**
+   * Check the types of the function parameters on the stack but don't pop them.
+   * @param {Interpreter} interpreter Interpreter instance
+   * @param {object} options Options
+   * @param {object} options.callerToken Token that called the lambda function, used for precise error messages
+   */
+  * checkParams (interpreter, { callerToken } = {}) {
+    let top = 0
     if (interpreter._stack.accessibleCount < this.params.length) {
       throw new Err(`Expected ${this.params.length} operands but only got ${interpreter._stack.accessibleCount}`, callerToken || this.origin)
     }
     for (let i = this.params.length - 1; i >= 0; i--) {
       const { ref, type } = this.params[i]
-      const value = interpreter._stack.pop()
+      const value = interpreter._stack.peek(top)
+      top++
       if (type != null && !value.isAssignableTo(type.toString())) {
         const typeChecker = interpreter._dictStack.get(`${type.name.toLowerCase()}?`)
         if (typeChecker) {
@@ -97,7 +112,6 @@ class Params extends Obj {
           throw new Err(`Unknown type ${type.toString()} for parameter ${ref.name}`, callerToken || ref.origin)
         }
       }
-      interpreter._dictStack.put(ref.name, value)
     }
   }
 

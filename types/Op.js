@@ -15,9 +15,10 @@ class Op extends Obj {
    * @param {Interpreter} interpreter PostFix interpreter instance
    * @param {object} options Execution options
    * @param {bool} options.isTail Whether or not this operation is in a tail position; used for tail call optimization
+   * @param {Token} options.callerToken Token that called this op, used for throwing better errors
    */
-  * execute (interpreter, { isTail = false } = {}) {
-    const result = this._impl.execute(interpreter, this.origin, { isTail })
+  * execute (interpreter, { isTail = false, callerToken } = {}) {
+    const result = this._impl.execute(interpreter, callerToken || this.origin, { isTail })
     if (result != null && result[Symbol.iterator]) {
       yield * result
     }

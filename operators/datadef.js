@@ -73,24 +73,25 @@ function defineStruct (interpreter, definition, name) {
   const structName = name.name.toLowerCase()
   const defs = {}
 
-  const op = (name) => new types.Op(interpreter.getBuiltIn(name))
-
-  // Note: In PostFix logic, the lam returns the type defined by the user,
-  // but since the functions are generated, the expensive struct type check is skipped
-  const constructor = new types.Lam(
-    [
-      new types.Marker('ArrOpen'),
-      new types.Sym('datadef'),
-      name,
-      ...definition.params.map((p) => new types.Ref(p.ref.name)),
-      new types.Marker('ArrClose')
-    ],
-    new types.Params(
-      definition.params,
-      [new types.Sym('Obj')]
-    ),
-    interpreter._dictStack.copyDict()
-  )
+  const constructor = new types.Op({
+    name: structName,
+    * execute (interpreter, token) {
+      const params = new types.Params(
+        definition.params,
+        [new types.Sym('Obj')]
+      )
+      yield * params.checkParams(interpreter, { callerToken: token })
+      const values = []
+      for (let i = 0; i < params.params.length; i++) {
+        values.push(interpreter._stack.pop())
+      }
+      interpreter._stack.push(new types.Arr([
+        new types.Sym('datadef'),
+        name,
+        ...values.reverse()
+      ]))
+    }
+  })
   defs[structName] = constructor
 
   const typeChecker = new types.Op({
@@ -111,51 +112,69 @@ function defineStruct (interpreter, definition, name) {
     const param = definition.params[i]
 
     // getter (o <index> get)
-    defs[`${structName}-${param.ref.name}`] = new types.Lam(
-      [
-        oParamRef,
-        new types.Int(i + 2),
-        op('get')
-      ],
-      new types.Params(
-        [{ ref: oParamRef, type: name }],
-        [param.type || new types.Sym('Obj')]
-      ),
-      interpreter._dictStack.copyDict()
-    )
+    defs[`${structName}-${param.ref.name}`] = new types.Op({
+      name: `${structName}-${param.ref.name}`,
+      * execute (interpreter, token) {
+        const params = new types.Params([{ ref: oParamRef, type: name }])
+        yield * params.checkParams(interpreter, { callerToken: token })
+        const obj = interpreter._stack.pop()
+        if (obj.length <= i + 2) {
+          // could happen when the user destroys the array
+          throw new types.Err(`Invalid ${name} instance`, token)
+        }
+        interpreter._stack.push(obj.items[i + 2])
+      }
+    })
 
     // setter (o <index> <value> set)
-    defs[`${structName}-${param.ref.name}-set`] = new types.Lam(
-      [
-        oParamRef,
-        new types.Int(i + 2),
-        xParamRef,
-        op('set')
-      ],
-      new types.Params(
-        [{ ref: oParamRef, type: name }, { ref: xParamRef, type: param.type || new types.Sym('Obj') }],
-        [name]
-      ),
-      interpreter._dictStack.copyDict()
-    )
+    defs[`${structName}-${param.ref.name}-set`] = new types.Op({
+      name: `${structName}-${param.ref.name}-set`,
+      * execute (interpreter, token) {
+        const params = new types.Params([
+          { ref: oParamRef, type: name },
+          { ref: xParamRef, type: param.type || new types.Sym('Obj') }])
+        yield * params.checkParams(interpreter, { callerToken: token })
+
+        const value = interpreter._stack.pop()
+        const obj = interpreter._stack.pop()
+        if (obj.length <= i + 2) {
+          // could happen when the user destroys the array
+          throw new types.Err(`Invalid ${name} instance`, token)
+        }
+        const newObj = obj.copy()
+        newObj.items[i + 2] = value
+        value.refs++
+        interpreter._stack.push(newObj)
+      }
+    })
 
     // updater (o <index> o <index> get <update> set)
-    defs[`${structName}-${param.ref.name}-do`] = new types.Lam(
-      [
-        oParamRef,
-        new types.Int(i + 2),
-        oParamRef,
-        new types.Int(i + 2),
-        op('get'),
-        xParamRef,
-        op('set')
-      ],
-      new types.Params(
-        [{ ref: oParamRef, type: name }, { ref: xParamRef, type: new types.Sym('ExeArr') }],
-        [name]
-      ),
-      null // no dictionary to allow accessing the current dictionary
-    )
+    defs[`${structName}-${param.ref.name}-do`] = new types.Op({
+      name: `${structName}-${param.ref.name}-do`,
+      * execute (interpreter, token) {
+        const params = new types.Params([
+          { ref: oParamRef, type: name },
+          { ref: xParamRef, type: new types.Sym('ExeArr') }
+        ])
+        yield * params.checkParams(interpreter, { callerToken: token })
+
+        const updater = interpreter._stack.pop()
+        const obj = interpreter._stack.pop()
+        if (obj.length <= i + 2) {
+          // could happen when the user destroys the array
+          throw new types.Err(`Invalid ${name} instance`, token)
+        }
+
+        interpreter._stack.push(obj.items[i + 2])
+        yield * interpreter.executeObj(updater)
+        const newValue = interpreter._stack.pop()
+        // TODO it is now possible to check type of the new value
+        const newObj = obj.copy()
+        newObj.items[i + 2] = newValue
+        newValue.refs++
+        interpreter._stack.push(newObj)
+      }
+    })
   }
 
   for (const name of Object.keys(defs)) {
@@ -168,20 +187,22 @@ function defineStruct (interpreter, definition, name) {
 function defineUnionTest (interpreter, variants, name) {
   // [ { o <t1>? } { o <t2>? } ... ] or
   const unionName = name.name.toLowerCase()
-  const oParamRef = new types.Ref('o')
-  const test = new types.Lam(
-    [
-      new types.Arr(variants.map((variant) =>
-        new types.ExeArr([ oParamRef, new types.Ref(`${variant.name.toLowerCase()}?`) ])
-      )),
-      new types.Op(interpreter.getBuiltIn('or'))
-    ],
-    new types.Params(
-      [{ ref: oParamRef, type: new types.Sym('Obj') }],
-      [new types.Sym('Bool')]
-    ),
-    interpreter._dictStack.copyDict()
-  )
+  const test = new types.Op({
+    name: `${unionName}?`,
+    * execute (interpreter, token) {
+      const obj = interpreter._stack.pop()
+      for (const variant of variants) {
+        interpreter._stack.push(obj)
+        yield * interpreter.executeObj(interpreter._dictStack.get(`${variant.name.toLowerCase()}?`))
+        const result = interpreter._stack.pop()
+        if (result instanceof types.Bool && result.value) {
+          interpreter._stack.push(types.Bool.true)
+          return
+        }
+      }
+      interpreter._stack.push(types.Bool.false)
+    }
+  })
   interpreter._dictStack.put(`${unionName}?`, test)
 
   return test

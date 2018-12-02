@@ -5,7 +5,7 @@ const { execute, runPostFixTests, checkErrorMessage, throwsErrorMessage } = requ
 test('datadef generates a constructor function', async (t) => {
   let { dictStack } = await execute('Point: (x :Num, y :Num) datadef')
   const constructor = dictStack.get('point')
-  t.true(constructor instanceof types.Lam)
+  t.true(constructor instanceof types.Op)
 })
 
 test('the datadef constructor constructs a struct', async (t) => {
@@ -136,8 +136,8 @@ test('datadef can define union types with :ExeArr syntax', async (t) => {
   `)
   t.is(stack.count, 1)
   t.is(stack.pop().value, true)
-  const constructor = dictStack.get('point?')
-  t.true(constructor instanceof types.Lam)
+  const typeChecker = dictStack.get('point?')
+  t.true(typeChecker instanceof types.Op)
 })
 
 test('types defined by datadef can be used for params and are checked', async (t) => {
