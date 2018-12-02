@@ -105,9 +105,10 @@ function defineStruct (interpreter, definition, name) {
   interpreter._dictStack.put(structName, constructor)
   interpreter._dictStack.put(`${structName}?`, typeChecker)
 
+  const structNameRef = new types.Ref(structName)
+  const updaterRef = new types.Ref('updater')
+
   // getters, setters and updaters
-  const oParamRef = new types.Ref('o')
-  const xParamRef = new types.Ref('x')
   for (let i = 0; i < definition.params.length; i++) {
     const param = definition.params[i]
 
@@ -115,7 +116,7 @@ function defineStruct (interpreter, definition, name) {
     defs[`${structName}-${param.ref.name}`] = new types.Op({
       name: `${structName}-${param.ref.name}`,
       * execute (interpreter, token) {
-        const params = new types.Params([{ ref: oParamRef, type: name }])
+        const params = new types.Params([{ ref: structNameRef, type: name }])
         yield * params.checkParams(interpreter, { callerToken: token })
         const obj = interpreter._stack.pop()
         if (obj.length <= i + 2) {
@@ -131,8 +132,8 @@ function defineStruct (interpreter, definition, name) {
       name: `${structName}-${param.ref.name}-set`,
       * execute (interpreter, token) {
         const params = new types.Params([
-          { ref: oParamRef, type: name },
-          { ref: xParamRef, type: param.type || new types.Sym('Obj') }])
+          { ref: structNameRef, type: name },
+          { ref: param.ref, type: param.type || new types.Sym('Obj') }])
         yield * params.checkParams(interpreter, { callerToken: token })
 
         const value = interpreter._stack.pop()
@@ -153,8 +154,8 @@ function defineStruct (interpreter, definition, name) {
       name: `${structName}-${param.ref.name}-do`,
       * execute (interpreter, token) {
         const params = new types.Params([
-          { ref: oParamRef, type: name },
-          { ref: xParamRef, type: new types.Sym('ExeArr') }
+          { ref: structNameRef, type: name },
+          { ref: updaterRef, type: new types.Sym('ExeArr') }
         ])
         yield * params.checkParams(interpreter, { callerToken: token })
 
@@ -189,7 +190,7 @@ function defineUnionTest (interpreter, variants, name) {
   const unionName = name.name.toLowerCase()
   const test = new types.Op({
     name: `${unionName}?`,
-    * execute (interpreter, token) {
+    * execute (interpreter) {
       const obj = interpreter._stack.pop()
       for (const variant of variants) {
         interpreter._stack.push(obj)

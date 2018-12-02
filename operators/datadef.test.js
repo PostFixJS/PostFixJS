@@ -218,5 +218,5 @@ test('Recursive types should work', async (t) => {
       B: (arg :Int)
     } datadef
     c b-arg
-  `), checkErrorMessage('Expected :B but got incompatible type :C for parameter o'))
+  `), checkErrorMessage('Expected :B but got incompatible type :C for parameter b'))
 })
