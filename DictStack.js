@@ -4,6 +4,9 @@
  * when a lambda function (Lam) is being executed.
  */
 class DictStack {
+  /**
+   * Create a new, empty dictionary stack.
+   */
   constructor () {
     this._dict = {}
     this._stack = [this._dict]

@@ -277,6 +277,11 @@ class Interpreter {
     }
   }
 
+  /**
+   * Handle an error, i.e. throw an instance of Err that matches the error.
+   * @param {Error} e Error to handle
+   * @param {Token} token Token that caused the error, if known
+   */
   _handleExecutionError (e, token) {
     if (e instanceof InvalidStackAccessError) {
       if (this._stack.count === 0) {
@@ -293,6 +298,11 @@ class Interpreter {
     }
   }
 
+  /**
+   * Start a stepper and handle the execution logic (for async operators) properly.
+   * @param {Iterator} stepper Stepper function, returned by this._run or this._runObj
+   * @return A promise for the whole execution, a cancel function and a step function that iterates over the tokens that are executed
+   */
   _startRunStepper (stepper) {
     const { token, cancel } = createCancellationToken()
 
@@ -374,6 +384,11 @@ class Interpreter {
     return this._startRunStepper(this._runObj(obj))
   }
 
+  /**
+   * Start a stepper and handle the execution logic (for async operators) properly.
+   * @param {Iterator} stepper Stepper function, returned by this._run or this._runObj
+   * @return A promise for the whole execution and a cancel function
+   */
   _runStepper (stepper) {
     const { token, cancel } = createCancellationToken()
 
@@ -428,6 +443,7 @@ class Interpreter {
   /**
    * Run all tokens.
    * @param {Iterable} tokens Tokens to execute
+   * @return A promise for the whole execution and a cancel function
    */
   run (tokens) {
     return this._runStepper(this._run(tokens))
@@ -436,6 +452,7 @@ class Interpreter {
   /**
    * Run a single object.
    * @param {Obj} obj Object to execute
+   * @return A promise for the whole execution and a cancel function
    */
   runObj (obj) {
     return this._runStepper(this._runObj(obj))

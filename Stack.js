@@ -1,5 +1,8 @@
 const InvalidStackAccessError = require('./InvalidStackAccessError')
 
+/**
+ * A stack.
+ */
 class Stack {
   constructor () {
     this._stack = []
@@ -7,11 +10,20 @@ class Stack {
     this._currentMinStackHeight = 0
   }
 
+  /**
+   * Push an object on the stack. This increases the reference counter.
+   * @param {Obj} obj Object
+   */
   push (obj) {
     obj.refs++
     this._stack.push(obj)
   }
 
+  /**
+   * Pop an object from the stack. This decreases the reference counter.
+   * @returns {Obj} Topmost object from the stack
+   * @throws {InvalidStackAccessError} If the stack is empty or if the next element can't be accessed by the current lambda function
+   */
   pop () {
     if (this._stack.length <= this._currentMinStackHeight) {
       throw new InvalidStackAccessError()
@@ -36,6 +48,12 @@ class Stack {
     return values.reverse()
   }
 
+  /**
+   * Get the i-th element from top from the stack, without removing it.
+   * @param {number} i Index, from top, of the element to return
+   * @returns {Obj} i-th element from top
+   * @throws {InvalidStackAccessError} If i is out of range or if the element can't be accessed by the current lambda function
+   */
   peek (i = 0) {
     const minStackHeight = this._currentMinStackHeight
     if (this._stack.length - i <= minStackHeight) {
@@ -44,6 +62,9 @@ class Stack {
     return this._stack[this._stack.length - 1 - i]
   }
 
+  /**
+   * Clear the stack. This decreases all reference counters.
+   */
   clear () {
     for (const obj of this._stack) {
       obj.refs--
@@ -53,6 +74,9 @@ class Stack {
     this._currentMinStackHeight = 0
   }
 
+  /**
+   * Get the current stack size.
+   */
   get count () {
     return this._stack.length
   }
@@ -86,6 +110,7 @@ class Stack {
   /**
    * Don't throw if the stack height gets below the given height.
    * This reverts forbidPop.
+   * @param height {number} Height limit to remove
    */
   allowPop (height) {
     const i = this._minStackHeight.lastIndexOf(height)
