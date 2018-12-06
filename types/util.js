@@ -1,4 +1,5 @@
 const Arr = require('./Arr')
+const Bool = require('./Bool')
 const Sym = require('./Sym')
 
 /**
@@ -42,8 +43,37 @@ function getTypeNameWithDatadef (obj) {
   return obj.getTypeName()
 }
 
+/**
+ * Check if the given object matches a type, evaluating type checking functions of datadefs, if needed.
+ * @param {Sym} expectedType Expected type
+ * @param {Obj} actual Object to check the type of
+ * @param {Interpreter} interpreter Interpreter instance for running type checking functions
+ * @returns {boolean|'unexpected'|'unknown'} True if the type matches, 'unexpected' if the type doesn't match and 'unknown' if the expected type is unknown (i.e. not built-in and no type checking function is available in the current dictionary)
+ */
+function * checkType (expectedType, actual, interpreter) {
+  if (actual.isAssignableTo(expectedType.toString())) {
+    return true
+  }
+
+  const typeChecker = interpreter._dictStack.get(`${expectedType.name.toLowerCase()}?`)
+  if (typeChecker) {
+    interpreter._stack.push(actual)
+    yield * interpreter.executeObj(typeChecker)
+    const typeMatches = interpreter._stack.pop()
+    if (!(typeMatches instanceof Bool) || typeMatches.value !== true) {
+      return 'unexpected'
+    }
+    return true
+  } else if (isBuiltInType(expectedType.toString())) {
+    return 'unexpected'
+  } else {
+    return 'unknown'
+  }
+}
+
 module.exports = {
   isBuiltInType,
   getDatadefType,
-  getTypeNameWithDatadef
+  getTypeNameWithDatadef,
+  checkType
 }

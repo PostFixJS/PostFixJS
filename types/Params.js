@@ -2,7 +2,7 @@ const Obj = require('./Obj')
 const Sym = require('./Sym')
 const Err = require('./Err')
 const Ref = require('./Ref')
-const { isBuiltInType, getTypeNameWithDatadef } = require('./util')
+const { isBuiltInType, getTypeNameWithDatadef, checkType } = require('./util')
 
 /**
  * A parameter list. This is used for function arguments and for declaration of struct data types.
@@ -134,22 +134,13 @@ class Params extends Obj {
       }
     }
     for (let i = 0; i < this.returns.length; i++) {
-      const expectedType = this.returns[i].toString()
+      const expectedType = this.returns[i]
       const actual = interpreter._stack.peek(this.returns.length - i - 1)
-      if (!actual.isAssignableTo(expectedType)) {
-        const typeChecker = interpreter._dictStack.get(`${this.returns[i].name.toLowerCase()}?`)
-        if (typeChecker) {
-          interpreter._stack.push(actual)
-          yield * interpreter.executeObj(typeChecker)
-          const typeMatches = interpreter._stack.pop()
-          if (typeMatches.value !== true) {
-            throw new Err(`Expected return value ${i + 1} to be of type ${expectedType} but got incompatible type ${getTypeNameWithDatadef(actual)}`, this.origin)
-          }
-        } else if (isBuiltInType(expectedType)) {
-          throw new Err(`Expected return value ${i + 1} to be of type ${expectedType} but got incompatible type ${getTypeNameWithDatadef(actual)}`, this.origin)
-        } else {
-          throw new Err(`Unknown expected return type ${expectedType} for return value ${i + 1}`, this.returns[i].origin || this.origin)
-        }
+      switch (yield * checkType(expectedType, actual, interpreter)) {
+        case 'unexpected':
+          throw new Err(`Expected return value ${i + 1} to be of type ${expectedType.toString()} but got incompatible type ${getTypeNameWithDatadef(actual)}`, this.origin)
+        case 'unknown':
+          throw new Err(`Unknown expected return type ${expectedType.toString()} for return value ${i + 1}`, this.returns[i].origin || this.origin)
       }
     }
   }
