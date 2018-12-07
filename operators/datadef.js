@@ -1,5 +1,5 @@
 const types = require('../types')
-const { getDatadefType } = require('../types/util')
+const { getDatadefType, getTypeNameWithDatadef, checkType } = require('../types/util')
 
 module.exports.datadef = {
   name: 'datadef',
@@ -169,7 +169,15 @@ function defineStruct (interpreter, definition, name) {
         interpreter._stack.push(obj.items[i + 2])
         yield * interpreter.executeObj(updater)
         const newValue = interpreter._stack.pop()
-        // TODO it is now possible to check type of the new value
+
+        const expectedType = param.type || new types.Sym('Obj')
+        switch (yield * checkType(expectedType, newValue, interpreter)) {
+          case 'unexpected':
+            throw new types.Err(`Expected the updater function to return ${expectedType.toString()} but it returned the incompatible type ${getTypeNameWithDatadef(newValue)}`, token || updater.origin)
+          case 'unknown': // should never happen
+            throw new types.Err(`Expected updater function to return the unknown type ${expectedType.toString()}`, token || updater.origin)
+        }
+
         const newObj = obj.copy()
         newObj.items[i + 2] = newValue
         newValue.refs++

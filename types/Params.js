@@ -2,7 +2,7 @@ const Obj = require('./Obj')
 const Sym = require('./Sym')
 const Err = require('./Err')
 const Ref = require('./Ref')
-const { isBuiltInType, getTypeNameWithDatadef, checkType } = require('./util')
+const { getTypeNameWithDatadef, checkType } = require('./util')
 
 /**
  * A parameter list. This is used for function arguments and for declaration of struct data types.
@@ -97,19 +97,12 @@ class Params extends Obj {
       const { ref, type } = this.params[i]
       const value = interpreter._stack.peek(top)
       top++
-      if (type != null && !value.isAssignableTo(type.toString())) {
-        const typeChecker = interpreter._dictStack.get(`${type.name.toLowerCase()}?`)
-        if (typeChecker) {
-          interpreter._stack.push(value)
-          yield * interpreter.executeObj(typeChecker)
-          const typeMatches = interpreter._stack.pop()
-          if (typeMatches.value !== true) {
+      if (type != null) {
+        switch (yield * checkType(type, value, interpreter)) {
+          case 'unexpected':
             throw new Err(`Expected ${type.toString()} but got incompatible type ${getTypeNameWithDatadef(value)} for parameter ${ref.name}`, callerToken || ref.origin)
-          }
-        } else if (isBuiltInType(type)) {
-          throw new Err(`Expected ${type.toString()} but got incompatible type ${getTypeNameWithDatadef(value)} for parameter ${ref.name}`, callerToken || ref.origin)
-        } else {
-          throw new Err(`Unknown type ${type.toString()} for parameter ${ref.name}`, callerToken || ref.origin)
+          case 'unknown':
+            throw new Err(`Unknown type ${type.toString()} for parameter ${ref.name}`, callerToken || ref.origin)
         }
       }
     }

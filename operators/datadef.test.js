@@ -97,6 +97,14 @@ test('the datadef updaters can access the outside dictionary', async (t) => {
   t.is(x.value, 6)
 })
 
+test('the datadef updaters check the return type of the updater', async (t) => {
+  await throwsErrorMessage(t, () => execute(`
+    Point: (x :Num, y :Num) datadef
+    3 4 point
+    { str "test" + } point-x-do point-x
+  `), checkErrorMessage('Expected the updater function to return :Num but it returned the incompatible type :Str'))
+})
+
 test('datadef can define union types with a union typecheck', async (t) => {
   let { stack } = await execute(`
     Point: [
