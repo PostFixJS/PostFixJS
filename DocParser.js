@@ -469,7 +469,8 @@ function parseDocComment (comment) {
       while (lastNonEmptyLine >= 0 && tag.value[lastNonEmptyLine].trim().length === 0) {
         lastNonEmptyLine--
       }
-      return { ...tag, value: tag.value.slice(0, lastNonEmptyLine + 1).join('\n') }
+      tag.value = tag.value.slice(0, lastNonEmptyLine + 1).join('\n')
+      return tag
     })
 
   const params = tags
