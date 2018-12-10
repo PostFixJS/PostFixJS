@@ -21,7 +21,8 @@ fac: (n :Int -> :Int) {
     ],
     returns: [
       { type: ':Int', description: 'Factorial of n' }
-    ]
+    ],
+    tags: {}
   }])
 })
 
@@ -40,7 +41,8 @@ fac: (n :Int -> :Int) {
     ],
     returns: [
       { type: ':Int', description: undefined }
-    ]
+    ],
+    tags: undefined
   }])
 })
 
@@ -60,7 +62,8 @@ foo: (n :Int -> :Str) {} fun
     ],
     returns: [
       { type: ':Str', description: undefined }
-    ]
+    ],
+    tags: {}
   }])
 })
 
@@ -81,7 +84,8 @@ foo: (n :Int -> :Str) {} fun
     ],
     returns: [
       { type: ':Str', description: 'The resulting string' }
-    ]
+    ],
+    tags: {}
   }])
 })
 
@@ -105,7 +109,8 @@ foo: (a b -> :Str) {} fun
     ],
     returns: [
       { type: ':Str', description: 'The resulting string' }
-    ]
+    ],
+    tags: {}
   }])
 })
 
@@ -123,7 +128,8 @@ foo: (-> :Str) {} fun
     params: [],
     returns: [
       { type: ':Str', description: undefined }
-    ]
+    ],
+    tags: {}
   }])
 })
 
@@ -132,14 +138,16 @@ test('DocParser supports functions that return nothing', async (t) => {
     name: 'noop',
     description: undefined,
     params: [],
-    returns: []
+    returns: [],
+    tags: undefined
   }])
 
   t.deepEqual(DocParser.getFunctions('noop: () {} fun'), [{
     name: 'noop',
     description: undefined,
     params: [],
-    returns: []
+    returns: [],
+    tags: undefined
   }])
 
   t.deepEqual(DocParser.getFunctions('pop: (top :Obj) {} fun'), [{
@@ -150,7 +158,8 @@ test('DocParser supports functions that return nothing', async (t) => {
       type: ':Obj',
       description: undefined
     }],
-    returns: []
+    returns: [],
+    tags: undefined
   }])
 })
 
@@ -172,7 +181,8 @@ firstTwo: (arr :Arr -> :Obj :Obj) {} fun
     returns: [
       { type: ':Obj', description: 'First element' },
       { type: ':Obj', description: 'Second element' }
-    ]
+    ],
+    tags: {}
   }])
 })
 
@@ -181,7 +191,40 @@ test('DocParser supports functions without params', async (t) => {
     name: 'test',
     description: undefined,
     params: [],
-    returns: []
+    returns: [],
+    tags: undefined
+  }])
+})
+
+test('DocParser finds examples for functions', async (t) => {
+  t.deepEqual(DocParser.getFunctions(`
+#<
+A demo function.
+@example "foo bar" demo # does something
+
+@example
+# a multiline example
+42 {
+  demo
+} fori
+
+@return A value
+>#
+demo: ( -> :Obj) {} fun
+  `), [{
+    name: 'demo',
+    description: 'A demo function.',
+    params: [],
+    returns: [{
+      type: ':Obj',
+      description: 'A value'
+    }],
+    tags: {
+      example: [ // note how surrounding empty lines are trimmed
+        '"foo bar" demo # does something',
+        '# a multiline example\n42 {\n  demo\n} fori'
+      ]
+    }
   }])
 })
 
@@ -223,7 +266,8 @@ condFun: (x :Int -> :Num) {} cond-fun
     ],
     returns: [
       { type: ':Num', description: 'Return value' }
-    ]
+    ],
+    tags: {}
   }])
 })
 
@@ -235,7 +279,8 @@ The answer to life, the universe and everything.
 answer: 42 !
   `), [{
     name: 'answer',
-    description: 'The answer to life, the universe and everything.'
+    description: 'The answer to life, the universe and everything.',
+    tags: {}
   }])
 })
 
@@ -247,7 +292,8 @@ The answer to life, the universe and everything.
 42 answer!
   `), [{
     name: 'answer',
-    description: 'The answer to life, the universe and everything.'
+    description: 'The answer to life, the universe and everything.',
+    tags: {}
   }])
 })
 
@@ -257,7 +303,8 @@ test('DocParser finds variable declarations with short syntax if the value is a 
 test: var!
   `), [{
     name: 'var',
-    description: undefined
+    description: undefined,
+    tags: undefined
   }])
 })
 
@@ -270,17 +317,20 @@ test('DocParser only finds the first declaration of a variable', async (t) => {
 21 test!
   `), [{
     name: 'test',
-    description: 'Test variable'
+    description: 'Test variable',
+    tags: {}
   }])
 })
 
 test('DocParser finds two successive variable definitions', async (t) => {
   t.deepEqual(DocParser.getVariables('21 a! 42 b!'), [{
     name: 'a',
-    description: undefined
+    description: undefined,
+    tags: undefined
   }, {
     name: 'b',
-    description: undefined
+    description: undefined,
+    tags: undefined
   }])
 })
 
@@ -298,14 +348,17 @@ test('DocParser finds datadef struct declarations', async (t) => {
     name: ':Point',
     description: 'A 2d point.',
     type: 'struct',
+    tags: {},
     fields: [{
       name: 'x',
       type: ':Num',
-      description: 'Position on the x-axis'
+      description: 'Position on the x-axis',
+      tags: {}
     }, {
       name: 'y',
       type: ':Num',
-      description: 'Position on the y-axis'
+      description: 'Position on the y-axis',
+      tags: {}
     }]
   }])
 })
@@ -336,31 +389,38 @@ Point: [
     name: ':Point',
     description: 'A 2d point.',
     type: 'union',
+    tags: {},
     types: [':Euclid', ':Polar']
   }, {
     name: ':Euclid',
     description: 'An euclidian point.',
     type: 'struct',
+    tags: {},
     fields: [{
       name: 'x',
       type: ':Num',
+      tags: {},
       description: 'Position on the x-axis'
     }, {
       name: 'y',
       type: ':Num',
+      tags: {},
       description: 'Position on the y-axis'
     }]
   }, {
     name: ':Polar',
     description: 'A point in polar coordinates.',
     type: 'struct',
+    tags: {},
     fields: [{
       name: 'theta',
       type: ':Num',
+      tags: {},
       description: 'The angular coordinate'
     }, {
       name: 'magnitude',
       type: ':Num',
+      tags: {},
       description: 'The radial coordinate'
     }]
   }])
@@ -382,33 +442,40 @@ Point: [
   `), [{
     name: ':Point',
     description: undefined,
+    tags: undefined,
     type: 'union',
     types: [':Euclid', ':Polar']
   }, {
     name: ':Euclid',
     description: undefined,
+    tags: undefined,
     type: 'struct',
     fields: [{
       name: 'x',
       type: ':Num',
-      description: undefined
+      description: undefined,
+      tags: undefined
     }, {
       name: 'y',
       type: ':Num',
-      description: undefined
+      description: undefined,
+      tags: undefined
     }]
   }, {
     name: ':Polar',
     description: undefined,
+    tags: undefined,
     type: 'struct',
     fields: [{
       name: 'theta',
       type: ':Num',
-      description: undefined
+      description: undefined,
+      tags: undefined
     }, {
       name: 'magnitude',
       type: ':Num',
-      description: undefined
+      description: undefined,
+      tags: undefined
     }]
   }])
 })
@@ -422,15 +489,18 @@ test('DocParser works fine with undocumented struct type declarations', async (t
   `), [{
     name: ':Polar',
     description: undefined,
+    tags: undefined,
     type: 'struct',
     fields: [{
       name: 'theta',
       type: ':Num',
-      description: undefined
+      description: undefined,
+      tags: undefined
     }, {
       name: 'magnitude',
       type: ':Num',
-      description: undefined
+      description: undefined,
+      tags: undefined
     }]
   }])
 })
@@ -449,7 +519,8 @@ test('DocParser does not use block comments that are not in the line above the t
     42 foo!
   `), [{
     name: 'foo',
-    description: undefined
+    description: undefined,
+    tags: undefined
   }])
 
   t.deepEqual(DocParser.getFunctions(`
@@ -462,7 +533,8 @@ test('DocParser does not use block comments that are not in the line above the t
     name: 'test',
     description: undefined,
     params: [{ name: 'x', type: undefined, description: undefined }],
-    returns: []
+    returns: [],
+    tags: undefined
   }])
 
   t.deepEqual(DocParser.getDatadefs(`
@@ -480,14 +552,17 @@ test('DocParser does not use block comments that are not in the line above the t
     name: ':Point',
     description: undefined,
     type: 'struct',
+    tags: undefined,
     fields: [{
       name: 'x',
       type: ':Int',
-      description: undefined
+      description: undefined,
+      tags: undefined
     }, {
       name: 'y',
       type: ':Int',
-      description: undefined
+      description: undefined,
+      tags: undefined
     }]
   }])
 
@@ -506,19 +581,23 @@ test('DocParser does not use block comments that are not in the line above the t
     name: ':Point',
     description: undefined,
     type: 'union',
+    tags: undefined,
     types: [':Euclid']
   }, {
     name: ':Euclid',
     description: undefined,
     type: 'struct',
+    tags: undefined,
     fields: [{
       name: 'x',
       type: ':Num',
-      description: undefined
+      description: undefined,
+      tags: undefined
     }, {
       name: 'y',
       type: ':Num',
-      description: undefined
+      description: undefined,
+      tags: undefined
     }]
   }])
 })
@@ -536,13 +615,16 @@ test('DocParser finds symbols', (t) => {
     :buzz
   `), [{
     name: ':foo',
-    description: undefined
+    description: undefined,
+    tags: undefined
   }, {
     name: ':bar',
-    description: 'Bar'
+    description: 'Bar',
+    tags: {}
   }, {
     name: ':buzz',
-    description: undefined
+    description: undefined,
+    tags: undefined
   }])
 })
 
@@ -562,6 +644,7 @@ fac: (n :Int -> :Int) {
     returns: [
       { type: ':Int', description: undefined }
     ],
+    tags: undefined,
     source: {
       params: {
         start: { line: 1, col: 5 }, // opening (
@@ -581,6 +664,7 @@ test('DocParser can include the source ranges of a function without params or wi
     description: undefined,
     params: [],
     returns: [],
+    tags: undefined,
     source: {
       params: undefined,
       body: {
@@ -595,6 +679,7 @@ test('DocParser can include the source ranges of a function without params or wi
     description: undefined,
     params: [],
     returns: [],
+    tags: undefined,
     source: {
       params: {
         start: { line: 0, col: 6 }, // opening (

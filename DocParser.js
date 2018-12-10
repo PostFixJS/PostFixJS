@@ -66,7 +66,8 @@ class DocParser {
             name: datadef.datadef.name,
             description: datadef.datadef.description,
             type: 'union',
-            types: datadef.datadef.types.map((type) => type.name)
+            types: datadef.datadef.types.map((type) => type.name),
+            tags: datadef.datadef.tags
           })
           for (const element of datadef.datadef.types) {
             datadefs.push(element)
@@ -100,11 +101,11 @@ class DocParser {
           const docToken = tokens[i - 1]
 
           foundSymbols.add(token.token)
+          const parsedComment = docToken != null && docToken.tokenType === 'BLOCK_COMMENT' && docToken.endLine === token.line - 1 ? parseDocComment(docToken.token) : null
           symbols.push({
             name: `:${symbolName}`,
-            description: docToken != null && docToken.tokenType === 'BLOCK_COMMENT' && docToken.endLine === token.line - 1
-              ? parseDocComment(docToken.token).description
-              : undefined
+            description: parsedComment ? parsedComment.description : undefined,
+            tags: parsedComment ? parsedComment.tags : undefined
           })
         }
       }
@@ -164,10 +165,12 @@ function getFunctionAt (tokens, i, options = { withRanges: false }) {
     docToken = tokens[i]
     doc = parseDocComment(tokens[i].token)
     fn.description = doc.description
+    fn.tags = doc.tags
     i++
   } else {
     doc = { params: {}, returns: [] }
     fn.description = undefined
+    fn.tags = undefined
   }
 
   if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
@@ -177,6 +180,7 @@ function getFunctionAt (tokens, i, options = { withRanges: false }) {
     if (docToken != null && docToken.endLine !== token.line - 1) {
       // ignore doc comments that are not in the line over the function symbol
       fn.description = undefined
+      fn.tags = undefined
       doc = { params: {}, returns: [] }
     }
   }
@@ -233,10 +237,13 @@ function getVariableAt (tokens, i) {
   let docToken
   if (tokens[i] && tokens[i].tokenType === 'BLOCK_COMMENT') {
     docToken = tokens[i]
-    variable.description = parseDocComment(tokens[i].token).description
+    const { description, tags } = parseDocComment(tokens[i].token)
+    variable.description = description
+    variable.tags = tags
     i++
   } else {
     variable.description = undefined
+    variable.tags = undefined
   }
 
   if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
@@ -248,6 +255,7 @@ function getVariableAt (tokens, i) {
     if (docToken != null && docToken.endLine !== token.line - 1) {
       // ignore doc comments that are not in the line over the function symbol
       variable.description = undefined
+      variable.tags = undefined
     }
 
     if (i < tokens.length && tokens[i].tokenType === 'DEFINITION') {
@@ -267,6 +275,7 @@ function getVariableAt (tokens, i) {
   if (docToken != null && tokens[i] && docToken.endLine !== tokens[i].line - 1) {
     // ignore doc comments that are not in the line over the function symbol
     variable.description = undefined
+    variable.tags = undefined
   }
   i = skipElement(tokens, i)
   if (i === false) return false
@@ -289,16 +298,20 @@ function getDatadefAt (tokens, i) {
   let docToken
   if (tokens[i] && tokens[i].tokenType === 'BLOCK_COMMENT') {
     docToken = tokens[i]
-    datadef.description = parseDocComment(tokens[i].token).description
+    const { description, tags } = parseDocComment(tokens[i].token)
+    datadef.description = description
+    datadef.tags = tags
     i++
   } else {
     datadef.description = undefined
+    datadef.tags = undefined
   }
 
   if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
     if (docToken != null && docToken.endLine !== tokens[i].line - 1) {
       // ignore doc comments that are not in the line over the function symbol
       datadef.description = undefined
+      datadef.tags = undefined
     }
 
     const token = tokens[i].token
@@ -314,11 +327,15 @@ function getDatadefAt (tokens, i) {
         if (tokens[i] && tokens[i].tokenType === 'REFERENCE' && tokens[i].token === 'datadef') {
           const struct = parseParamsList(tokens.slice(params.firstToken, params.lastToken + 1))
           datadef.type = 'struct'
-          datadef.fields = struct.params.map((param) => ({
-            name: param.name,
-            type: param.type,
-            description: param.doc ? parseDocComment(param.doc).description : undefined
-          }))
+          datadef.fields = struct.params.map((param) => {
+            const parsedDocs = param.doc && parseDocComment(param.doc)
+            return {
+              name: param.name,
+              type: param.type,
+              description: parsedDocs ? parsedDocs.description : undefined,
+              tags: parsedDocs ? parsedDocs.tags : undefined
+            }
+          })
           return { datadef, i }
         }
       }
@@ -331,12 +348,14 @@ function getDatadefAt (tokens, i) {
           datadef.type = 'union'
           datadef.types = []
 
-          let next = { description: undefined }
+          let next = { description: undefined, tags: undefined }
           let nextDescriptionToken
           for (let i = union.firstToken + 1; i < union.lastToken; i++) {
             if (tokens[i].tokenType === 'BLOCK_COMMENT') {
               nextDescriptionToken = tokens[i]
-              next.description = parseDocComment(tokens[i].token).description
+              const { description, tags } = parseDocComment(tokens[i].token)
+              next.description = description
+              next.tags = tags
             } else if (tokens[i].tokenType === 'SYMBOL') {
               next.name = normalizeSymbol(tokens[i].token, true)
               i++
@@ -345,19 +364,24 @@ function getDatadefAt (tokens, i) {
               if (params) {
                 const struct = parseParamsList(tokens.slice(params.firstToken, params.lastToken + 1))
                 next.type = 'struct'
-                next.fields = struct.params.map((param) => ({
-                  name: param.name,
-                  type: param.type,
-                  description: param.doc ? parseDocComment(param.doc).description : undefined
-                }))
+                next.fields = struct.params.map((param) => {
+                  const parsedDocs = param.doc && parseDocComment(param.doc)
+                  return {
+                    name: param.name,
+                    type: param.type,
+                    description: parsedDocs ? parsedDocs.description : undefined,
+                    tags: parsedDocs ? parsedDocs.tags : undefined
+                  }
+                })
 
                 if (nextDescriptionToken != null && nextDescriptionToken.endLine !== tokens[i].line - 1) {
                   // ignore doc comments that are not in the line over the function symbol
                   next.description = undefined
+                  next.tags = undefined
                 }
 
                 datadef.types.push(next)
-                next = { description: undefined }
+                next = { description: undefined, tags: undefined }
                 i = params.lastToken // + 1 is done by the for loop
               }
             }
@@ -420,14 +444,33 @@ function skipElement (tokens, i) {
  */
 function parseDocComment (comment) {
   const lines = comment.substring(2, comment.length - 2).trim().split('\n')
-  const firstParam = lines.findIndex((line) => line.trim()[0] === '@')
-  const tags = (firstParam >= 0 ? lines.slice(firstParam) : [])
-    .filter((line) => line[0] === '@')
-    .map((line) => {
-      const match = line.match(/^(@.+?)\s+(.+?)$/)
-      return match ? { tag: match[1], value: match[2] } : null
+  const firstTag = lines.findIndex((line) => line.trim()[0] === '@')
+  const tags = (firstTag >= 0 ? lines.slice(firstTag) : [])
+    .reduce((tags, line) => {
+      const match = line.match(/^(@.+?)(\s+(.+?))?$/)
+      if (match) {
+        if (match[3]) {
+          return [...tags, { tag: match[1], value: [match[3]] }]
+        } else {
+          return [...tags, { tag: match[1], value: [] }]
+        }
+      } else if (tags.length > 0) {
+        if (tags[tags.length - 1].value == null) {
+          tags[tags.length - 1].value = [line]
+        } else {
+          tags[tags.length - 1].value.push(line)
+        }
+      }
+      return tags
+    }, [])
+    .filter((tag) => tag.value != null && tag.value.length > 0)
+    .map((tag) => {
+      let lastNonEmptyLine = tag.value.length - 1
+      while (lastNonEmptyLine >= 0 && tag.value[lastNonEmptyLine].trim().length === 0) {
+        lastNonEmptyLine--
+      }
+      return { ...tag, value: tag.value.slice(0, lastNonEmptyLine + 1).join('\n') }
     })
-    .filter((tag) => tag != null)
 
   const params = tags
     .filter(({ tag }) => tag === '@param')
@@ -446,9 +489,20 @@ function parseDocComment (comment) {
     .map(({ value }) => ({ description: value }))
 
   return {
-    description: (firstParam >= 0 ? lines.slice(0, firstParam) : lines).join('\n') || undefined,
+    description: (firstTag >= 0 ? lines.slice(0, firstTag) : lines).join('\n') || undefined,
     params,
-    returns
+    returns,
+    tags: tags
+      .filter(({ tag }) => tag !== '@param' && tag !== '@return')
+      .reduce((tags, { tag, value }) => {
+        tag = tag.substr(1) // remove the @
+        if (!tags[tag]) {
+          tags[tag] = [value]
+        } else {
+          tags[tag].push(value)
+        }
+        return tags
+      }, {})
   }
 }
 
