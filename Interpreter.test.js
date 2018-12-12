@@ -127,7 +127,7 @@ test('The interpreter should support proper tail calls in cond bodies', async (t
   t.is(stack.pop().value, 720)
 })
 
-test('The interpreter should support proper tail calls in conf-fun bodies', async (t) => {
+test('The interpreter should support proper tail calls in cond-fun bodies', async (t) => {
   const { stack } = await execute(`
     factorial_tr: (acc :Int, n :Int) {
       { n 1 > } { acc n * n 1 - recur }
@@ -138,6 +138,20 @@ test('The interpreter should support proper tail calls in conf-fun bodies', asyn
   `, { maximumDictStackHeight: 2 })
   t.is(stack.count, 1)
   t.is(stack.pop().value, 720)
+})
+
+test('The interpreter should support proper tail calls when using exec', async (t) => {
+  const { stack, dictStack } = await execute(`
+  factorial_tr: (acc :Int, n :Int) {
+    { { n 1 > } { acc n * n 1 - recur: vref exec }
+     { true } { acc } } cond
+  } fun
+  factorial: (n :Int) { 1 n factorial_tr: vref exec } fun
+  6 factorial: vref exec
+  `, { maximumDictStackHeight: 2 })
+  t.is(stack.count, 1)
+  t.is(stack.pop().value, 720)
+  t.is(dictStack.count, 1)
 })
 
 test('Proper tail calls can be disabled', async (t) => {
