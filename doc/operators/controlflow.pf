@@ -3,12 +3,26 @@ Run `then` if the `condition` is true or `else` otherwise.
 @param condition A condition
 @param then Code to run if the condition is true
 @param else Code to run if the condition is false (optional)
+@example
+i 2 < {
+  # this is executed if i is less than 2
+} {
+  # this is executed otherwise
+} if
 >#
 if: (condition :Bool, then :ExeArr, else :ExeArr) {} fun
 
 #<
 Execute the first condition that returns `true`. Only the executable array of the first matching condition is executed.
 @param conditions Array of executable arrays, always pairs of an executable array that calculates a condition and an executable array that is executed if the condition is true
+@example
+# fizz buzz implementation (x is number)
+[
+  { x 15 mod 0 = } { "fizz buzz" println }
+  { x 3 mod 0 = } { "fizz" println }
+  { x 5 mod 0 = } { "buzz" println }
+  { true } { x println }
+] cond
 >#
 cond: (conditions :Arr) {} fun
 
@@ -17,12 +31,26 @@ Create a function that wraps `cond`.
 @param name Symbol for the function name
 @param params Parameter list of the function
 @param conditions Array of executable arrays, always pairs of an executable array that calculates a condition and an executable array that is executed if the condition is true
+@example
+# fizz buzz implementation (x is number)
+fizzbuzz: (x :Int) {
+  { x 15 mod 0 = } { "fizz buzz" println }
+  { x 3 mod 0 = } { "fizz" println }
+  { x 5 mod 0 = } { "buzz" println }
+  { true } { x println }
+} cond-fun
+30 fizzbuzz # prints "fizz buzz"
 >#
 cond-fun: (name :Sym, params :Params, conditions :Arr) {} fun
 
 #<
 Execute the given executable array until the loop is exited with `break` or `breakif`.
 @param body Executable array to run in a loop
+@example
+{
+  1000 sleep
+  "1 second passed" println
+} loop
 >#
 loop: (body :ExeArr) {} fun
 
@@ -32,6 +60,7 @@ Before every iteration, the current value is pushed on the stack.
 @param lower Start of the range (inclusive)
 @param upper End of the range (exclusive)
 @param body Executable array to run for number in the range
+@example 1 10 { println } for # prints the numbers from 1 to 9
 >#
 for: (lower :Int, upper :Int, body :ExeArr) {} fun
 
@@ -40,6 +69,7 @@ Execute the given executable array for every item of the array.
 Before every iteration, the current item is pushed on the stack.
 @param arr Array to iterate through
 @param body Executable array to run for every item
+@example [ 1 2 3 4 ] { 7 * println } for # prints 7, 14, 21, 28
 >#
 for: (arr :Arr, body :ExeArr) {} fun
 
@@ -48,6 +78,7 @@ Execute the given executable array for character of the string.
 Before every iteration, the current character is pushed on the stack.
 @param str A string
 @param body Executable array to run for every character
+@example "hello" { println } for # prints h, e, l, l, o (one letter per line)
 >#
 for: (str :Str, body :ExeArr) {} fun
 
@@ -56,6 +87,11 @@ Execute the given executable array for every item of the array.
 Before every iteration, the current item and index are pushed on the stack.
 @param arr Array to iterate through
 @param body Executable array to run for every item
+@example
+[ "a", "b", "c" ] {
+  i! v! # bind current index and item to variables
+  "item %d is %s" [i v] printfln
+} fori
 >#
 fori: (arr :Arr, body :ExeArr) {} fun
 
@@ -64,16 +100,35 @@ Execute the given executable array for character of the string.
 Before every iteration, the current character and index are pushed on the stack.
 @param str A string
 @param body Executable array to run for every character
+@example
+"hello" {
+  i! l! # bind current index and character to variables
+  "character %d is %s" [i l] printfln
+} fori
 >#
 fori: (str :Str, body :ExeArr) {} fun
 
 #<
 Break the current loop.
+@example
+0 i!
+{
+  i 1 + i!
+  # ...
+  i 5 = { break } if # leave the loop when i is 5
+} loop
 >#
 break: () {} fun
 
 #<
 Break the current loop if the condition is true.
 @param condition A condition
+@example
+0 i!
+{
+  i 1 + i!
+  # ...
+  i 5 = breakif # leave the loop when i is 5
+} loop
 >#
 breakif: (condition :Bool) {} fun
