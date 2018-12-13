@@ -12,8 +12,13 @@ module.exports.err = {
 
 module.exports.exec = {
   name: 'exec',
-  * execute (interpreter) {
-    yield * interpreter.executeObj(interpreter._stack.pop())
+  * execute (interpreter, token, { isTail = false } = {}) {
+    const obj = interpreter._stack.pop()
+    if (isTail && obj instanceof types.Lam) {
+      throw new TailCallException(obj)
+    } else {
+      yield * interpreter.executeObj(obj)
+    }
   }
 }
 
