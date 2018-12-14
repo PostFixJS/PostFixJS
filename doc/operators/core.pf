@@ -1,6 +1,7 @@
 #<
 Raise an error. This stops the program immediately.
 @param message An error message
+@example "This is an error." err
 >#
 err: (message :Str) {} fun
 
@@ -13,6 +14,7 @@ tailcall: (fn :Sym) {} fun
 #<
 Execute an object.
 @param obj Object to execute
+@example { #< more code here ># } exec # executes the executable array
 >#
 exec: (obj :Obj) {} fun
 
@@ -21,11 +23,21 @@ Create a function and save it into the current dictionary.
 @param name Symbol for the function name
 @param params Parameter list of the function (optional)
 @param body Function body
+@example
+#<
+Calculate the square of a number.
+@param n A number
+@return Squared number
+>#
+square: (n :Num -> :Num) {
+  n n *
+} fun
+2 square # returns 4
 >#
 fun: (name :Sym, params :Params, body :ExeArr) {} fun
 
 #<
-Create a lambda function.
+Create a lambda function. This is like `fun` but puts the function on the stack and not in the dictionary.
 @param params Parameter list of the function (optional)
 @param body Function body
 @return Lambda function
@@ -35,12 +47,28 @@ lam: (params :Params, body :ExeArr -> :Lam) {} fun
 #<
 Take a snapshot of the current dictionary and set copies of it as dictionary of the given functions.
 @param functions Array of symbols of the functions to update
+@example
+2 x!
+x-squared: {
+  x x *
+} fun
+x-squared # returns 4
+5 x!
+x-squared # still returns 4
+[:x-squared] update-lam
+x-squared # returns 25
 >#
 update-lam: (functions :Arr) {} fun
 
 #<
 Pop values from the stack and bind them to the parameter list, that is, put them into the current dictionary with the names from the parameter list. An error is thrown if types don't match.
 @param params Parameter list to bind the stack content to
+@example
+42
+"a string"
+(a :Int, s :Str) popv
+a # 42
+s # "a string"
 >#
 popv: (params :Params) {} fun
 
@@ -48,6 +76,10 @@ popv: (params :Params) {} fun
 Get the value of the given symbol from the current dictionary and put it on the stack, without executing it.
 @param sym Name of a dictionary entry
 @return Value of the dictionary entry
+@example
+demo: { "test" println } fun
+:demo vref # get a reference to demo, but don't execute it
+exec # execute the reference (prints "test")
 >#
 vref: (sym :Sym -> :Obj) {} fun
 
@@ -55,6 +87,9 @@ vref: (sym :Sym -> :Obj) {} fun
 Check if an object is an empty array or executable array or nil.
 @param obj Object
 @return True if the object is an empty array or executable array or nil, false otherwise
+@example
+[1, 2, 3] empty? # false
+[] empty? # true
 >#
 empty?: (obj :Obj -> :Bool) {} fun
 
@@ -62,5 +97,8 @@ empty?: (obj :Obj -> :Bool) {} fun
 Put a value in the dictionary under the specified name.
 @param name Name of the dictionary entry
 @param value value
+@example
+42 x!
+x # put the value of x (42) on the stack
 >#
 !: (name :Sym, value :Obj) {} fun
