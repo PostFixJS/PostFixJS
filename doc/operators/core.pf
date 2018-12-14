@@ -24,15 +24,10 @@ Create a function and save it into the current dictionary.
 @param params Parameter list of the function (optional)
 @param body Function body
 @example
-#<
-Calculate the square of a number.
-@param n A number
-@return Squared number
->#
-square: (n :Num -> :Num) {
-  n n *
+double: (n :Num -> :Num) {
+  n 2 *
 } fun
-2 square # returns 4
+2 double # returns 4
 >#
 fun: (name :Sym, params :Params, body :ExeArr) {} fun
 
