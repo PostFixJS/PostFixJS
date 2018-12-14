@@ -2,6 +2,8 @@
 Get the length of a string.
 @param str String
 @return Length of the string
+
+@example "hello world" length # returns 11
 >#
 length: (str :Str -> :Int) {} fun
 
@@ -9,6 +11,8 @@ length: (str :Str -> :Int) {} fun
 Get the length of an array.
 @param arr Array
 @return Length of the array
+
+@example [ "a" 3 ] length # returns 2
 >#
 length: (arr :Arr -> :Int) {} fun
 

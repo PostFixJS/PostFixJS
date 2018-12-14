@@ -16,7 +16,7 @@ if: (condition :Bool, then :ExeArr, else :ExeArr) {} fun
 Execute the first condition that returns `true`. Only the executable array of the first matching condition is executed.
 @param conditions Array of executable arrays, always pairs of an executable array that calculates a condition and an executable array that is executed if the condition is true
 @example
-# fizz buzz implementation (x is number)
+# fizz buzz implementation (x is a number)
 [
   { x 15 mod 0 = } { "fizz buzz" println }
   { x 3 mod 0 = } { "fizz" println }
@@ -32,7 +32,7 @@ Create a function that wraps `cond`.
 @param params Parameter list of the function
 @param conditions Array of executable arrays, always pairs of an executable array that calculates a condition and an executable array that is executed if the condition is true
 @example
-# fizz buzz implementation (x is number)
+# fizz buzz implementation
 fizzbuzz: (x :Int) {
   { x 15 mod 0 = } { "fizz buzz" println }
   { x 3 mod 0 = } { "fizz" println }
