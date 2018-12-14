@@ -25,6 +25,9 @@ dup: (obj :Obj -> :Obj, :Obj) {} fun
 Copy the i-th object (from top) of the stack on top of the stack.
 @param i Offset of the object to copy, from the top of the stack
 @return The copied object
+@example
+1 2 3 4 5 # put some elements on the stack
+4 copy # returns the 4th element from top, i.e. 1
 >#
 copy: (i :Int -> :Obj) {} fun
 

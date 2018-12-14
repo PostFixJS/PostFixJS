@@ -2,6 +2,7 @@
 Get the type of an object.
 @param obj Object
 @return The type of the object
+@returns "a string" type # returns :Str
 >#
 type: (obj :Obj -> :Sym) {} fun
 
@@ -86,6 +87,7 @@ sym?: (obj :Obj -> :Bool) {} fun
 Convert the given object to a string.
 @param obj Object
 @return String representation of the object
+@example 10 str # returns the string "10"
 >#
 str: (obj :Obj -> :Str) {} fun
 
@@ -93,6 +95,8 @@ str: (obj :Obj -> :Str) {} fun
 Convert the given object to a float.
 @param obj Object
 @return Object parsed to a float, or `nil` if not possible
+@example "3.14" flt # returns 3.14 as :Flt
+@example "not a number" flt # returns nil
 >#
 flt: (obj :Obj -> :Flt) {} fun
 
@@ -100,6 +104,8 @@ flt: (obj :Obj -> :Flt) {} fun
 Convert the given object to an integer.
 @param obj Object
 @return Object parsed to an integer, or `nil` if not possible
+@example "1" int # returns 1 as :Int
+@example "not a number" int # returns nil
 >#
 int: (obj :Obj -> :Int) {} fun
 
@@ -107,6 +113,7 @@ int: (obj :Obj -> :Int) {} fun
 Convert the given object to a symbol.
 @param obj String or symbol
 @return The specified symbol or a new symbol with the given name if the argument is a string
+@example "test" sym # returns :test
 >#
 sym: (obj :Obj -> :Sym) {} fun
 
