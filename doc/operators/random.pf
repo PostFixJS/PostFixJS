@@ -15,5 +15,9 @@ rand-int: (n :Int -> :Int) {} fun
 Initialize the random number generator with the given seed. When initialized
 with the same seed, the generated random numbers will be deterministic.
 @param seed Any number to be used as seed
+@example
+1 rand-seed # seed the random number generator
+10 rand-int # 2
+10 rand-int # 4
 >#
 rand-seed: (seed :Int) {} fun

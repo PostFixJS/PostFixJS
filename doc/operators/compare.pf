@@ -3,6 +3,7 @@ Check if a is smaller than b.
 @param a Number a
 @param b Number b
 @return true if a is smaller than b, false otherwise
+@example 1 2 < # true
 >#
 <: (a :Num, b :Num -> :Bool) {} fun
 
@@ -11,6 +12,7 @@ Check if the string a appears before b when sorted alphabetically.
 @param a String a
 @param b String b
 @return true if a comes before b in alphabetical order, false otherwise
+@example "zebra" "apple" < # false
 >#
 <: (a :Str, b :Str -> :Bool) {} fun
 
@@ -99,6 +101,7 @@ Check if two objects are approximately equal, according to the following rules:
 @param b Object b
 @param tolerance Tolerance for comparing numbers
 @return true if the objects are approximately equal, false otherwise
+@example 1.25 1.0 0.3 ~= # returns true
 >#
 ~=: (a :Obj, b :Obj, tolerance :Num -> :Bool) {} fun
 
@@ -113,5 +116,6 @@ Check if two objects are not approximately equal, according to the following rul
 @param b Object b
 @param tolerance Tolerance for comparing numbers
 @return true if the objects are not approximately equal, false otherwise
+@example 1.25 1.0 0.3 !~= # returns false
 >#
 !~=: (a :Obj, b :Obj, tolerance :Num -> :Bool) {} fun
