@@ -2,6 +2,7 @@
 Remove whitespace from the start and end of a string.
 @param str String
 @return Trimmed string
+@example "  test " trim # "test"
 >#
 trim: (str :Str -> :Str) {} fun
 
@@ -9,6 +10,7 @@ trim: (str :Str -> :Str) {} fun
 Transform a string to lower-case.
 @param str String
 @return String in lower-case
+@example "dEmO" lower-case # "demo"
 >#
 lower-case: (str :Str -> :Str) {} fun
 
@@ -16,6 +18,7 @@ lower-case: (str :Str -> :Str) {} fun
 Transform a string to upper-case.
 @param str String
 @return String in upper-case
+@example "dEmO" upper-case # "DEMO"
 >#
 upper-case: (str :Str -> :Str) {} fun
 
@@ -23,6 +26,7 @@ upper-case: (str :Str -> :Str) {} fun
 Get the characters of a string.
 @param str String
 @return Array of character codes
+@example "test" str->chars # returns [116, 101, 115, 116]
 >#
 str->chars: (str :Str -> :Arr) {} fun
 
@@ -30,6 +34,7 @@ str->chars: (str :Str -> :Arr) {} fun
 Create a string from an array of character codes.
 @param chars Characters codes
 @return String with the given character codes
+@example [116, 101, 115, 116] chars->str # returns "test"
 >#
 chars->str: (chars :Arr -> :Str) {} fun
 
@@ -37,6 +42,7 @@ chars->str: (chars :Arr -> :Str) {} fun
 Get the character of a given character code.
 @param char Character code
 @return Character as string
+@example 65 char->str # "A"
 >#
 char->str: (char :Int -> :Str) {} fun
 
@@ -45,6 +51,7 @@ Split a string using a regular expression. The string is split wherever it match
 @param str String
 @param regex A regular expression
 @return Splitted parts
+@example "a,b,c,d" "," split # returns ["a", "b", "c", "d"]
 >#
 split: (str :Str, regex :Str -> :Arr) {} fun
 
@@ -54,6 +61,7 @@ Replace the first match of a regular expression in a string.
 @param regex A regular expression
 @param replace String to replace the match with
 @return Modified string
+@example "test" "t" "r" replace-first # returns "rest"
 >#
 replace-first: (str :Str, regex :Str, replace :Str -> :Str) {} fun
 
@@ -63,6 +71,7 @@ Replace the all matches of a regular expression in a string.
 @param regex A regular expression
 @param replace String to replace the matches with
 @return Modified string
+@example "test" "t" "r" replace-all # returns "resr"
 >#
 replace-all: (str :Str, regex :Str, replace :Str -> :Str) {} fun
 
@@ -72,5 +81,6 @@ This uses a C-style format string, e.g. `%d` is used for integers, `%s` for stri
 @param format Format string
 @param params Parameters
 @return Formatted string
+@example "1 + 1 = %d" [1 1 +] format # returns "1 + 1 = 2"
 >#
 format: (format :Str, params :Arr -> :Str) {} fun
