@@ -135,9 +135,10 @@ class Interpreter {
       if (builtIn != null) {
         // this is an optimization; don't create an intermediate Obj instance
         // if it is executed right away
-        if (this._openExeArrs > 0) {
-          const operation = new types.Op(builtIn, token)
-          this._stack.push(operation)
+        if (this._openParamLists > 0) {
+          this._stack.push(types.Ref.fromToken(token))
+        } else if (this._openExeArrs > 0) {
+          this._stack.push(new types.Op(builtIn, token))
         } else {
           try {
             const result = builtIn.execute(this, token)
@@ -152,8 +153,7 @@ class Interpreter {
         // this is an optimization; don't create an intermediate Ref instance
         // if it is executed right away
         if (this._openExeArrs > 0 || this._openParamLists > 0) {
-          const ref = types.Ref.fromToken(token)
-          this._stack.push(ref)
+          this._stack.push(types.Ref.fromToken(token))
         } else {
           const value = this._dictStack.get(token.token)
           if (value) {
