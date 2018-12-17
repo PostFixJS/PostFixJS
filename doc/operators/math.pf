@@ -63,9 +63,10 @@ Calculate the remainder of a divison.
 mod: (a :Num, b :Num -> :Num) {} fun
 
 #<
-The mathematical constant Pi.
+Get the mathematical constant Pi.
+@return Pi
 >#
-3.141 PI!
+PI: (-> :Flt) {} fun
 
 #<
 Get the signum of a number.
