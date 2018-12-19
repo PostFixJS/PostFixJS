@@ -204,7 +204,7 @@ test('DocParser finds examples for functions', async (t) => {
   t.deepEqual(DocParser.getFunctions(`
 #<
 A demo function.
-@example "foo bar" demo # does something
+@example "foo bar" demo #< does something >#
 
 @example
 # a multiline example
@@ -225,7 +225,7 @@ demo: ( -> :Obj) {} fun
     }],
     tags: {
       example: [ // note how surrounding empty lines are trimmed
-        '"foo bar" demo # does something',
+        '"foo bar" demo #< does something >#',
         '# a multiline example\n42 {\n  demo\n} fori'
       ]
     }
@@ -721,5 +721,39 @@ test('DocParser finds param lists with ranges', (t) => {
         line: 0
       }
     }
+  }])
+})
+
+test('DocParser finds lambda functions', (t) => {
+  t.deepEqual(DocParser.getLambdaFunctions(`
+  (a :Obj, b -> :Int) {
+
+} lam
+`, { withRanges: true }), [{
+    description: undefined,
+    params: [{
+      description: undefined,
+      name: 'a',
+      type: ':Obj'
+    }, {
+      description: undefined,
+      name: 'b',
+      type: undefined
+    }],
+    returns: [{
+      description: undefined,
+      type: ':Int'
+    }],
+    source: {
+      params: {
+        start: { col: 2, line: 1 },
+        end: { col: 20, line: 1 }
+      },
+      body: {
+        start: { col: 22, line: 1 },
+        end: { col: 0, line: 3 }
+      }
+    },
+    tags: undefined
   }])
 })

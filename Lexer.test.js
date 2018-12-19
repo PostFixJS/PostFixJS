@@ -45,18 +45,26 @@ test`)
 })
 
 test('The lexer handles nested multiline comments correctly', t => {
-  const tokens = Lexer.parse(`
+  t.deepEqual(Lexer.parse(`
   #< comment
-  with multiple lines #< nested
-  multiline comment >#
+  with multiple lines #< nested multiline comment >#
   # nested single line comment
-  ># test`)
-  t.deepEqual(tokens, [{
+  ># test`, { emitComments: true }), [{
+    line: 1,
+    col: 2,
+    endCol: 4,
+    endLine: 4,
+    token: `#< comment
+  with multiple lines #< nested multiline comment >#
+  # nested single line comment
+  >#`,
+    tokenType: 'BLOCK_COMMENT'
+  }, {
     token: 'test',
     tokenType: 'REFERENCE',
-    line: 5,
+    line: 4,
     col: 5,
-    endLine: 5,
+    endLine: 4,
     endCol: 9
   }])
 })

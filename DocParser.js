@@ -540,7 +540,7 @@ function skipElement (tokens, i) {
 
 /**
  * Parse a Javadoc-style documentation comment. It supports return and param tags.
- * @param {string} comment Raw documentation comment, including <# and #>
+ * @param {string} comment Raw documentation comment, including #< and >#
  * @returns {object} Parsed comment with params, returns and description
  */
 function parseDocComment (comment) {
