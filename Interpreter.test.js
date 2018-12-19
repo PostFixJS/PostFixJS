@@ -8,6 +8,15 @@ test('Param list in ExeArrs should work as expected', async (t) => {
   t.true(stack.pop() instanceof types.Params)
 })
 
+test('Operators should not be executed in a param list', async (t) => {
+  const { stack } = await execute('(a b err)') // in the buggy implementation, err would be executed
+  t.is(stack.count, 1)
+  const params = stack.pop()
+  t.true(params instanceof types.Params)
+  t.is(params.params.length, 3)
+  t.is(params.returns, null)
+})
+
 test('Trying to get elements from an empty stack should throw an error', async (t) => {
   await throwsErrorMessage(t, async () => {
     await execute('42 pop pop')
