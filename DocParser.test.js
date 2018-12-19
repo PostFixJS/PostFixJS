@@ -26,6 +26,10 @@ fac: (n :Int -> :Int) {
   }])
 })
 
+test('DocParser ignores invalid functions', async (t) => {
+  t.deepEqual(DocParser.getFunctions('fun\n{} fun'), [])
+})
+
 test('DocParser gets the signature of an undocumented function', async (t) => {
   const functions = DocParser.getFunctions(`
 fac: (n :Int -> :Int) {

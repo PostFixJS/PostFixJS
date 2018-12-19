@@ -28,6 +28,28 @@ class DocParser {
   }
 
   /**
+   * Get all lambda function signatures and related documentation from the given code.
+   * @param {string} code PostFix code
+   * @param {object} options Options
+   * @param {bool} options.withRanges True to include body ranges of the functions
+   * @return {object[]} Lambda function signatures with descriptions
+   */
+  static getLambdaFunctions (code, options = { withRanges: false }) {
+    const functions = []
+    const tokens = Lexer.parse(code, { emitComments: true })
+
+    for (let i = 0; i < tokens.length; i++) {
+      const fn = getLambdaFunctionAt(tokens, i, options)
+      if (fn !== false) {
+        functions.push(fn.fn)
+        i = fn.i
+      }
+    }
+
+    return functions
+  }
+
+  /**
    * Get all variable declarations and related documentation from the given code.
    * @param {string} code PostFix code
    * @return {object[]} Variable names with descriptions
@@ -183,7 +205,10 @@ function getFunctionAt (tokens, i, options = { withRanges: false }) {
       fn.tags = undefined
       doc = { params: {}, returns: [] }
     }
+  } else {
+    return false // function has no name and thus can't be a function
   }
+
   i++
   const params = readParamsList(tokens, i)
   if (params) {
@@ -218,6 +243,82 @@ function getFunctionAt (tokens, i, options = { withRanges: false }) {
     i = skipElement(tokens, i) // skip the executable array
   }
   if (i !== false && i < tokens.length && tokens[i].tokenType === 'REFERENCE' && (tokens[i].token === 'fun' || tokens[i].token === 'cond-fun')) {
+    if (options.withRanges) {
+      fn.source.body.end = { line: tokens[i - 1].line, col: tokens[i - 1].col }
+    }
+    return { fn, i }
+  }
+  return false
+}
+
+/**
+ * Get the lambda function at the given token index.
+ * @param {object[]} tokens Tokens
+ * @param {number} i Starting index
+ * @param {object} options Options
+ * @param {bool} options.withRanges True to include body ranges of the functions
+ * @returns {object} Function and index of the first token after the function, or false if no function was found
+ */
+function getLambdaFunctionAt (tokens, i, options = { withRanges: false }) {
+  const fn = {}
+  if (options.withRanges) {
+    fn.source = {}
+  }
+
+  let doc
+  let docToken
+  if (tokens[i] && tokens[i].tokenType === 'BLOCK_COMMENT') {
+    docToken = tokens[i]
+    doc = parseDocComment(tokens[i].token)
+    fn.description = doc.description
+    fn.tags = doc.tags
+    i++
+  } else {
+    doc = { params: {}, returns: [] }
+    fn.description = undefined
+    fn.tags = undefined
+  }
+
+  const params = readParamsList(tokens, i)
+  if (params) {
+    if (docToken != null && docToken.endLine !== tokens[i].line - 1) {
+      // ignore doc comments that are not in the line over the function symbol
+      fn.description = undefined
+      fn.tags = undefined
+      doc = { params: {}, returns: [] }
+    }
+
+    i = params.lastToken + 1
+    const paramsAndReturns = parseParamsList(tokens.slice(params.firstToken, params.lastToken + 1))
+    fn.params = paramsAndReturns.params.map((param) => ({
+      name: param.name,
+      type: param.type,
+      description: doc.params[param.name]
+    }))
+    fn.returns = paramsAndReturns.returns.map((type, i) => ({
+      type,
+      description: doc.returns.length > i ? doc.returns[i].description : undefined
+    }))
+    if (options.withRanges) {
+      fn.source.params = {
+        start: { line: tokens[params.firstToken].line, col: tokens[params.firstToken].col },
+        end: { line: tokens[params.lastToken].line, col: tokens[params.lastToken].col }
+      }
+    }
+  } else {
+    fn.params = []
+    fn.returns = []
+    if (options.withRanges) {
+      fn.source.params = undefined
+    }
+  }
+  if (i !== false && i < tokens.length) {
+    if (options.withRanges) {
+      fn.source.body = { start: { line: tokens[i].line, col: tokens[i].col } }
+    }
+    i = skipElement(tokens, i) // skip the executable array
+  }
+  if (i !== false && i < tokens.length && tokens[i].tokenType === 'REFERENCE' && tokens[i].token === 'lam') {
     if (options.withRanges) {
       fn.source.body.end = { line: tokens[i - 1].line, col: tokens[i - 1].col }
     }
