@@ -10,13 +10,13 @@ and: (a :Bool, b :Bool -> :Bool) {} fun
 Check if all values in the array are :Bool and true. All items are executed, so executable arrays that produce a :Bool may be used. The evaluation is stopped when the first non-true value is encountered.
 @param arr Array of items to check
 @return True if all items are true, false otherwise
-@example [true {1 2 <}] or # returns true
+@example [true {1 2 <}] and # returns true
 @example
 [
   {1 2 <}
   false
   {#< this is never executed >#}
-] or # returns false
+] and # returns false
 >#
 and: (arr :Arr -> :Bool) {} fun
 
