@@ -122,12 +122,14 @@ class Stack {
 
   /**
    * Create a copy of this stack.
+   * @returns {Stack} A copy of this stack
    */
   copy () {
     const copy = new Stack()
     copy._stack = this._stack.slice()
     copy._minStackHeight = this._minStackHeight.slice()
     copy._currentMinStackHeight = this._currentMinStackHeight
+    return copy
   }
 }
 
