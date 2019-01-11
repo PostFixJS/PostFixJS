@@ -478,8 +478,7 @@ class Interpreter {
     interpreter._testReporter = this._testReporter
     // TODO copy objects if needed (or add reference counting later)
     interpreter._stack = this._stack.copy()
-    interpreter._dictStack._dict = this._dictStack.copyDict()
-    interpreter._dictStack._stack = [interpreter._dictStack._dict]
+    interpreter._dictStack = this._dictStack.copyCurrent()
     interpreter._openExeArrs = this._openExeArrs
     interpreter._openParamLists = this._openParamLists
     return interpreter

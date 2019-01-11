@@ -84,6 +84,18 @@ class DictStack {
   getDicts () {
     return this._stack
   }
+
+  /**
+   * Create a copy of this dictionary stack that only includes
+   * the topmost dictionary.
+   * @returns {DictStack} New dictionary stack with a copy of the topmost dictionary
+   */
+  copyCurrent () {
+    const copy = new DictStack()
+    copy._dict = this.copyDict()
+    copy._stack = [copy._dict]
+    return copy
+  }
 }
 
 module.exports = DictStack

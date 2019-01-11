@@ -198,3 +198,15 @@ test('Numbers support E-notation', async (t) => {
     2e-2 0.02 test=
   `, t)
 })
+
+test('The interpreter can be copied', async (t) => {
+  const Interpreter = require('./Interpreter')
+  const Stack = require('./Stack')
+  const DictStack = require('./DictStack')
+
+  const interpreter = new Interpreter()
+  const copy = interpreter.copy()
+
+  t.true(copy._stack instanceof Stack, 'Missing stack')
+  t.true(copy._dictStack instanceof DictStack, 'Missing dictionary stack')
+})
