@@ -56,9 +56,11 @@ function compare (a, b, token) {
     return a.value.localeCompare(b.value)
   } else if (a instanceof types.Bool && b instanceof types.Bool) {
     if (a.value === b.value) return 0
-    return a ? 1 : -1 // true > false
+    return a.value ? 1 : -1 // true > false
   } else if (a instanceof types.Sym && b instanceof types.Sym) {
     return a.name.localeCompare(b.name)
+  } else if (a instanceof types.Nil && b instanceof types.Nil) {
+    return !isEqual(a, b) | 0
   } else if (a instanceof types.Arr && b instanceof types.Arr) {
     const n = Math.min(a.items.length, b.items.length)
     for (let i = 0; i < n; i++) {

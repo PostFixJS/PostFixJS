@@ -157,9 +157,13 @@ class Interpreter {
         } else {
           const value = this._dictStack.get(token.token)
           if (value) {
+            if (value instanceof types.ExeArr
+              && value.items.some(_token => _token.origin != null && !_token.origin.tokenType.localeCompare("REFERENCE")
+                && !_token.origin.token.localeCompare(token.token)))
+              throw new types.Err(`Executing "${token.token}" will result in an endless loop`, token)
             try {
               const result = value.execute(this, { callerToken: token })
-              if (result != null && result[Symbol.iterator]) {
+              if (result !== undefined && result[Symbol.iterator]) {
                 yield * result
               }
             } catch (e) {
@@ -238,7 +242,7 @@ class Interpreter {
     } else {
       try {
         const result = obj.execute(this, { isTail })
-        if (result != null && result[Symbol.iterator]) {
+        if (result !== undefined && result[Symbol.iterator]) {
           yield * result
         }
       } catch (e) {
@@ -406,9 +410,8 @@ class Interpreter {
       promise: new Promise((resolve, reject) => {
         token.onCancel(() => reject(new Error('cancelled')))
         const continueExecution = async () => {
-          let isDone = false
           let promiseResult
-          while (!isDone) {
+          while (true /* !isDone */) {
             try {
               const { done, value } = stepper.next(promiseResult)
               promiseResult = undefined
@@ -421,7 +424,7 @@ class Interpreter {
                   return
                 }
               } else if (done) {
-                isDone = true
+                // isDone = true
                 resolve()
                 return
               } else if (token.cancelled) {

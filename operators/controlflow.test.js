@@ -51,6 +51,10 @@ test('break should throw an error when when used outside of a loop when using ex
   await throwsErrorMessage(t, () => execute('{ 1 break 2 3 } exec'), checkErrorMessage('break can only be used in a loop'))
 })
 
+test('executing a self-referencing executable array should throw an error when leading to a crash', async (t) => {
+  await throwsErrorMessage(t, () => execute(':a {a} ! a'), checkErrorMessage('Executing "a" will result in an endless loop'))
+})
+
 test('breakif should leave a loop', async (t) => {
   const { stack } = await executeTimeout('1 3 { i! 1 true breakif 3 4 5 } for', 1000)
   t.is(stack.count, 1)

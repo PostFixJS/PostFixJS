@@ -19,6 +19,8 @@ module.exports.datadef = {
       defineStruct(interpreter, definition, name)
     } else if (definition instanceof types.Arr) {
       if (definition instanceof types.ExeArr) {
+        if(definition instanceof types.Lam)
+          throw new types.Err('Lambdas are not allowed in datadef definitions', token)
         // convert the :ExeArr to :Arr by executing it
         yield * interpreter.executeObj(new types.Marker('ArrOpen'))
         yield * interpreter.executeObj(definition)
@@ -119,7 +121,7 @@ function defineStruct (interpreter, definition, name) {
         const params = new types.Params([{ ref: structNameRef, type: name }])
         yield * params.checkParams(interpreter, { callerToken: token })
         const obj = interpreter._stack.pop()
-        if (obj.length <= i + 2) {
+        if (obj.items.length <= i + 2) {
           // could happen when the user destroys the array
           throw new types.Err(`Invalid ${name} instance`, token)
         }
@@ -138,7 +140,7 @@ function defineStruct (interpreter, definition, name) {
 
         const value = interpreter._stack.pop()
         const obj = interpreter._stack.pop()
-        if (obj.length <= i + 2) {
+        if (obj.items.length <= i + 2) {
           // could happen when the user destroys the array
           throw new types.Err(`Invalid ${name} instance`, token)
         }
@@ -161,7 +163,7 @@ function defineStruct (interpreter, definition, name) {
 
         const updater = interpreter._stack.pop()
         const obj = interpreter._stack.pop()
-        if (obj.length <= i + 2) {
+        if (obj.items.length <= i + 2) {
           // could happen when the user destroys the array
           throw new types.Err(`Invalid ${name} instance`, token)
         }

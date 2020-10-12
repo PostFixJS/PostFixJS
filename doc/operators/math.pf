@@ -52,7 +52,7 @@ Divide two numbers and discard the remainder.
 @param b Divisor
 @return The quotient of the two numbers, without the remainder
 >#
-i/: (a :Num, b :Num -> :Int) {} fun
+div: (a :Num, b :Num -> :Int) {} fun
 
 #<
 Calculate the remainder of a divison.

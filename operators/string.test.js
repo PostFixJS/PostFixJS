@@ -1,6 +1,6 @@
 import test from 'ava'
 const types = require('../types')
-const { execute } = require('../test/helpers/util')
+const { execute, throwsErrorMessage, checkErrorMessage } = require('../test/helpers/util')
 
 test('trim should trim a string', async (t) => {
   const { stack } = await execute('"  test " trim')
@@ -70,4 +70,27 @@ test('format formats a string, just like C\'s vsprintf', async (t) => {
   const { stack } = await execute('"answer to everything = %d" [42] format')
   t.is(stack.count, 1)
   t.is(stack.pop().value, 'answer to everything = 42')
+})
+
+test('using certain invalid placeholders in format strings does not crash the interpreter', async (t) => {
+  await throwsErrorMessage(t, () => execute('"t%:t" [4] format'),
+    checkErrorMessage('Invalid format string: "t%:t" - [sprintf] unexpected placeholder'))
+})
+
+test('parameter mismatch in format string does not crash the interpreter', async (t) => {
+  await throwsErrorMessage(t, () => execute('"%d%s" ["test" 4] format'),
+    checkErrorMessage('Parameters [STRING,INTEGER] do not match format string: "%d%s"' +
+      ' - [sprintf] expecting number but found string'))
+})
+
+test('using the %v placeholder from the sprintf-js module does not crash the interpreter', async (t) => {
+  await throwsErrorMessage(t, () => execute('"%v" { } format'),
+    checkErrorMessage('The parameter for the placeholder %v was empty'))
+  await throwsErrorMessage(t, () => execute('"t%2$v" { } format'),
+    checkErrorMessage('The parameter for the placeholder %v was empty'))
+})
+
+test('replacement fields are forbidden as they can be abused to access javascript objects', async (t) => {
+  await throwsErrorMessage(t, () => execute('"%(test)s" { "alert(\'FlX\');" } format'),
+    checkErrorMessage('Replacement fields, such as "%(test)s", are not allowed'))
 })

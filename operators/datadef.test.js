@@ -228,3 +228,20 @@ test('Recursive types should work', async (t) => {
     c b-arg
   `), checkErrorMessage('Expected :B but got incompatible type :C for parameter b'))
 })
+
+test('Datadef does not crash the interpreter when trying to use special lambdas in the definition', async (t) => {
+  const payload = "696E743A205B0D0A2020205B0D0A213D200D7B0D207B0D0A0D0A7D6E0D203A496E7429206DF4C800F996760A0D0A7D206C616D200A0D0A2020506F6C61723A20280D0A200105FFFF0565746120FD32224E756D2C0D0A202020206D61676E3A0D007429207B0D2D31202C74616E28000D0A0D0A7D206C616D0A0D20646174616465660D0A0D0A2274657374290D0A5D206461746164C5660D0A0D0A227465735D11202878203A496E742C2079204F466C74202D3E200091B47B403A537472290D0A0D0A2861203A4F626A2C2062202D3E203A496E7429207B0D0A0D0A7D206C616D"
+  await throwsErrorMessage(t, () => execute(Buffer.from(payload, 'hex').toString()),
+    checkErrorMessage('Lambdas are not allowed in datadef definitions'))
+})
+
+test('Accessing invalid Datadef instances does not crash the interpreter', async (t) => {
+  await throwsErrorMessage(t, () => execute(`
+    FlXME: [
+     FlX: ( payload )
+     FlX: ( )
+    ] datadef
+    flx
+    flx-payload
+  `), checkErrorMessage('Invalid :FlX instance'))
+})

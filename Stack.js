@@ -36,7 +36,7 @@ class Stack {
   /**
    * Pop from the stack until the given function returns `true` for the popped element and return all elements.
    * @param {function} condition Condition function
-   * @returns Popped elements, in the order they were popped
+   * @returns {Obj[]} Popped elements, in the order they were popped
    */
   popUntil (condition) {
     const values = []
@@ -122,7 +122,7 @@ class Stack {
 
   /**
    * Create a copy of this stack.
-   * @returns {Stack} A copy of this stack
+   * @returns {Stack} A copy of the stack
    */
   copy () {
     const copy = new Stack()

@@ -11,6 +11,11 @@ const Interpreter = require('../../Interpreter')
  */
 async function execute (code, options = {}) {
   const interpreter = new Interpreter(options.interpreterOptions)
+  interpreter.setTestReporter({
+    report () { /* not needed for testing */ },
+    showStats () { /* not needed for testing */ },
+    reset () { /* not needed for testing */ }
+  })
   const { step, promise } = interpreter.startRun(Lexer.parse(code))
   let done = false
   while (!done) {
@@ -31,17 +36,23 @@ async function execute (code, options = {}) {
  * This is useful to test things that may result in an infinite loop.
  * @param {string} code Code to execute
  * @param {number} timeout Execution timeout, in milliseconds
- * @returns {object} Promise of an object that contains the stack and dictStack
+ * @returns {object} Object that contains the stack and dictStack
  */
 async function executeTimeout (code, timeout = 1000) {
   const interpreter = new Interpreter()
-  const { cancel, step } = interpreter.startRun(Lexer.parse(code))
+  interpreter.setTestReporter({
+    report () { /* not needed for testing */ },
+    showStats () { /* not needed for testing */ },
+    reset () { /* not needed for testing */ }
+  })
+  const { cancel, step, promise } = interpreter.startRun(Lexer.parse(code))
   const timeoutId = setTimeout(cancel, timeout)
   let done = false
   while (!done) {
     done = (await step()).done
   }
   clearTimeout(timeoutId)
+  await promise
   return {
     stack: interpreter._stack,
     dictStack: interpreter._dictStack

@@ -272,8 +272,8 @@ class Lexer {
 
     // TODO how/where to handle .foo (currently handled by the lexer) and bar.!
 
-    if (!isNaN(token)) {
-      if (token.indexOf('.') >= 0 || token.indexOf('e-') >= 0) {
+    if (!isNaN(parseFloat(token)) && !isNaN(token - 0)) {
+      if (token.indexOf('.') >= 0 || token.indexOf('e-') >= 0 || token.indexOf('E-') >= 0) {
         return 'FLOAT'
       } else {
         return 'INTEGER'

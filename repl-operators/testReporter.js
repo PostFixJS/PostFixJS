@@ -3,13 +3,13 @@ let failed = 0
 
 /**
  * Report a test result. This increments that statistics counter and prints to the console.
- * @param {bool} passed Whether or not the test passed
+ * @param {bool} didPass Whether or not the test passed
  * @param {string} type Test type
  * @param {Array} params Test parameters (actual value, expected value, optional tolerance)
  * @param {Token} token Token of the test function
  */
-function report (passed, type, params, token) {
-  if (passed) {
+function report (didPass, type, params, token) {
+  if (didPass) {
     passed++
     console.log(`Line ${token.line + 1}: Test passed`)
   } else {

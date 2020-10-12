@@ -70,7 +70,7 @@ module.exports.divide = {
 }
 
 module.exports.intDivide = {
-  name: 'i/',
+  name: 'div',
   execute (interpreter, token) {
     const [a, b] = popOperands(interpreter, [
       { type: ['Int', 'Flt'] },

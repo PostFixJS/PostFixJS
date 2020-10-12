@@ -12,4 +12,4 @@ getStdin().then((code) => {
   } else {
     console.log(JSON.stringify({ functions }))
   }
-})
+}).catch(err => { console.log(err) })

@@ -8,11 +8,7 @@ const types = require('../../types')
  * @returns {string} Formatted string
  */
 module.exports.format = (formatStr, params) => vsprintf(formatStr, params.items.map((obj) => {
-  if (obj instanceof types.Num) {
-    return obj.value
-  } else if (obj instanceof types.Str) {
-    return obj.value
-  } else {
-    return obj.toString()
-  }
+  return obj instanceof types.Num
+      || obj instanceof types.Str
+       ? obj.value : obj.toString()
 }))

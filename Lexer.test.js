@@ -2,29 +2,51 @@ import test from 'ava'
 import Lexer from './Lexer'
 
 test('The lexer Lexer.parses PostFix code', t => {
-  const tokens = Lexer.parse('2 21 multiply')
-  t.deepEqual(tokens[0], {
-    token: '2',
-    tokenType: 'INTEGER',
-    line: 0,
-    col: 0,
-    endLine: 0,
-    endCol: 1
-  })
+  const tokens = Lexer.parse('2 21 *')
+  t.deepEqual(tokens,
+    [{
+      col: 0,
+      endCol: 1,
+      endLine: 0,
+      line: 0,
+      token: "2",
+      tokenType: "INTEGER"
+    }, {
+      col: 2,
+      endCol: 4,
+      endLine: 0,
+      line: 0,
+      token: "21",
+      tokenType: "INTEGER"
+    }, {
+      col: 5,
+      endCol: 6,
+      endLine: 0,
+      line: 0,
+      token: "*",
+      tokenType: "REFERENCE"
+    }])
 })
 
 test('The lexer handles comments', t => {
   let tokens = Lexer.parse('# this is a comment')
   t.is(tokens.length, 0)
 
-  tokens = Lexer.parse('42 # this is a comment')
+  tokens = Lexer.parse('42 # this is a comment\n24 # another comment at the end of the code')
   t.deepEqual(tokens, [{
-    token: '42',
-    tokenType: 'INTEGER',
-    line: 0,
     col: 0,
+    endCol: 2,
     endLine: 0,
-    endCol: 2
+    line: 0,
+    token: "42",
+    tokenType: "INTEGER"
+  }, {
+    col: 0,
+    endCol: 2,
+    endLine: 1,
+    line: 1,
+    token: "24",
+    tokenType: "INTEGER"
   }])
 })
 
@@ -207,6 +229,15 @@ test('The lexer parses scientific notation', async (t) => {
     endCol: 3,
     endLine: 0
   }])
+
+  t.deepEqual(Lexer.parse('7E-8'), [{
+    token: '7E-8',
+    tokenType: 'FLOAT',
+    col: 0,
+    line: 0,
+    endCol: 4,
+    endLine: 0
+  }])
 })
 
 test('The lexer emits tokens for line comments when emitComments is true', async (t) => {
@@ -246,25 +277,25 @@ test('The lexer emits tokens for block comments when emitComments is true', asyn
 })
 
 test('The lexer emitted block comment tokens end where the comment ends', async (t) => {
-  t.deepEqual(Lexer.parse('\n #< test ># \n', { emitComments: true })[0], {
+  t.deepEqual(Lexer.parse('\n #< test ># \n', { emitComments: true }), [{
     token: '#< test >#',
     tokenType: 'BLOCK_COMMENT',
     col: 1,
     line: 1,
     endCol: 11,
     endLine: 1
-  })
+  }])
 })
 
 test('The lexer parses nil properly', async (t) => {
-  t.deepEqual(Lexer.parse('nil')[0], {
+  t.deepEqual(Lexer.parse('nil'), [{
     token: 'nil',
     tokenType: 'NIL',
     col: 0,
     line: 0,
     endCol: 3,
     endLine: 0
-  })
+  }])
 })
 
 test('The lexer trims Windows line breaks', async (t) => {

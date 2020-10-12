@@ -197,6 +197,11 @@ test('Numbers support E-notation', async (t) => {
     2e5 200000 test=
     2e-2 0.02 test=
   `, t)
+
+  const { stack } = await execute('4E-2')
+  const flt = stack.pop()
+  t.true(flt instanceof types.Flt)
+  t.is(flt.value, 0.04)
 })
 
 test('The interpreter can be copied', async (t) => {
@@ -209,4 +214,24 @@ test('The interpreter can be copied', async (t) => {
 
   t.true(copy._stack instanceof Stack, 'Missing stack')
   t.true(copy._dictStack instanceof DictStack, 'Missing dictionary stack')
+  t.true(copy._builtIns.hasOwnProperty('!'), 'Missing builtIns or \'!\' operator')
 })
+
+test('Rand returns a proper number', async (t) => {
+  await runPostFixTests(`
+    10 rand-int type :Int test=
+    10 rand-flt type :Flt test=
+  `, t)
+})
+
+test('rand-seed seed is properly working for testing', async (t) => {
+  await runPostFixTests(`
+    410447 rand-seed
+    1337 rand-int 420 test=
+    1337 rand-int 69 test=
+    54834078922795940 rand-seed
+    1337 rand-int 69 test=
+    1337 rand-int 420 test=
+  `, t)
+})
+

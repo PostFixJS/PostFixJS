@@ -288,6 +288,47 @@ answer: 42 !
   }])
 })
 
+test('DocParser finds complex declarations with long syntax and makes use of intelligent lookahead', async (t) => {
+  t.deepEqual(DocParser.getVariables(`
+#<
+The answer to life, the universe and everything.
+>#
+answer: 40 2 + !
+  `), [{
+    name: 'answer',
+    description: 'The answer to life, the universe and everything.',
+    tags: {}
+  }])
+})
+
+test('DocParser finds nested declarations with long syntax and makes use of intelligent lookahead', async (t) => {
+  t.deepEqual(DocParser.getVariables(`
+#<
+The answer to life, the universe and everything.
+>#
+answer: hitchhiker: 0 42 ! !
+  `), [{
+    name: 'answer',
+    description: 'The answer to life, the universe and everything.',
+    tags: {}
+  }, {
+    name: 'hitchhiker',
+    description: undefined,
+    tags: undefined
+  }])
+})
+
+test('DocParser\'s intelligent lookahead recognizes depth', async (t) => {
+  t.deepEqual(DocParser.getVariables(`
+a: [ 4 b: 2 ] !
+a b
+  `), [{
+    name: 'a',
+    description: undefined,
+    tags: undefined
+  }])
+})
+
 test('DocParser finds variable declarations with short syntax', async (t) => {
   t.deepEqual(DocParser.getVariables(`
 #<

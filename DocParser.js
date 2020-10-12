@@ -363,10 +363,16 @@ function getVariableAt (tokens, i) {
       // maybe the value is a symbol, e.g. :foo bar!
       i--
     } else {
-      i = skipElement(tokens, i)
-      if (i === false) return false
-      if (tokens[i].token === '!') {
-        return { variable, i }
+      let j = --i
+      let openSymbols = 1
+      while (j = skipElement(tokens, j)) {
+        if (tokens[j].tokenType === 'SYMBOL') {
+          openSymbols++
+        } else if (tokens[j].token === '!') {
+          openSymbols--
+          if (openSymbols === 0)
+            return { variable, i }
+        }
       }
       return false
     }
@@ -519,6 +525,10 @@ function skipElement (tokens, i) {
     case 'EXEARR_START':
       closeToken = 'EXEARR_END'
       break
+    case 'PARAM_LIST_END':
+    case 'ARR_END':
+    case 'EXEARR_END':
+      return false;
     default:
       return i < tokens.length - 1 ? i + 1 : false
   }

@@ -1,7 +1,7 @@
 {
   "name": "postfixjs",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Web-based PostFix IDE.",
   "main": "index.js",
   "scripts": {
     "test": "ava",
@@ -17,12 +17,12 @@
   "homepage": "https://bitbucket.org/leMaik/postfixjs#readme",
   "devDependencies": {
     "ava": "1.0.0-beta.8",
-    "standard": "^11.0.1"
+    "standard": "^14.3.3"
   },
   "dependencies": {
-    "get-stdin": "^6.0.0",
+    "get-stdin": "^7.0.0",
     "read": "^1.0.7",
-    "seedrandom": "^2.4.4",
-    "sprintf-js": "^1.1.1"
+    "seedrandom": "^3.0.5",
+    "sprintf-js": "^1.1.2"
   }
 }
