@@ -107,35 +107,6 @@ module.exports.format = {
       { type: 'Str', name: 'formatStr' },
       { type: 'Arr', name: 'params' }
     ], token)
-    // TODO: This is a hotfix. The actual bug is in the module sprintf-js. Update as soon as my PR has been accepted
-    const placeholders = [...formatStr.value
-      .matchAll(/\x25(?:([1-9]\d*)\$|\(([^)]+)\))?(\+)?(0|'[^$])?(-)?(\d+)?(?:\.(\d+))?([b-gijostTuvxX])/g)]
-    if(params.items.some(item => item instanceof Function))
-      throw new types.Err(`Malicious code execution has been prevented`, token)
-    // Can be abused for uncontrolled code execution
-    if(placeholders.some(match => match.some(ph => ph != null && ph.includes('('))))
-      throw new types.Err(`Replacement fields, such as ${formatStr}, are not allowed`, token)
-    if(placeholders.some(match => match.some(ph => ph === 'v'))) {
-      try {
-        format(formatStr.value, params)
-      } catch (e) {
-        if(e instanceof TypeError && e.message === "Cannot read property 'valueOf' of undefined")
-          throw new types.Err(`The parameter for the placeholder %v was empty`, token)
-      }
-    }
-    try {
-      interpreter._stack.push(new types.Str(format(formatStr.value, params)))
-    } catch (e) {
-      if(e instanceof SyntaxError) {
-        throw new types.Err(`Invalid format string: ${formatStr} - ${e.message}`, token)
-      } else if (e instanceof TypeError && e.message.includes("[sprintf] expecting")) {
-        throw new types.Err('Parameters [' + params.items.map(item => item.origin.tokenType).toString()
-          + `] do not match format string: ${formatStr} - ${e.message}`, token)
-      } else if (e instanceof TypeError && e.message.includes("[sprintf]")) {
-        throw new types.Err(e.message, token)
-      } else {
-        throw e
-      }
-    }
+    interpreter._stack.push(new types.Str(format(formatStr.value, params, token)))
   }
 }

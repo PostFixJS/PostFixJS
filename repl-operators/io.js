@@ -24,7 +24,7 @@ module.exports.printf = {
       { name: 'formatStr', type: 'Str' },
       { name: 'params', type: 'Arr' }
     ], token)
-    process.stdout.write(format(formatStr.value, params))
+    process.stdout.write(format(formatStr.value, params, token))
   }
 }
 
@@ -35,7 +35,7 @@ module.exports.printfln = {
       { name: 'formatStr', type: 'Str' },
       { name: 'params', type: 'Arr' }
     ], token)
-    process.stdout.write(`${format(formatStr.value, params)}\n`)
+    process.stdout.write(`${format(formatStr.value, params, token)}\n`)
   }
 }
 

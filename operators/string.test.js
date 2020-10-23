@@ -83,14 +83,24 @@ test('parameter mismatch in format string does not crash the interpreter', async
       ' - [sprintf] expecting number but found string'))
 })
 
-test('using the %v placeholder from the sprintf-js module does not crash the interpreter', async (t) => {
-  await throwsErrorMessage(t, () => execute('"%v" { } format'),
-    checkErrorMessage('The parameter for the placeholder %v was empty'))
-  await throwsErrorMessage(t, () => execute('"t%2$v" { } format'),
-    checkErrorMessage('The parameter for the placeholder %v was empty'))
+// test('using the %v placeholder from the sprintf-js module does not crash the interpreter', async (t) => {
+//   await throwsErrorMessage(t, () => execute('"%v" { } format'),
+//     checkErrorMessage('The parameter for the placeholder %v was empty'))
+//   await throwsErrorMessage(t, () => execute('"t%2$v" { } format'),
+//     checkErrorMessage('The parameter for the placeholder %v was empty'))
+// })
+
+test('the usage of %v is forbidden', async (t) => {
+  await throwsErrorMessage(t, () => execute('"%v" [ "alert(\'FlX\')" ] format'),
+    checkErrorMessage('The usage of %v is temporarily restricted'))
 })
 
 test('replacement fields are forbidden as they can be abused to access javascript objects', async (t) => {
   await throwsErrorMessage(t, () => execute('"%(test)s" { "alert(\'FlX\');" } format'),
     checkErrorMessage('Replacement fields, such as "%(test)s", are not allowed'))
+})
+
+test('using a precision of 0 for the %g printf placeholder does not crash the interpreter', async (t) => {
+  await throwsErrorMessage(t, () => execute('"%.0g" [3.14] format'),
+    checkErrorMessage('Precision for %g must be between 1 and 100'))
 })

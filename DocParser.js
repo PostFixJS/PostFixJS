@@ -347,6 +347,8 @@ function getVariableAt (tokens, i) {
     variable.tags = undefined
   }
 
+  if(tokens[i] === undefined) return false
+
   if (tokens[i] && tokens[i].tokenType === 'SYMBOL') {
     // :variableName value !
     const token = tokens[i]
@@ -384,7 +386,7 @@ function getVariableAt (tokens, i) {
     variable.description = undefined
     variable.tags = undefined
   }
-  i = skipElement(tokens, i)
+  if(tokens[i].tokenType !== 'DEFINITION') i = skipElement(tokens, i)
   if (i === false) return false
   if (tokens[i].tokenType === 'DEFINITION') {
     variable.name = tokens[i].token.substr(0, tokens[i].token.length - 1)
